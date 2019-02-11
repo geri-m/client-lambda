@@ -17,7 +17,6 @@ jobs:
 
     steps:
     - checkout
-    - configureAWS
 
     # Download and cache dependencies
     - restore_cache:
