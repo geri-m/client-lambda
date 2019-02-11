@@ -53,5 +53,5 @@ jobs:
         command: export AWS_DEFAULT_REGION=eu-central-1
 
     - run:
-        name: "Test"
-        command: aws s3 ls
+        name: "Copy JAR to S3"
+        command: aws s3 cp ./target/slack-lambda.jar s3://user-group/slack-lambda.jar
