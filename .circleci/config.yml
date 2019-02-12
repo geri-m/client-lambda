@@ -40,18 +40,21 @@ jobs:
         # command: mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Dmaven.test.failure.ignore=false
         command: mvn clean install -Dmaven.test.failure.ignore=false
 
-    - run:
-        name: "Configure AWS via CLI 1/3"
-        command: export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+    - run: export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+    - run: export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+    - run: export AWS_DEFAULT_REGION=eu-central-1
+
 
     - run:
-        name: "Configure AWS via CLI 2/3"
-        command: export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-
-    - run:
-        name: "Configure AWS via CLI 3/3"
-        command: export AWS_DEFAULT_REGION=eu-central-1
+        name: "Create Bucket if not exist"
+        command: |
+            if aws s3 ls s3://jars.madlmayr.at/; then
+                echo "Bucket exists"
+            else
+                echo "Create Bucket"
+                aws s3 mb s3://jars.madlmayr.at/
+            fi
 
     - run:
         name: "Copy JAR to S3"
-        command: aws s3 cp ./target/client-lambda.jar s3://jars/client-lambda.jar
+        command: aws s3 cp ./target/client-lambda.jar s3://jars.madlmayr.at/client-lambda.jar
