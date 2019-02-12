@@ -1,15 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Deploy Slack API Lambda from S3 using Cloudformation.
+Description: Deploy Client API Lambda from S3 using Cloudformation.
 Resources:
-  slackApi:
+  ClientApi:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: "user-group"
-        S3Key: "slack-lambda.zip"
+        S3Bucket: "jars"
+        S3Key: "client-lambda.zip"
       Handler: 'at.madlmayr.SampleLambda::handleRequest'
       Runtime: java8
-      Description: "Slack API Lambda"
+      Description: "Client API Lambda"
       MemorySize: 512
       Timeout: 15
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -36,10 +36,6 @@ Resources:
                   - logs:*
                   - firehose:*
                   - xray:*
-                  - dynamodb:DescribeStream
-                  - dynamodb:GetRecords
-                  - dynamodb:GetShardIterator
-                  - dynamodb:ListStreams
                 Resource: "*"
   RateRuleDaily:
     Type: AWS::Events::Rule
@@ -50,9 +46,16 @@ Resources:
       State: "ENABLED"
       Targets:
         - Arn: !GetAtt
-            - slackApi
+            - ClientApi
             - Arn
           Id: RateRuleDailyScheduler
           #RoleArn: !GetAtt
           #  - EventsInvokeKinesisTargetRole
           #  - Arn
+  InvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt ClientApi.Arn
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt RateRuleDaily.Arn

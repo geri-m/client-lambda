@@ -54,4 +54,4 @@ jobs:
 
     - run:
         name: "Copy JAR to S3"
-        command: aws s3 cp ./target/slack-lambda.jar s3://user-group/slack-lambda.jar
+        command: aws s3 cp ./target/client-lambda.jar s3://jars/client-lambda.jar
