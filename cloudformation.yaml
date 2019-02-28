@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Deploy Client API Lambda from S3 using Cloudformation.
+Description: Deploy Client API Lambda using Cloudformation.
 Resources:
   ClientApi:
     Type: AWS::Serverless::Function
@@ -43,7 +43,7 @@ Resources:
       Name: "RateRuleDaily"
       ScheduleExpression: cron(* * * * ? *)
       State: "ENABLED"
-      #EventPattern: "Static Input for Lambda"
+      EventPattern: "Static Input for Lambda"
       Targets:
         - Arn: !GetAtt
             - ClientApi
