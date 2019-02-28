@@ -48,21 +48,21 @@ jobs:
     - run:
         name: "Create Bucket if not exist"
         command: |
-            if aws s3 ls s3://jars.madlmayr.at/; then
+            if aws s3 ls s3://lambda-sources-123hoppala/; then
                 echo "Bucket exists"
             else
                 echo "Create Bucket"
-                aws s3 mb s3://jars.madlmayr.at/
+                aws s3 mb s3://lambda-sources-123hoppala/
             fi
 
     - run:
         name: "Copy JAR to S3"
-        command: aws s3 cp ./target/client-lambda.jar s3://jars.madlmayr.at/client-lambda.zip
+        command: aws s3 cp ./target/client-lambda.jar s3://lambda-sources-123hoppala/client-lambda.zip
 
     - run:
         name: "Copy CF to S3"
-        command: aws s3 cp ./cloudformation.yaml s3://jars.madlmayr.at/cloudformation.yaml
+        command: aws s3 cp ./cloudformation.yaml s3://lambda-sources-123hoppala/cloudformation.yaml
 
     - run:
         name: "Execute Cloudformation Template"
-        command: ./create-or-update-stack.sh eu-central-1 client-api --template-url https://s3.eu-central-1.amazonaws.com/jars.madlmayr.at/cloudformation.yaml --capabilities "CAPABILITY_IAM"
+        command: ./create-or-update-stack.sh eu-central-1 client-api --template-url https://s3.eu-central-1.amazonaws.com/lambda-sources-123hoppala/cloudformation.yaml --capabilities "CAPABILITY_IAM"
