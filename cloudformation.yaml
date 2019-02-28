@@ -4,9 +4,7 @@ Resources:
   ClientApi:
     Type: AWS::Lambda::Function
     Properties:
-      Code:
-        S3Bucket: "jars.madlmayr.at"
-        S3Key: "client-lambda.zip"
+      CodeUri: target/client-lambda.jar
       Handler: 'at.madlmayr.SampleLambda::handleRequest'
       Runtime: java8
       Description: "Client API Lambda"
