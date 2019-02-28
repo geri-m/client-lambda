@@ -57,7 +57,7 @@ jobs:
 
     - run:
         name: "Copy JAR to S3"
-        command: aws cloudformation package --template-file cloudformation.yaml --s3-bucket lamda-sources-123hoppala/ --output-template-file processed-template.yml
+        command: aws cloudformation package --template-file cloudformation.yaml --s3-bucket lamda-sources-123hoppala --output-template-file processed-template.yml
 
     - run:
         name: "Create or update cloudformation stack"
