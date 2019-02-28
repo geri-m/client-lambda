@@ -43,7 +43,7 @@ Resources:
       Name: "RateRuleDaily"
       ScheduleExpression: cron(* * * * ? *)
       State: "ENABLED"
-      EventPattern: "Static Input for Lambda"
+      #EventPattern: "Static Input for Lambda"
       Targets:
         - Arn: !GetAtt
             - ClientApi
