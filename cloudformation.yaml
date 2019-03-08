@@ -1,12 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Deploy Client API Lambda from S3 using Cloudformation.
+Transform: AWS::Serverless-2016-10-31
+Description: Deploy Client API Lambda using Cloudformation.
 Resources:
   ClientApi:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
-      Code:
-        S3Bucket: "jars.madlmayr.at"
-        S3Key: "client-lambda.zip"
+      CodeUri: target/client-lambda.jar
       Handler: 'at.madlmayr.SampleLambda::handleRequest'
       Runtime: java8
       Description: "Client API Lambda"

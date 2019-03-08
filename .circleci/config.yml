@@ -42,7 +42,7 @@ jobs:
 
     - run: export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
     - run: export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-    - run: export AWS_DEFAULT_REGION=eu-central-1
+    - run: echo 'export AWS_DEFAULT_REGION="eu-central-1"' >> $BASH_ENV
 
 
     - run:
@@ -56,13 +56,9 @@ jobs:
             fi
 
     - run:
-        name: "Copy JAR to S3"
-        command: aws s3 cp ./target/client-lambda.jar s3://jars.madlmayr.at/client-lambda.zip
-
+        name: "Copy JAR to S3 and modify cloudformation-template code-uri path"
+        command: aws cloudformation package --template-file cloudformation.yaml --s3-bucket jars.madlmayr.at --output-template-file processed-template.yml
+        
     - run:
-        name: "Copy CF to S3"
-        command: aws s3 cp ./cloudformation.yaml s3://jars.madlmayr.at/cloudformation.yaml
-
-    - run:
-        name: "Execute Cloudformation Template"
-        command: ./create-or-update-stack.sh eu-central-1 client-api --template-url https://s3.eu-central-1.amazonaws.com/jars.madlmayr.at/cloudformation.yaml --capabilities "CAPABILITY_IAM"
+        name: "Create or update cloudformation stack"
+        command: aws cloudformation deploy --stack-name client-api --template-file processed-template.yml --no-fail-on-empty-changeset --capabilities "CAPABILITY_IAM"
