@@ -6,7 +6,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: target/client-lambda.jar
-      Handler: 'at.madlmayr.SampleLambda::handleRequest'
+      Handler: 'at.madlmayr.ReadConfig::handleRequest'
       Runtime: java8
       Description: "Client API Lambda"
       MemorySize: 512
@@ -59,3 +59,24 @@ Resources:
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt RateRuleDaily.Arn
+  DynamoDBConfigTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "Company"
+          AttributeType: "S"
+        - AttributeName: "Tool"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Company"
+          KeyType: "HASH"
+        - AttributeName: "Tool"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: "Config"
+Outputs:
+  TableName:
+    Value: !Ref 'DynamoDBConfigTable'
+    Description: Table name of the newly created DynamoDB table for Configs

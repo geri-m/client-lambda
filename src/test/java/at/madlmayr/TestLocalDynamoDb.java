@@ -7,13 +7,14 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-
+@Disabled
 public class TestLocalDynamoDb {
 
     // Initialize the Log4j logger.
@@ -120,6 +121,8 @@ public class TestLocalDynamoDb {
         final AmazonDynamoDB ddb = getConnectionLocalhost();
 
         try {
+
+
             Map<String,AttributeValue> returnedItems =
                     ddb.getItem(request).getItem();
             if (returnedItems != null) {
