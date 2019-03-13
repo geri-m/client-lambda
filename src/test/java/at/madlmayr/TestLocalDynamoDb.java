@@ -9,8 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -19,7 +18,7 @@ public class TestLocalDynamoDb {
 
     // Initialize the Log4j logger.
     private static final Logger LOGGER = LogManager.getLogger(TestLocalDynamoDb.class);
-
+    private final static String TABLE_NAME = "Config";
 
     private AmazonDynamoDB getConnectionLocalhost(){
         return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
@@ -39,7 +38,7 @@ public class TestLocalDynamoDb {
                         "Name", ScalarAttributeType.S))
                 .withKeySchema(new KeySchemaElement("Name", KeyType.HASH))
                 .withProvisionedThroughput(new ProvisionedThroughput(5L, 5L))
-                .withTableName("Config");
+                .withTableName(TABLE_NAME);
 
         final AmazonDynamoDB ddb = getConnectionLocalhost();
 
@@ -101,6 +100,76 @@ public class TestLocalDynamoDb {
             return;
         }
 
+        LOGGER.info("Done!");
+    }
+
+    @Test
+    public void testReadElementToTable() {
+        String keyName = "Name";
+
+        LOGGER.info(String.format("Retrieving item \"%s\" from \"%s\"",
+                keyName, TABLE_NAME));
+
+        HashMap<String,AttributeValue> keyList = new HashMap<>();
+        keyList.put(keyName, new AttributeValue(keyName));
+
+        GetItemRequest request = new GetItemRequest()
+                    .withKey(keyList)
+                    .withTableName(TABLE_NAME);
+
+        final AmazonDynamoDB ddb = getConnectionLocalhost();
+
+        try {
+            Map<String,AttributeValue> returnedItems =
+                    ddb.getItem(request).getItem();
+            if (returnedItems != null) {
+                Set<String> keys = returnedItems.keySet();
+                for (String key : keys) {
+                    LOGGER.info(String.format("%s: %s",
+                            key, returnedItems.get(key).getS()));
+                }
+            } else {
+                LOGGER.info(String.format("No item found with the key %s!", keyName));
+            }
+        } catch (AmazonServiceException e) {
+            LOGGER.error(e.getErrorMessage());
+            fail();
+        }
+    }
+
+    @Test
+    public void testAddElement(){
+        String keyName = "Name";
+        ArrayList<String[]> additionalFields = new ArrayList<>();
+        additionalFields.add(new String[]{"field1", "value"});
+        LOGGER.info(String.format("Adding \"%s\" to \"%s\"", keyName, TABLE_NAME));
+        if (additionalFields.size() > 0) {
+            LOGGER.info("Additional fields:");
+            for (String[] field : additionalFields) {
+                LOGGER.info(String.format("  %s: %s", field[0], field[1]));
+            }
+        }
+
+        HashMap<String,AttributeValue> item_values = new HashMap<>();
+
+        item_values.put(keyName, new AttributeValue(keyName));
+
+        for (String[] field : additionalFields) {
+            item_values.put(field[0], new AttributeValue(field[1]));
+        }
+
+        final AmazonDynamoDB ddb = getConnectionLocalhost();
+
+        try {
+            ddb.putItem(TABLE_NAME, item_values);
+        } catch (ResourceNotFoundException e) {
+            LOGGER.error(String.format("Error: The table \"%s\" can't be found.", TABLE_NAME));
+            LOGGER.error("Be sure that it exists and that you've typed its name correctly!");
+            fail();
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getMessage());
+            fail();
+        }
         LOGGER.info("Done!");
     }
 
