@@ -63,7 +63,7 @@ public class ReadConfig implements RequestHandler<String, String>{
                 if(returnedItems.containsKey("URL") && returnedItems.containsKey("Bearer")){
                     HttpGet request = new HttpGet(returnedItems.get("URL").getS());
                     // Set Bearer Header
-                    request.setHeader("Bearer", returnedItems.get("Bearer").getS());
+                    request.setHeader("Authorization", "Bearer" + returnedItems.get("Bearer").getS());
                     boolean is2xx = false;
 
                     try {
