@@ -35,6 +35,7 @@ Resources:
                   - logs:*
                   - firehose:*
                   - xray:*
+                  - dynamodb:*
                 Resource: "*"
   RateRuleDaily:
     Type: AWS::Events::Rule
@@ -48,7 +49,7 @@ Resources:
             - ClientApi
             - Arn
           Id: RateRuleDailyScheduler
-          Input: "{\"Hey\":\"WAKE UP!\"}"
+          #Input: "{\"Hey\":\"WAKE UP!\"}"
           #RoleArn: !GetAtt
           #  - EventsInvokeKinesisTargetRole
           #  - Arn
