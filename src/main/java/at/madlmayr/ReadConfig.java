@@ -74,16 +74,22 @@ public class ReadConfig implements RequestHandler<String, String>{
                         // TODO: https://www.baeldung.com/java-org-json
                         JSONObject jsonResponse = new JSONObject(jsonString);
                         is2xx = (response.getStatusLine().getStatusCode() / 100) == 2;
-                        LOGGER.info("Result: {}", jsonResponse.toString(2));
-                        LOGGER.debug("Status Code: {}", is2xx);
+                        if(is2xx){
+                            LOGGER.debug("HTTP Call to '{}' was successful", returnedItems.get("URL").getS());
+                            Map<String, AttributeValue> item = new HashMap<>();
+                            item.put("Company", new AttributeValue().withS(returnedItems.get("Company").getS()));
+                            item.put("Tool", new AttributeValue().withS(returnedItems.get("Tool").getS()));
+                            item.put("Timestamp", new AttributeValue().withN("" + Instant.now().getEpochSecond()));
+                            item.put("Data", new AttributeValue().withS(jsonResponse.toString()));
+                            dynamoClient.putItem("RawData", item);
+                            LOGGER.debug("Data successfully stored in DB");
+                        } else {
+                            LOGGER.error("Call to '{}' was not successful. Ended with response: '{}'", returnedItems.get("URL").getS(), jsonResponse.toString());
+                        }
                     } catch (IOException ioe) {
                         LOGGER.error(ioe);
                     }
-                    Map<String, AttributeValue> item = new HashMap<>();
-                    item.put("Timestamp", new AttributeValue().withN("" + Instant.now().getEpochSecond()));
-                    dynamoClient.putItem("amazon-2xx", item);
                 }
-
             } else {
                 LOGGER.info("No item found");
             }
