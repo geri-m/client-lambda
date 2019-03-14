@@ -85,14 +85,10 @@ Resources:
           AttributeType: "S"
         - AttributeName: "Tool"
           AttributeType: "S"
-        - AttributeName: "Timestamp"
-          AttributeType: "N"
       KeySchema:
         - AttributeName: "Company"
           KeyType: "HASH"
         - AttributeName: "Tool"
-          KeyType: "RANGE"
-        - AttributeName: "Timestamp"
           KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 1
