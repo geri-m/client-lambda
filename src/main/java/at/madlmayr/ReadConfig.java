@@ -77,8 +77,7 @@ public class ReadConfig implements RequestHandler<String, String>{
                         if(is2xx){
                             LOGGER.debug("HTTP Call to '{}' was successful", returnedItems.get("URL").getS());
                             Map<String, AttributeValue> item = new HashMap<>();
-                            item.put("Company", new AttributeValue().withS(returnedItems.get("Company").getS()));
-                            item.put("Tool", new AttributeValue().withS(returnedItems.get("Tool").getS()));
+                            item.put("CompanyTool", new AttributeValue().withS(returnedItems.get("Company").getS() + "#" +returnedItems.get("Tool").getS()));
                             item.put("Timestamp", new AttributeValue().withN("" + Instant.now().getEpochSecond()));
                             item.put("Data", new AttributeValue().withS(jsonResponse.toString()));
                             dynamoClient.putItem("RawData", item);

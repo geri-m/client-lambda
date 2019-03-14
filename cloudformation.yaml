@@ -42,14 +42,14 @@ Resources:
     Properties:
       Description: "Run Event every Minute"
       Name: "RateRuleDaily"
-      ScheduleExpression: cron(* * * * ? *)
+      ScheduleExpression: rate(15 minutes)
       State: "ENABLED"
       Targets:
         - Arn: !GetAtt
             - ClientApi
             - Arn
           Id: RateRuleDailyScheduler
-          Input: ""
+          # Input: "Input"
           #RoleArn: !GetAtt
           #  - EventsInvokeKinesisTargetRole
           #  - Arn
@@ -81,14 +81,14 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: "Company"
+        - AttributeName: "CompanyTool"
           AttributeType: "S"
-        - AttributeName: "Tool"
-          AttributeType: "S"
+        - AttributeName: "Timestamp"
+          AttributeType: "N"
       KeySchema:
-        - AttributeName: "Company"
+        - AttributeName: "CompanyTool"
           KeyType: "HASH"
-        - AttributeName: "Tool"
+        - AttributeName: "Timestamp"
           KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 1
