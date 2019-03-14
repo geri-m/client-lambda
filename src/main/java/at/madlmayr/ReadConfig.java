@@ -47,6 +47,9 @@ public class ReadConfig implements RequestHandler<String, String>{
                 .withTableName(CONFIG_TABLE_NAME);
 
         ScanResult result = dynamoClient.scan(scanRequest);
+
+        LOGGER.info("Amount of Config found: {}", result.getItems().size());
+
         for (Map<String, AttributeValue> returnedItems : result.getItems()){
             if (returnedItems != null) {
                 Set<String> keys = returnedItems.keySet();
@@ -71,6 +74,8 @@ public class ReadConfig implements RequestHandler<String, String>{
                         // TODO: https://www.baeldung.com/java-org-json
                         JSONObject jsonResponse = new JSONObject(jsonString);
                         is2xx = (response.getStatusLine().getStatusCode() / 100) == 2;
+                        LOGGER.info("Result: {}", jsonResponse.toString(2));
+                        LOGGER.debug("Status Code: {}", is2xx);
                     } catch (IOException ioe) {
                         LOGGER.error(ioe);
                     }
