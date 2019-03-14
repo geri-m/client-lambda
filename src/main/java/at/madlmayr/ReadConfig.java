@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class ReadConfig implements RequestHandler<String, String>{
+public class ReadConfig implements RequestHandler<Void, String>{
 
     // Initialize the Log4j logger.
     private static final Logger LOGGER = LogManager.getLogger(ReadConfig.class);
@@ -39,7 +39,7 @@ public class ReadConfig implements RequestHandler<String, String>{
     }
 
     @Override
-    public String handleRequest(String input, Context context) {
+    public String handleRequest(Void input, Context context) {
         LOGGER.info("handleRequest: {}", input);
 
         // Get all Element from the Table

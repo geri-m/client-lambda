@@ -42,7 +42,7 @@ Resources:
     Properties:
       Description: "Run Event every Minute"
       Name: "RateRuleDaily"
-      ScheduleExpression: rate(15 minutes)
+      ScheduleExpression: rate(1 minutes)
       State: "ENABLED"
       Targets:
         - Arn: !GetAtt
