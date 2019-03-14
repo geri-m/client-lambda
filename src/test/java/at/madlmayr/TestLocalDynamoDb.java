@@ -140,7 +140,7 @@ public class TestLocalDynamoDb {
         }
     }
 
-    @Test
+     @Test
     public void testAddElement(){
         String keyName = "Name";
         ArrayList<String[]> additionalFields = new ArrayList<>();
