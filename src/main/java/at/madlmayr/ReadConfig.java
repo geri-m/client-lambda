@@ -16,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ public class ReadConfig implements RequestHandler<Void, Void> {
     // Initialize the Log4j logger.
     private static final Logger LOGGER = LogManager.getLogger(ReadConfig.class);
     private static final String CONFIG_TABLE_NAME = "Config";
+    private static final String RAWDATA_TABLE_NAME = "RawData";
 
     private static final AmazonDynamoDB dynamoClient;
     private static final HttpClient httpClient;
@@ -46,45 +48,42 @@ public class ReadConfig implements RequestHandler<Void, Void> {
                 .withTableName(CONFIG_TABLE_NAME);
 
         ScanResult result = dynamoClient.scan(scanRequest);
-
         LOGGER.info("Amount of Config found: {}", result.getItems().size());
 
         for (Map<String, AttributeValue> returnedItems : result.getItems()){
             if (returnedItems != null) {
-                /*
-                Set<String> keys = returnedItems.keySet();
-                LOGGER.info(returnedItems);
-                for (String key : keys) {
-                    LOGGER.info(String.format("%s: %s",
-                            key, returnedItems.get(key).getS()));
+                if (!returnedItems.containsKey("URL")) {
+                    LOGGER.error("URL not present in Record");
+                    return;
                 }
-                */
-                // TODO: Add Xray later: https://docs.aws.amazon.com/de_de/lambda/latest/dg/java-tracing.html
-                if(returnedItems.containsKey("URL") && returnedItems.containsKey("Bearer")){
-                    HttpGet request = new HttpGet(returnedItems.get("URL").getS());
-                    // Set Bearer Header
-                    request.setHeader("Authorization", "Bearer " + returnedItems.get("Bearer").getS());
 
+                if (!returnedItems.containsKey("Bearer")) {
+                    LOGGER.error("URL not present in Record");
+                    return;
+                }
+
+                HttpGet request = new HttpGet(returnedItems.get("URL").getS());
+                // Set Bearer Header
+                request.setHeader("Authorization", "Bearer " + returnedItems.get("Bearer").getS());
                     try {
                         HttpResponse response = httpClient.execute(request);
                         String jsonString = EntityUtils.toString(response.getEntity());
                         if((response.getStatusLine().getStatusCode() / 100) == 2){
                             LOGGER.info("HTTP Call to '{}' was successful", returnedItems.get("URL").getS());
                             Map<String, AttributeValue> item = new HashMap<>();
-                            item.put("CompanyTool", new AttributeValue().withS(returnedItems.get("Company").getS() + "#" +returnedItems.get("Tool").getS()));
+                            item.put("CompanyTool", new AttributeValue().withS(returnedItems.get("Company").getS() + "#" + returnedItems.get("Tool").getS()));
                             item.put("Timestamp", new AttributeValue().withN("" + Instant.now().getEpochSecond()));
                             item.put("Data", new AttributeValue().withS(jsonString));
-                            dynamoClient.putItem("RawData", item);
-                            LOGGER.info("Data successfully stored in DB");
+                            dynamoClient.putItem(RAWDATA_TABLE_NAME, item);
+                            LOGGER.info("Data successfully stored in RawData Table");
                         } else {
                             LOGGER.error("Call to '{}' was not successful. Ended with response: '{}'", returnedItems.get("URL").getS(), jsonString);
                         }
                     } catch (IOException ioe) {
                         LOGGER.error(ioe);
                     }
-                }
             } else {
-                LOGGER.info("No item found");
+                LOGGER.info("No item found in Config Table");
             }
         }
         });
