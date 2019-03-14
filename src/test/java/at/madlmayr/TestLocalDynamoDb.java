@@ -5,11 +5,18 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.*;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -175,5 +182,29 @@ public class TestLocalDynamoDb {
         }
         LOGGER.info("Done!");
     }
+
+    @Test
+    public void testHttpCall(){
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet("https://slack.com/api/users.list/");
+        // Set Bearer Header
+        request.setHeader("Authorization", "Bearer " + "xoxb-287011596231-546061883216-gf5ei9hGdlXUskG2Gt40bP6d");
+        boolean is2xx = false;
+
+        try {
+            HttpResponse response = httpClient.execute(request);
+            String jsonString = EntityUtils.toString(response.getEntity());
+
+            // TODO: https://stackoverflow.com/questions/27500749/dynamodb-object-to-attributevalue
+            // TODO: https://www.baeldung.com/java-org-json
+            JSONObject jsonResponse = new JSONObject(jsonString);
+            is2xx = (response.getStatusLine().getStatusCode() / 100) == 2;
+            LOGGER.info("Result: {}", jsonResponse.toString(2));
+            LOGGER.debug("Status Code: {}", is2xx);
+        } catch (IOException ioe) {
+            LOGGER.error(ioe);
+        }
+    }
+
 
 }
