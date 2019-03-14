@@ -8,23 +8,21 @@ import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.json.JSONObject;
-
+import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 
-public class ReadConfig implements RequestHandler<Void, String>{
+public class ReadConfig implements RequestHandler<Void, Void> {
 
     // Initialize the Log4j logger.
     private static final Logger LOGGER = LogManager.getLogger(ReadConfig.class);
@@ -39,7 +37,8 @@ public class ReadConfig implements RequestHandler<Void, String>{
     }
 
     @Override
-    public String handleRequest(Void input, Context context) {
+    public Void handleRequest(Void input, Context context) {
+        AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
         LOGGER.info("handleRequest: {}", input);
 
         // Get all Element from the Table
@@ -52,38 +51,33 @@ public class ReadConfig implements RequestHandler<Void, String>{
 
         for (Map<String, AttributeValue> returnedItems : result.getItems()){
             if (returnedItems != null) {
+                /*
                 Set<String> keys = returnedItems.keySet();
                 LOGGER.info(returnedItems);
                 for (String key : keys) {
                     LOGGER.info(String.format("%s: %s",
                             key, returnedItems.get(key).getS()));
                 }
-
+                */
                 // TODO: Add Xray later: https://docs.aws.amazon.com/de_de/lambda/latest/dg/java-tracing.html
                 if(returnedItems.containsKey("URL") && returnedItems.containsKey("Bearer")){
                     HttpGet request = new HttpGet(returnedItems.get("URL").getS());
                     // Set Bearer Header
                     request.setHeader("Authorization", "Bearer " + returnedItems.get("Bearer").getS());
-                    boolean is2xx = false;
 
                     try {
                         HttpResponse response = httpClient.execute(request);
                         String jsonString = EntityUtils.toString(response.getEntity());
-
-                        // TODO: https://stackoverflow.com/questions/27500749/dynamodb-object-to-attributevalue
-                        // TODO: https://www.baeldung.com/java-org-json
-                        JSONObject jsonResponse = new JSONObject(jsonString);
-                        is2xx = (response.getStatusLine().getStatusCode() / 100) == 2;
-                        if(is2xx){
-                            LOGGER.debug("HTTP Call to '{}' was successful", returnedItems.get("URL").getS());
+                        if((response.getStatusLine().getStatusCode() / 100) == 2){
+                            LOGGER.info("HTTP Call to '{}' was successful", returnedItems.get("URL").getS());
                             Map<String, AttributeValue> item = new HashMap<>();
                             item.put("CompanyTool", new AttributeValue().withS(returnedItems.get("Company").getS() + "#" +returnedItems.get("Tool").getS()));
                             item.put("Timestamp", new AttributeValue().withN("" + Instant.now().getEpochSecond()));
-                            item.put("Data", new AttributeValue().withS(jsonResponse.toString()));
+                            item.put("Data", new AttributeValue().withS(jsonString));
                             dynamoClient.putItem("RawData", item);
-                            LOGGER.debug("Data successfully stored in DB");
+                            LOGGER.info("Data successfully stored in DB");
                         } else {
-                            LOGGER.error("Call to '{}' was not successful. Ended with response: '{}'", returnedItems.get("URL").getS(), jsonResponse.toString());
+                            LOGGER.error("Call to '{}' was not successful. Ended with response: '{}'", returnedItems.get("URL").getS(), jsonString);
                         }
                     } catch (IOException ioe) {
                         LOGGER.error(ioe);
@@ -93,8 +87,8 @@ public class ReadConfig implements RequestHandler<Void, String>{
                 LOGGER.info("No item found");
             }
         }
-
-        return "handleRequest finished";
+        });
+        return null;
     }
 
 
