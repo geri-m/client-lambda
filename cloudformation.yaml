@@ -36,13 +36,14 @@ Resources:
                   - firehose:*
                   - xray:*
                   - dynamodb:*
+                  - lambda:InvokeFunction
                 Resource: "*"
   RateRuleDaily:
     Type: AWS::Events::Rule
     Properties:
       Description: "Run Event every Minute"
       Name: "RateRuleDaily"
-      ScheduleExpression: rate(1 minutes)
+      ScheduleExpression: rate(1 minute)
       State: "ENABLED"
       Targets:
         - Arn: !GetAtt
