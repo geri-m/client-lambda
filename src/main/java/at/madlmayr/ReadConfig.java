@@ -9,7 +9,7 @@ import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.entities.Subsegment;
+import com.amazonaws.xray.handlers.TracingHandler;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -35,15 +35,15 @@ public class ReadConfig implements RequestHandler<Void, Void> {
     private static final HttpClient httpClient;
 
     static {
-        dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).build();
+        dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
         httpClient = HttpClientBuilder.create().build();
     }
 
     @Override
     public Void handleRequest(Void input, Context context) {
-        Subsegment subsegment = AWSXRay.beginSubsegment("Create Request");
-        try {
-            // AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
+        AWSXRay.beginSegment("Create Request");
+
+        // AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
             LOGGER.info("handleRequest: {}", input);
 
             // Get all Element from the Table
@@ -89,12 +89,7 @@ public class ReadConfig implements RequestHandler<Void, Void> {
                     LOGGER.info("No item found in Config Table");
                 }
             }
-        } catch (Exception e) {
-            subsegment.addException(e);
-            throw e;
-        } finally {
-            AWSXRay.endSubsegment();
-        }
+        AWSXRay.endSegment();
         // });
         return null;
     }

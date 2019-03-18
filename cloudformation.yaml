@@ -91,9 +91,11 @@ Resources:
           KeyType: "HASH"
         - AttributeName: "Timestamp"
           KeyType: "RANGE"
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
+      # Require
+      BillingMode: PAY_PER_REQUEST
+      #ProvisionedThroughput:
+      #  ReadCapacityUnits: 1
+      #  WriteCapacityUnits: 1
       TableName: "RawData"
 Outputs:
   TableName:
