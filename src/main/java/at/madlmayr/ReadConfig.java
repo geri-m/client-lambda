@@ -37,13 +37,13 @@ public class ReadConfig implements RequestHandler<Void, Void> {
 
     static {
         // AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.defaultRecorder());
-        dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
+        dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).build();
         httpClient = HttpClientBuilder.create().build();
     }
 
     @Override
     public Void handleRequest(Void input, Context context) {
-        AWSXRay.beginSegment("Create Request");
+        // AWSXRay.beginSegment("Create Request");
         // AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
         LOGGER.info("handleRequest: {}", input);
 
@@ -90,7 +90,7 @@ public class ReadConfig implements RequestHandler<Void, Void> {
                 LOGGER.info("No item found in Config Table");
             }
         }
-        AWSXRay.endSegment();
+        // AWSXRay.endSegment();
         // });
         return null;
     }
