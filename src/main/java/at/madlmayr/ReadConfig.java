@@ -9,6 +9,7 @@ import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.AWSXRayRecorderBuilder;
 import com.amazonaws.xray.handlers.TracingHandler;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import org.apache.http.HttpResponse;
@@ -35,6 +36,7 @@ public class ReadConfig implements RequestHandler<Void, Void> {
     private static final HttpClient httpClient;
 
     static {
+        AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.defaultRecorder());
         dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
         httpClient = HttpClientBuilder.create().build();
     }
@@ -42,7 +44,6 @@ public class ReadConfig implements RequestHandler<Void, Void> {
     @Override
     public Void handleRequest(Void input, Context context) {
         AWSXRay.beginSegment("Create Request");
-
         // AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
             LOGGER.info("handleRequest: {}", input);
 
