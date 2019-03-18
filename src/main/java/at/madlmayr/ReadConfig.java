@@ -36,7 +36,7 @@ public class ReadConfig implements RequestHandler<Void, Void> {
     private static final HttpClient httpClient;
 
     static {
-        AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.defaultRecorder());
+        // AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.defaultRecorder());
         dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
         httpClient = HttpClientBuilder.create().build();
     }
@@ -45,51 +45,51 @@ public class ReadConfig implements RequestHandler<Void, Void> {
     public Void handleRequest(Void input, Context context) {
         AWSXRay.beginSegment("Create Request");
         // AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
-            LOGGER.info("handleRequest: {}", input);
+        LOGGER.info("handleRequest: {}", input);
 
-            // Get all Element from the Table
-            ScanRequest scanRequest = new ScanRequest()
-                    .withTableName(CONFIG_TABLE_NAME);
+        // Get all Element from the Table
+        ScanRequest scanRequest = new ScanRequest()
+                .withTableName(CONFIG_TABLE_NAME);
 
-            ScanResult result = dynamoClient.scan(scanRequest);
-            LOGGER.info("Amount of Config found: {}", result.getItems().size());
+        ScanResult result = dynamoClient.scan(scanRequest);
+        LOGGER.info("Amount of Config found: {}", result.getItems().size());
 
-            for (Map<String, AttributeValue> returnedItems : result.getItems()){
-                if (returnedItems != null) {
-                    if (!returnedItems.containsKey("URL")) {
-                        LOGGER.error("URL not present in Record");
-                        return null;
-                    }
-
-                    if (!returnedItems.containsKey("Bearer")) {
-                        LOGGER.error("URL not present in Record");
-                        return null;
-                    }
-
-                    HttpGet request = new HttpGet(returnedItems.get("URL").getS());
-                    // Set Bearer Header
-                    request.setHeader("Authorization", "Bearer " + returnedItems.get("Bearer").getS());
-                    try {
-                        HttpResponse response = httpClient.execute(request);
-                        String jsonString = EntityUtils.toString(response.getEntity());
-                        if((response.getStatusLine().getStatusCode() / 100) == 2){
-                            LOGGER.info("HTTP Call to '{}' was successful", returnedItems.get("URL").getS());
-                            Map<String, AttributeValue> item = new HashMap<>();
-                            item.put("CompanyTool", new AttributeValue().withS(returnedItems.get("Company").getS() + "#" + returnedItems.get("Tool").getS()));
-                            item.put("Timestamp", new AttributeValue().withN("" + Instant.now().getEpochSecond()));
-                            item.put("Data", new AttributeValue().withS(jsonString));
-                            dynamoClient.putItem(RAWDATA_TABLE_NAME, item);
-                            LOGGER.info("Data successfully stored in RawData Table");
-                        } else {
-                            LOGGER.error("Call to '{}' was not successful. Ended with response: '{}'", returnedItems.get("URL").getS(), jsonString);
-                        }
-                    } catch (IOException ioe) {
-                        LOGGER.error(ioe);
-                    }
-                } else {
-                    LOGGER.info("No item found in Config Table");
+        for (Map<String, AttributeValue> returnedItems : result.getItems()) {
+            if (returnedItems != null) {
+                if (!returnedItems.containsKey("URL")) {
+                    LOGGER.error("URL not present in Record");
+                    return null;
                 }
+
+                if (!returnedItems.containsKey("Bearer")) {
+                    LOGGER.error("URL not present in Record");
+                    return null;
+                }
+
+                HttpGet request = new HttpGet(returnedItems.get("URL").getS());
+                // Set Bearer Header
+                request.setHeader("Authorization", "Bearer " + returnedItems.get("Bearer").getS());
+                try {
+                    HttpResponse response = httpClient.execute(request);
+                    String jsonString = EntityUtils.toString(response.getEntity());
+                    if ((response.getStatusLine().getStatusCode() / 100) == 2) {
+                        LOGGER.info("HTTP Call to '{}' was successful", returnedItems.get("URL").getS());
+                        Map<String, AttributeValue> item = new HashMap<>();
+                        item.put("CompanyTool", new AttributeValue().withS(returnedItems.get("Company").getS() + "#" + returnedItems.get("Tool").getS()));
+                        item.put("Timestamp", new AttributeValue().withN("" + Instant.now().getEpochSecond()));
+                        item.put("Data", new AttributeValue().withS(jsonString));
+                        dynamoClient.putItem(RAWDATA_TABLE_NAME, item);
+                        LOGGER.info("Data successfully stored in RawData Table");
+                    } else {
+                        LOGGER.error("Call to '{}' was not successful. Ended with response: '{}'", returnedItems.get("URL").getS(), jsonString);
+                    }
+                } catch (IOException ioe) {
+                    LOGGER.error(ioe);
+                }
+            } else {
+                LOGGER.info("No item found in Config Table");
             }
+        }
         AWSXRay.endSegment();
         // });
         return null;
