@@ -188,7 +188,7 @@ public class TestLocalDynamoDb {
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet("https://slack.com/api/users.list/");
         // Set Bearer Header
-        request.setHeader("Authorization", "Bearer " + "xoxb-287011596231-546061883216-5TRBoVEAaHuhvbHCF4ujErnK");
+        request.setHeader("Authorization", "Bearer " + "xoxb");
         boolean is2xx = false;
 
         LOGGER.info(request.toString());

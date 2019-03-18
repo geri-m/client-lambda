@@ -9,6 +9,7 @@ import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -40,31 +41,33 @@ public class ReadConfig implements RequestHandler<Void, Void> {
 
     @Override
     public Void handleRequest(Void input, Context context) {
-        AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
-        LOGGER.info("handleRequest: {}", input);
+        Subsegment subsegment = AWSXRay.beginSubsegment("Create Request");
+        try {
+            // AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
+            LOGGER.info("handleRequest: {}", input);
 
-        // Get all Element from the Table
-        ScanRequest scanRequest = new ScanRequest()
-                .withTableName(CONFIG_TABLE_NAME);
+            // Get all Element from the Table
+            ScanRequest scanRequest = new ScanRequest()
+                    .withTableName(CONFIG_TABLE_NAME);
 
-        ScanResult result = dynamoClient.scan(scanRequest);
-        LOGGER.info("Amount of Config found: {}", result.getItems().size());
+            ScanResult result = dynamoClient.scan(scanRequest);
+            LOGGER.info("Amount of Config found: {}", result.getItems().size());
 
-        for (Map<String, AttributeValue> returnedItems : result.getItems()){
-            if (returnedItems != null) {
-                if (!returnedItems.containsKey("URL")) {
-                    LOGGER.error("URL not present in Record");
-                    return;
-                }
+            for (Map<String, AttributeValue> returnedItems : result.getItems()){
+                if (returnedItems != null) {
+                    if (!returnedItems.containsKey("URL")) {
+                        LOGGER.error("URL not present in Record");
+                        return null;
+                    }
 
-                if (!returnedItems.containsKey("Bearer")) {
-                    LOGGER.error("URL not present in Record");
-                    return;
-                }
+                    if (!returnedItems.containsKey("Bearer")) {
+                        LOGGER.error("URL not present in Record");
+                        return null;
+                    }
 
-                HttpGet request = new HttpGet(returnedItems.get("URL").getS());
-                // Set Bearer Header
-                request.setHeader("Authorization", "Bearer " + returnedItems.get("Bearer").getS());
+                    HttpGet request = new HttpGet(returnedItems.get("URL").getS());
+                    // Set Bearer Header
+                    request.setHeader("Authorization", "Bearer " + returnedItems.get("Bearer").getS());
                     try {
                         HttpResponse response = httpClient.execute(request);
                         String jsonString = EntityUtils.toString(response.getEntity());
@@ -82,11 +85,17 @@ public class ReadConfig implements RequestHandler<Void, Void> {
                     } catch (IOException ioe) {
                         LOGGER.error(ioe);
                     }
-            } else {
-                LOGGER.info("No item found in Config Table");
+                } else {
+                    LOGGER.info("No item found in Config Table");
+                }
             }
+        } catch (Exception e) {
+            subsegment.addException(e);
+            throw e;
+        } finally {
+            AWSXRay.endSubsegment();
         }
-        });
+        // });
         return null;
     }
 
