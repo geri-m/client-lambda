@@ -12,6 +12,7 @@ Resources:
       MemorySize: 512
       Timeout: 15
       Role: !GetAtt LambdaExecutionRole.Arn
+      FunctionName: ClientApi
   SlackCall:
     Type: AWS::Serverless::Function
     Properties:
@@ -22,6 +23,7 @@ Resources:
       MemorySize: 512
       Timeout: 15
       Role: !GetAtt LambdaExecutionRole.Arn
+      FunctionName: SlackCall
   ArtifactoryCall:
     Type: AWS::Serverless::Function
     Properties:
@@ -32,6 +34,7 @@ Resources:
       MemorySize: 512
       Timeout: 15
       Role: !GetAtt LambdaExecutionRole.Arn
+      FunctionName: ArtifactoryCall
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
