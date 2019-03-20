@@ -12,6 +12,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -184,7 +185,7 @@ public class TestLocalDynamoDb {
     }
 
     @Test
-    public void testHttpCall(){
+    public void testHttpCallToSlack(){
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet("https://slack.com/api/users.list/");
         // Set Bearer Header
@@ -208,5 +209,43 @@ public class TestLocalDynamoDb {
         }
     }
 
+
+    @Test
+    public void testHttpCallToArtifactory(){
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet("https://p7s1.jfrog.io/p7s1/api/security/users");
+        // Set Bearer Header
+        request.setHeader("X-JFrog-Art-Api", null);
+        boolean is2xx = false;
+
+        LOGGER.info(request.toString());
+
+        try {
+            HttpResponse response = httpClient.execute(request);
+            String jsonString = EntityUtils.toString(response.getEntity());
+
+            // TODO: https://stackoverflow.com/questions/27500749/dynamodb-object-to-attributevalue
+            // TODO: https://www.baeldung.com/java-org-json
+            JSONArray userList = new JSONArray(jsonString);
+            LOGGER.info("Amount of Users: {} ", userList.length());
+
+            JSONArray userDetailList = new JSONArray();
+            for(int i = 0; i < userList.length(); i++){
+                // LOGGER.info(new JSONObject(userList.get(i).toString()).get("uri"));
+                HttpGet requestForUser = new HttpGet(new JSONObject(userList.get(i).toString()).get("uri").toString());
+                requestForUser.setHeader("X-JFrog-Art-Api", null);
+                HttpResponse responseForUser = httpClient.execute(requestForUser);
+                String jsonStringForUser = EntityUtils.toString(responseForUser.getEntity());
+                userDetailList.put(new JSONObject(jsonStringForUser));
+            }
+
+            LOGGER.info(userDetailList);
+
+            is2xx = (response.getStatusLine().getStatusCode() / 100) == 2;
+            LOGGER.debug("Status Code: {}", is2xx);
+        } catch (IOException ioe) {
+            LOGGER.error(ioe);
+        }
+    }
 
 }
