@@ -13,8 +13,7 @@ Resources:
       Timeout: 15
       Role: !GetAtt LambdaExecutionRole.Arn
       FunctionName: ClientApi
-      TracingConfig:
-        Mode: Active
+      Tracing: Active
   SlackCall:
     Type: AWS::Serverless::Function
     Properties:
@@ -26,8 +25,7 @@ Resources:
       Timeout: 15
       Role: !GetAtt LambdaExecutionRole.Arn
       FunctionName: SlackCall
-      TracingConfig:
-        Mode: Active
+      Tracing: Active
   ArtifactoryCall:
     Type: AWS::Serverless::Function
     Properties:
@@ -39,8 +37,7 @@ Resources:
       Timeout: 15
       Role: !GetAtt LambdaExecutionRole.Arn
       FunctionName: ArtifactoryCall
-      TracingConfig:
-        Mode: Active
+      Tracing: Active
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
