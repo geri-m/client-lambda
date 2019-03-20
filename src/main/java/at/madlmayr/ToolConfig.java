@@ -25,6 +25,11 @@ public class ToolConfig implements Serializable {
     @JsonProperty("tool")
     private String tool;
 
+    // Required for Jackson to create an Object.
+    public ToolConfig() {
+
+    }
+
     public ToolConfig(Map<String, AttributeValue> returnedItems) throws ToolCallException {
 
         if (!returnedItems.containsKey(COLUMN_COMPANY) || returnedItems.get(COLUMN_COMPANY).getS().isEmpty()) {
