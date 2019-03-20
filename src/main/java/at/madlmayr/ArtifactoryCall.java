@@ -34,7 +34,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
         ToolConfig toolConfig;
         try {
-            // Handling De-Serialziation myself
+            // Handling De-Serialization myself
             // https://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-req-resp.html
             toolConfig = objectMapper.readValue(inputStream, ToolConfig.class);
         } catch (IOException e) {
