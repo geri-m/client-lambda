@@ -12,6 +12,26 @@ Resources:
       MemorySize: 512
       Timeout: 15
       Role: !GetAtt LambdaExecutionRole.Arn
+  SlackCall:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: target/client-lambda.jar
+      Handler: 'at.madlmayr.SlackCall::handleRequest'
+      Runtime: java8
+      Description: "Slack Call Lambda"
+      MemorySize: 512
+      Timeout: 15
+      Role: !GetAtt LambdaExecutionRole.Arn
+  ArtifactoryCall:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: target/client-lambda.jar
+      Handler: 'at.madlmayr.ArtifactoryCall::handleRequest'
+      Runtime: java8
+      Description: "Artifactory Call Lambda"
+      MemorySize: 512
+      Timeout: 15
+      Role: !GetAtt LambdaExecutionRole.Arn
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
