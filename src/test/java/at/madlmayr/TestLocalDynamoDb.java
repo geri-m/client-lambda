@@ -5,6 +5,8 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -246,6 +248,20 @@ public class TestLocalDynamoDb {
         } catch (IOException ioe) {
             LOGGER.error(ioe);
         }
+    }
+
+    @Test
+    public void testJsonOutput(){
+        ObjectMapper mapper = new ObjectMapper();
+        ToolConfig obj = new ToolConfig("company", "url", "bearr");
+
+        try {
+            LOGGER.info(mapper.writeValueAsString(obj));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 }
