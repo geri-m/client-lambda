@@ -14,9 +14,9 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.HttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.http.client.HttpClient;
 
 import java.util.Map;
 
@@ -69,7 +69,7 @@ public class ReadConfig implements RequestHandler<Void, Void> {
                     return null;
                 }
 
-                LOGGER.info("Tool: '{}'", ToolEnum.valueOf(returnedItems.get("Tool").getS()).getName());
+                LOGGER.info("Tool: '{}'", ToolEnum.valueOf(returnedItems.get("Tool").getS().toUpperCase()).getName());
                 ToolConfig toolConfig = new ToolConfig(returnedItems.get("Company").getS(), returnedItems.get("URL").getS(), returnedItems.get("Bearer").getS());
 
                 ObjectMapper mapper = new ObjectMapper();
