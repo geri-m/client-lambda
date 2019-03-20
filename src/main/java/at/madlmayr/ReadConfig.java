@@ -11,6 +11,8 @@ import com.amazonaws.services.lambda.AWSLambdaAsyncClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.AWSXRayRecorderBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,14 +32,14 @@ public class ReadConfig implements RequestHandler<Void, Void> {
     private static final AWSLambdaAsync lambda;
 
     static {
-        // AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.defaultRecorder());
+        AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.defaultRecorder());
         dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).build();
         lambda = AWSLambdaAsyncClientBuilder.defaultClient();
     }
 
     @Override
     public Void handleRequest(Void input, Context context)  {
-        // AWSXRay.beginSegment("Create Request");
+        AWSXRay.beginSegment("Create Request");
         // AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
         LOGGER.info("handleRequest: {}", input);
 
@@ -66,7 +68,7 @@ public class ReadConfig implements RequestHandler<Void, Void> {
                 LOGGER.info("No item found in Config Table");
             }
         }
-        // AWSXRay.endSegment();
+        AWSXRay.endSegment();
         // });
         return null;
     }
