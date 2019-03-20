@@ -253,7 +253,12 @@ public class TestLocalDynamoDb {
     @Test
     public void testJsonOutput(){
         ObjectMapper mapper = new ObjectMapper();
-        ToolConfig obj = new ToolConfig("company", "url", "bearr");
+        Map<String, AttributeValue> map = new HashMap<>();
+        map.put("Company", new AttributeValue("Company"));
+        map.put("URL", new AttributeValue("Company"));
+        map.put("Bearer", new AttributeValue("Company"));
+        map.put("Tool", new AttributeValue("Company"));
+        ToolConfig obj = new ToolConfig(map);
 
         try {
             LOGGER.info(mapper.writeValueAsString(obj));
