@@ -262,7 +262,11 @@ public class TestLocalDynamoDb {
 
         try {
             LOGGER.info(mapper.writeValueAsString(obj));
+            ToolConfig result = mapper.readValue(mapper.writeValueAsString(obj), ToolConfig.class);
+            LOGGER.info(mapper.writeValueAsString(result));
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

@@ -1,8 +1,9 @@
 package at.madlmayr;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -13,22 +14,33 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-public class ArtifactoryCall implements RequestHandler<ToolConfig, Void>, ToolCall {
+public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
     private static final Logger LOGGER = LogManager.getLogger(ArtifactoryCall.class);
     private final static DynamoAbstraction db;
     private static final CloseableHttpClient httpClient;
+    private static final ObjectMapper objectMapper;
 
     static {
         db = new DynamoAbstraction();
         httpClient = HttpClientBuilder.create().build();
+        objectMapper = new ObjectMapper();
     }
 
     @Override
-    public Void handleRequest(ToolConfig toolConfig, Context context)  {
+    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
+        ToolConfig toolConfig;
+        try {
+            // Handling De-Serialziation myself
+            // https://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-req-resp.html
+            toolConfig = objectMapper.readValue(inputStream, ToolConfig.class);
+        } catch (IOException e) {
+            throw new ToolCallException(e);
+        }
         db.writeRawData(toolConfig.generateKey(ToolEnum.ARTIFACTORY.getName()), processCall(toolConfig.getUrl(), toolConfig.getBearer()));
-        return null;
     }
 
     @Override
