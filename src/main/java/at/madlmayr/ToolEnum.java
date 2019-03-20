@@ -3,7 +3,7 @@ package at.madlmayr;
 public enum ToolEnum {
 
     SLACK("slack", "SlackCall"),
-    ARITFACTORY("artifactory", "ArtifactoryCall");
+    ARTIFACTORY("artifactory", "ArtifactoryCall");
 
     private final String name;
     private final String functionName;

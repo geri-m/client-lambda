@@ -27,7 +27,7 @@ public class ArtifactoryCall implements RequestHandler<ToolConfig, Void>, ToolCa
 
     @Override
     public Void handleRequest(ToolConfig toolConfig, Context context)  {
-        db.writeRawData(toolConfig.generateKey(ToolEnum.ARITFACTORY.getName()), processCall(toolConfig.getUrl(), toolConfig.getBearer()));
+        db.writeRawData(toolConfig.generateKey(ToolEnum.ARTIFACTORY.getName()), processCall(toolConfig.getUrl(), toolConfig.getBearer()));
         return null;
     }
 
