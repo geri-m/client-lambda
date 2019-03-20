@@ -53,10 +53,10 @@ public class ReadConfig implements RequestHandler<Void, Void> {
 
                 try {
                     ToolConfig toolConfig = new ToolConfig(returnedItems);
-                    LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolConfig.getTool()).getName());
+                    LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolConfig.getTool().toUpperCase()).getName());
                     ObjectMapper mapper = new ObjectMapper();
                     InvokeRequest req = new InvokeRequest()
-                            .withFunctionName(ToolEnum.valueOf(toolConfig.getTool()).getFunctionName())
+                            .withFunctionName(ToolEnum.valueOf(toolConfig.getTool().toUpperCase()).getFunctionName())
                             .withPayload(mapper.writeValueAsString(toolConfig));
                     lambda.invokeAsync(req);
                 } catch (Exception e) {
