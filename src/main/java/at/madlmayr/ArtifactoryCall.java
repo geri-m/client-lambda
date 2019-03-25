@@ -4,7 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.AWSXRayRecorder;
-import com.amazonaws.xray.entities.Segment;
+import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
@@ -75,10 +75,10 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                 JSONArray userList = new JSONArray(jsonString);
                 LOGGER.info("Amount of Users: {} ", userList.length());
                 // Do Detailed Calls to fetch more users.
-                Segment userSegment = AWSXRay.beginSegment("## Fetch Users");
+                Subsegment userSubSegment = AWSXRay.beginSubsegment("## Fetch Users");
                 JSONArray userDetailList = doClientCallsAsync(userList, bearer);
-                userSegment.putMetadata("Amount of Users", userList.length());
-                AWSXRay.endSegment();
+                userSubSegment.putMetadata("Amount of Users", userList.length());
+                AWSXRay.endSubsegment();
                 return userDetailList.toString();
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
