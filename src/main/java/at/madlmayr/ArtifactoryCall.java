@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.AWSXRayRecorder;
+import com.amazonaws.xray.entities.Segment;
 import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,7 +108,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
     private JSONArray doClientCalls(final JSONArray userList, final String bearer) throws IOReactorException, ToolCallException {
         AWSXRay.setGlobalRecorder(recorder);
-        Subsegment seg = AWSXRay.beginSubsegment("Do Async Users Calls in parallel");
+        Segment userSegment = AWSXRay.beginSegment("User Details");
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
         PoolingNHttpClientConnectionManager cm =
                 new PoolingNHttpClientConnectionManager(ioReactor);
@@ -120,8 +121,8 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             JSONArray userDetailList = new JSONArray();
 
             for (int i = 0; i < userList.length(); i++) {
-
                 String uri = new JSONObject(userList.get(i).toString()).get("uri").toString();
+                Subsegment userSubSegment = AWSXRay.beginSubsegment("uri" + uri);
                 HttpGet requestForUser = new HttpGet(uri);
                 requestForUser.setHeader("X-JFrog-Art-Api", bearer);
                 LOGGER.debug("uri: " + uri);
@@ -132,20 +133,24 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                             String jsonStringForUser = EntityUtils.toString(response.getEntity());
                             userDetailList.put(new JSONObject(jsonStringForUser));
                         } catch (IOException e) {
-                            seg.addException(e);
+                            userSubSegment.addException(e);
                             throw new ToolCallException(e);
                         }
                         latchForUserCalls.countDown();
+                        AWSXRay.endSubsegment();
                     }
 
                     public void failed(final Exception ex) {
+                        userSubSegment.addException(ex);
                         latchForUserCalls.countDown();
                         LOGGER.error(requestForUser.getRequestLine() + "->" + ex);
+                        AWSXRay.endSubsegment();
                     }
 
                     public void cancelled() {
                         latchForUserCalls.countDown();
                         LOGGER.error(requestForUser.getRequestLine() + " cancelled");
+                        AWSXRay.endSubsegment();
                     }
                 });
             }
@@ -154,10 +159,10 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
             return userDetailList;
         } catch (IOException | InterruptedException e) {
-            seg.addException(e);
+            userSegment.addException(e);
             throw new ToolCallException(e);
         } finally {
-            AWSXRay.endSubsegment();
+            AWSXRay.endSegment();
         }
     }
 }
