@@ -251,6 +251,12 @@ public class TestLocalDynamoDb {
     }
 
     @Test
+    public void testArtifactoryCall() {
+        ToolCall call = new ArtifactoryCall();
+        call.processCall("https://p7s1.jfrog.io/p7s1/api/security/users", "AKCp5budNy64P21YRwWgW6S38U3bLeCmjPY4BMBeBRVjC5ib6kFtpPDevaQCfPfKcmEL7yzFQ");
+    }
+
+    @Test
     public void testJsonOutput(){
         ObjectMapper mapper = new ObjectMapper();
         Map<String, AttributeValue> map = new HashMap<>();
