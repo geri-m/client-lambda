@@ -107,7 +107,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
     private JSONArray doClientCallsAsync(final JSONArray userList, final String bearer) throws IOReactorException, ToolCallException {
         AWSXRay.setGlobalRecorder(recorder);
-        Subsegment userSegment = AWSXRay.beginSubsegment("User Details");
+        // Subsegment userSegment = AWSXRay.beginSubsegment("User Details");
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
         PoolingNHttpClientConnectionManager cm =
                 new PoolingNHttpClientConnectionManager(ioReactor);
@@ -157,10 +157,10 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
             return userDetailList;
         } catch (IOException | InterruptedException e) {
-            userSegment.addException(e);
+            // userSegment.addException(e);
             throw new ToolCallException(e);
         } finally {
-            AWSXRay.endSubsegment();
+            // AWSXRay.endSubsegment();
         }
     }
 }
