@@ -4,7 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -26,6 +26,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
     static {
         db = new DynamoAbstraction();
+        // We use XRay, hence the {@link HttpClients.createDefault();} is not used
         httpClient = HttpClientBuilder.create().build();
         objectMapper = new ObjectMapper();
     }
@@ -49,8 +50,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
         // Set Bearer Header
         request.setHeader("X-JFrog-Art-Api", bearer);
 
-        try {
-            HttpResponse response = httpClient.execute(request);
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
             String jsonString = EntityUtils.toString(response.getEntity());
             if ((response.getStatusLine().getStatusCode() / 100) == 2) {
                 LOGGER.info("HTTP Call to '{}' was successful (fetching list of Users)", url);
@@ -58,15 +58,19 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                 JSONArray userList = new JSONArray(jsonString);
                 LOGGER.info("Amount of Users: {} ", userList.length());
 
+                // Response Element
                 JSONArray userDetailList = new JSONArray();
-                for(int i = 0; i < userList.length(); i++){
-                    HttpGet requestForUser = new HttpGet(new JSONObject(userList.get(i).toString()).get("uri").toString());
-                    requestForUser.setHeader("X-JFrog-Art-Api", bearer);
-                    HttpResponse responseForUser = httpClient.execute(requestForUser);
-                    String jsonStringForUser = EntityUtils.toString(responseForUser.getEntity());
-                    userDetailList.put(new JSONObject(jsonStringForUser));
 
+                for (Object jsonUserObject : userList) {
+                    String uri = ((JSONObject) jsonUserObject).get("uri").toString();
+                    HttpGet requestForUser = new HttpGet(uri);
+                    requestForUser.setHeader("X-JFrog-Art-Api", bearer);
+                    try (CloseableHttpResponse responseForUser = httpClient.execute(requestForUser)) {
+                        String jsonStringForUser = EntityUtils.toString(responseForUser.getEntity());
+                        userDetailList.put(new JSONObject(jsonStringForUser));
+                    }
                 }
+
                 return userDetailList.toString();
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
@@ -75,5 +79,6 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             throw new ToolCallException(ioe);
         }
     }
+
 
 }

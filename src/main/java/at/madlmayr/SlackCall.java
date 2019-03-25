@@ -4,9 +4,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +19,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
 
     private static final Logger LOGGER = LogManager.getLogger(SlackCall.class);
     private final static DynamoAbstraction db;
-    private static final HttpClient httpClient;
+    private static final CloseableHttpClient httpClient;
     private static final ObjectMapper objectMapper;
 
     static {
@@ -46,9 +46,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
         HttpGet request = new HttpGet(url);
         // Set Bearer Header
         request.setHeader("Authorization", "Bearer " + bearer);
-        HttpResponse response;
-        try {
-            response = httpClient.execute(request);
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
             String jsonString = EntityUtils.toString(response.getEntity());
             if ((response.getStatusLine().getStatusCode() / 100) == 2) {
                 LOGGER.info("HTTP Call to '{}' was successful", url);
