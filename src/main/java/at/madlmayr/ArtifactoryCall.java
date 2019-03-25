@@ -4,7 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.AWSXRayRecorder;
-import com.amazonaws.xray.entities.Segment;
 import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,28 +74,8 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
                 JSONArray userList = new JSONArray(jsonString);
                 LOGGER.info("Amount of Users: {} ", userList.length());
-
-                // Response Element
-                /*
-                JSONArray userDetailList = new JSONArray();
-
-
-                for (Object jsonUserObject : userList) {
-                    String uri = ((JSONObject) jsonUserObject).get("uri").toString();
-                    HttpGet requestForUser = new HttpGet(uri);
-                    requestForUser.setHeader("X-JFrog-Art-Api", bearer);
-                    try (CloseableHttpResponse responseForUser = httpClient.execute(requestForUser)) {
-                        if ((responseForUser.getStatusLine().getStatusCode() / 100) == 2) {
-                            String jsonStringForUser = EntityUtils.toString(responseForUser.getEntity());
-                            userDetailList.put(new JSONObject(jsonStringForUser));
-                        } else {
-                            LOGGER.error("Failed to to Detailed User Call using URL '{}'", uri);
-                        }
-                    }
-                }
-                */
-
-                JSONArray userDetailList = doClientCalls(userList, bearer);
+                // Do Detailed Calls to fetch more users.
+                JSONArray userDetailList = doClientCallsAsync(userList, bearer);
                 return userDetailList.toString();
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
@@ -106,9 +85,29 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
         }
     }
 
-    private JSONArray doClientCalls(final JSONArray userList, final String bearer) throws IOReactorException, ToolCallException {
+    private JSONArray doClientCallsSync(final JSONArray userList, final String bearer) {
+        JSONArray userDetailList = new JSONArray();
+        for (Object jsonUserObject : userList) {
+            String uri = ((JSONObject) jsonUserObject).get("uri").toString();
+            HttpGet requestForUser = new HttpGet(uri);
+            requestForUser.setHeader("X-JFrog-Art-Api", bearer);
+            try (CloseableHttpResponse responseForUser = httpClient.execute(requestForUser)) {
+                if ((responseForUser.getStatusLine().getStatusCode() / 100) == 2) {
+                    String jsonStringForUser = EntityUtils.toString(responseForUser.getEntity());
+                    userDetailList.put(new JSONObject(jsonStringForUser));
+                } else {
+                    LOGGER.error("Failed to to Detailed User Call using URL '{}'", uri);
+                }
+            } catch (IOException e) {
+                LOGGER.error(e.getLocalizedMessage());
+            }
+        }
+        return userDetailList;
+    }
+
+    private JSONArray doClientCallsAsync(final JSONArray userList, final String bearer) throws IOReactorException, ToolCallException {
         AWSXRay.setGlobalRecorder(recorder);
-        Segment userSegment = AWSXRay.beginSegment("User Details");
+        Subsegment userSegment = AWSXRay.beginSubsegment("User Details");
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
         PoolingNHttpClientConnectionManager cm =
                 new PoolingNHttpClientConnectionManager(ioReactor);
@@ -125,7 +124,6 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                 Subsegment userSubSegment = AWSXRay.beginSubsegment("uri" + uri);
                 HttpGet requestForUser = new HttpGet(uri);
                 requestForUser.setHeader("X-JFrog-Art-Api", bearer);
-                LOGGER.debug("uri: " + uri);
                 httpAsyncClient.execute(requestForUser, new FutureCallback<HttpResponse>() {
 
                     public void completed(final HttpResponse response) {
@@ -162,7 +160,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             userSegment.addException(e);
             throw new ToolCallException(e);
         } finally {
-            AWSXRay.endSegment();
+            AWSXRay.endSubsegment();
         }
     }
 }
