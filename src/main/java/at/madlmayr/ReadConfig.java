@@ -12,7 +12,8 @@ import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.AWSXRayRecorderBuilder;
+import com.amazonaws.xray.entities.Segment;
+import com.amazonaws.xray.handlers.TracingHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,15 +33,13 @@ public class ReadConfig implements RequestHandler<Void, Void> {
     private static final AWSLambdaAsync lambda;
 
     static {
-        AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.defaultRecorder());
-        dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).build();
+        dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
         lambda = AWSLambdaAsyncClientBuilder.defaultClient();
     }
 
     @Override
     public Void handleRequest(Void input, Context context)  {
-        AWSXRay.beginSegment("Create Request");
-        // AWSXRay.createSubsegment("makeRequest", (subsegment) -> {
+        Segment seg = AWSXRay.beginSegment("Read Config");
         LOGGER.info("handleRequest: {}", input);
 
         // Get all Element from the Table
@@ -49,10 +48,10 @@ public class ReadConfig implements RequestHandler<Void, Void> {
 
         ScanResult result = dynamoClient.scan(scanRequest);
         LOGGER.info("Amount of Config found: {}", result.getItems().size());
+        seg.putMetadata("Amount of Configs", result.getItems().size());
 
         for (Map<String, AttributeValue> returnedItems : result.getItems()) {
             if (returnedItems != null) {
-
                 try {
                     ToolConfig toolConfig = new ToolConfig(returnedItems);
                     LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolConfig.getTool().toUpperCase()).getName());
