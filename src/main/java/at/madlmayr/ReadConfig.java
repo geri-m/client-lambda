@@ -12,7 +12,7 @@ import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.entities.Segment;
+import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.handlers.TracingHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +39,7 @@ public class ReadConfig implements RequestHandler<Void, Void> {
 
     @Override
     public Void handleRequest(Void input, Context context)  {
-        Segment seg = AWSXRay.beginSegment("Read Config");
+        Subsegment seg = AWSXRay.beginSubsegment("Read Config");
         LOGGER.info("handleRequest: {}", input);
 
         // Get all Element from the Table
@@ -67,7 +67,7 @@ public class ReadConfig implements RequestHandler<Void, Void> {
                 LOGGER.info("No item found in Config Table");
             }
         }
-        AWSXRay.endSegment();
+        AWSXRay.endSubsegment();
         // });
         return null;
     }
