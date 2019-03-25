@@ -75,7 +75,10 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                 JSONArray userList = new JSONArray(jsonString);
                 LOGGER.info("Amount of Users: {} ", userList.length());
                 // Do Detailed Calls to fetch more users.
+                Subsegment userSubSegment = AWSXRay.beginSubsegment("## Fetch Users");
                 JSONArray userDetailList = doClientCallsAsync(userList, bearer);
+                userSubSegment.putMetadata("Amount of Users", userList.length());
+                AWSXRay.endSubsegment();
                 return userDetailList.toString();
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
@@ -106,8 +109,6 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
     }
 
     private JSONArray doClientCallsAsync(final JSONArray userList, final String bearer) throws IOReactorException, ToolCallException {
-        AWSXRay.setGlobalRecorder(recorder);
-        // Subsegment userSegment = AWSXRay.beginSubsegment("User Details");
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
         PoolingNHttpClientConnectionManager cm =
                 new PoolingNHttpClientConnectionManager(ioReactor);
@@ -121,7 +122,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
             for (int i = 0; i < userList.length(); i++) {
                 String uri = new JSONObject(userList.get(i).toString()).get("uri").toString();
-                Subsegment userSubSegment = AWSXRay.beginSubsegment("uri" + uri);
+
                 HttpGet requestForUser = new HttpGet(uri);
                 requestForUser.setHeader("X-JFrog-Art-Api", bearer);
                 httpAsyncClient.execute(requestForUser, new FutureCallback<HttpResponse>() {
@@ -131,24 +132,20 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                             String jsonStringForUser = EntityUtils.toString(response.getEntity());
                             userDetailList.put(new JSONObject(jsonStringForUser));
                         } catch (IOException e) {
-                            userSubSegment.addException(e);
                             throw new ToolCallException(e);
+                        } finally {
+                            latchForUserCalls.countDown();
                         }
-                        latchForUserCalls.countDown();
-                        AWSXRay.endSubsegment();
                     }
 
                     public void failed(final Exception ex) {
-                        userSubSegment.addException(ex);
                         latchForUserCalls.countDown();
                         LOGGER.error(requestForUser.getRequestLine() + "->" + ex);
-                        AWSXRay.endSubsegment();
                     }
 
                     public void cancelled() {
                         latchForUserCalls.countDown();
                         LOGGER.error(requestForUser.getRequestLine() + " cancelled");
-                        AWSXRay.endSubsegment();
                     }
                 });
             }
@@ -157,10 +154,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
             return userDetailList;
         } catch (IOException | InterruptedException e) {
-            // userSegment.addException(e);
             throw new ToolCallException(e);
-        } finally {
-            // AWSXRay.endSubsegment();
         }
     }
 }
