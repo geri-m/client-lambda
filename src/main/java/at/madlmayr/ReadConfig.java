@@ -10,7 +10,7 @@ import com.amazonaws.services.lambda.AWSLambdaAsync;
 import com.amazonaws.services.lambda.AWSLambdaAsyncClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.handlers.TracingHandler;
@@ -18,10 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 
 
-public class ReadConfig implements RequestHandler<Void, Void> {
+public class ReadConfig implements RequestStreamHandler {
 
     // Initialize the Log4j logger.
     private static final Logger LOGGER = LogManager.getLogger(ReadConfig.class);
@@ -38,9 +40,8 @@ public class ReadConfig implements RequestHandler<Void, Void> {
     }
 
     @Override
-    public Void handleRequest(Void input, Context context)  {
+    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
         Subsegment seg = AWSXRay.beginSubsegment("Read Config");
-        LOGGER.info("handleRequest: {}", input);
 
         // Get all Element from the Table
         ScanRequest scanRequest = new ScanRequest()
@@ -69,7 +70,6 @@ public class ReadConfig implements RequestHandler<Void, Void> {
         }
         AWSXRay.endSubsegment();
         // });
-        return null;
     }
 
 
