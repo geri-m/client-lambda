@@ -2,7 +2,6 @@ package at.madlmayr;
 
 
 import cloud.localstack.DockerTestUtils;
-import cloud.localstack.TestUtils;
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.amazonaws.services.lambda.AWSLambda;
@@ -13,11 +12,15 @@ import com.amazonaws.services.lambda.model.Runtime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+
 @Disabled
+@TestInstance(PER_CLASS)
 @ExtendWith(LocalstackDockerExtension.class)
 @LocalstackDockerProperties(randomizePorts = true, services = {"lambda"})
 public class TestWithLocalStack {
@@ -32,7 +35,7 @@ public class TestWithLocalStack {
 
     @Test
     public void testLocalS3API() throws Exception {
-        AWSLambda lambda = TestUtils.getClientLambda();
+        AWSLambda lambda = DockerTestUtils.getClientLambda();
         String functionName = UUID.randomUUID().toString();
         String streamName = UUID.randomUUID().toString();
 
