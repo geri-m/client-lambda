@@ -11,6 +11,8 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.ArchivePaths;
@@ -39,8 +41,10 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @LocalstackDockerProperties(randomizePorts = true, services = {"s3", "lambda"})
 class LocalStackLambdaZipDeploymentIT {
 
-    private static final int HTTP_OK = 200;
+    // Initialize the Log4j logger.
+    private static final Logger LOGGER = LogManager.getLogger(LocalStackLambdaZipDeploymentIT.class);
 
+    private static final int HTTP_OK = 200;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private AmazonS3 amazonS3;
@@ -63,7 +67,7 @@ class LocalStackLambdaZipDeploymentIT {
         // Create Lambda archive
         final JavaArchive lambdaZip = ShrinkWrap.create(JavaArchive.class);
         lambdaZip.addClasses(handlerClass, SameModuleInput.class);
-        System.out.println(lambdaZip.toString(true));
+        LOGGER.info(lambdaZip.toString(true));
 
         // Create request object
         final SameModuleInput sameModuleInput = new SameModuleInput();
@@ -95,7 +99,7 @@ class LocalStackLambdaZipDeploymentIT {
                 .withTransitivity()
                 .asList(JavaArchive.class)
                 .forEach(javaArchive -> lambdaZip.add(javaArchive, archiveLibraryPath, ZipExporter.class));
-        System.out.println(lambdaZip.toString(true));
+        LOGGER.info(lambdaZip.toString(true));
 
         // Create request object
         final OtherModuleInput otherModuleInput = new OtherModuleInput();
@@ -111,22 +115,28 @@ class LocalStackLambdaZipDeploymentIT {
     private InvokeResult invokeLambda(final Archive lambdaArchive, final Object requestObject,
                                       final String lambdaFunctionName, final String handlerClassName) throws IOException {
 
+        LOGGER.info("invokeLambda");
         // Create temp file for archive
         final File tempLambdaZipFile = writeArchiveAsTempFile(lambdaArchive, "lambda-", ".zip");
 
+
         // Create S3 bucket for archive
         final String bucketName = "test-bucket";
+        LOGGER.info("Next: Create Bucket");
         final Bucket s3Bucket = createTestS3Bucket(bucketName);
+        LOGGER.info("Bucket created");
         assertThat(s3Bucket.getName()).isEqualTo(bucketName);
 
         // Upload archive to S3
         final String lambdaZipFileName = "testing.zip";
         final PutObjectResult putObjectResult = uploadLambdaFunction(bucketName, tempLambdaZipFile, lambdaZipFileName);
+        LOGGER.info("Upload Done");
         assertThat(putObjectResult.getContentMd5()).isNotNull();
 
         // Create Lambda Function
         final CreateFunctionResult createFunctionResult = createLambdaFunction(bucketName, lambdaZipFileName,
                 lambdaFunctionName, handlerClassName);
+        LOGGER.info("Create Lambda Done");
         assertThat(createFunctionResult.getFunctionArn()).isNotNull();
 
         // Create Lambda invocation request
@@ -145,9 +155,10 @@ class LocalStackLambdaZipDeploymentIT {
 
         // Write the archive to the temp file
         final ZipExporter zipExporter = archive.as(ZipExporter.class);
+        LOGGER.info("Archiv Done");
         final boolean writeToExistingTempFile = true;
         zipExporter.exportTo(tempFile, writeToExistingTempFile);
-
+        LOGGER.info("Export Done");
         return tempFile;
     }
 
