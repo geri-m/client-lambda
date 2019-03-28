@@ -1,6 +1,7 @@
 package at.madlmayr;
 
 
+import cloud.localstack.DockerTestUtils;
 import cloud.localstack.TestUtils;
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
@@ -18,13 +19,13 @@ import java.util.UUID;
 
 @Disabled
 @ExtendWith(LocalstackDockerExtension.class)
-@LocalstackDockerProperties(randomizePorts = false, services = {"serverless"})
+@LocalstackDockerProperties(randomizePorts = true, services = {"lambda"})
 public class TestWithLocalStack {
 
 
     @Test
     public void testLocalLambdaAPI() {
-        AWSLambda lambda = TestUtils.getClientLambda();
+        AWSLambda lambda = DockerTestUtils.getClientLambda();
         ListFunctionsResult functions = lambda.listFunctions();
         Assertions.assertTrue(functions.getFunctions().isEmpty());
     }
