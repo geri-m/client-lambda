@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @TestInstance(PER_CLASS)
 @ExtendWith(LocalstackDockerExtension.class)
-@LocalstackDockerProperties(randomizePorts = true, services = {"s3", "lambda"})
+@LocalstackDockerProperties(randomizePorts = false, services = {"s3", "lambda"})
 class LocalStackLambdaZipDeploymentIT {
 
     // Initialize the Log4j logger.
@@ -90,7 +90,7 @@ class LocalStackLambdaZipDeploymentIT {
 
         // Create Lambda archive
         final JavaArchive lambdaZip = ShrinkWrap.create(JavaArchive.class);
-        lambdaZip.addClasses(handlerClass);
+        lambdaZip.addClasses(handlerClass, OtherModuleInput.class);
         final ArchivePath archiveLibraryPath = ArchivePaths.create("/lib");
         Maven.resolver()
                 .loadPomFromFile("pom.xml")

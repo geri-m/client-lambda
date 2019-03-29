@@ -24,7 +24,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(LocalstackDockerExtension.class)
-@LocalstackDockerProperties(randomizePorts = true, services = {"s3"})
+@LocalstackDockerProperties(randomizePorts = false, services = {"s3"})
 public class S3Upload {
 
     /**

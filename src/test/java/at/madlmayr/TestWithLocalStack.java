@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @Disabled
 @TestInstance(PER_CLASS)
 @ExtendWith(LocalstackDockerExtension.class)
-@LocalstackDockerProperties(randomizePorts = true, services = {"s3", "lambda"})
+@LocalstackDockerProperties(randomizePorts = false, services = {"s3", "lambda"})
 public class TestWithLocalStack {
 
 
