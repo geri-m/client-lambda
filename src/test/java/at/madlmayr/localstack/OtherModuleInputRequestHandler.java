@@ -1,4 +1,4 @@
-package at.madlmayr.lambdasample;
+package at.madlmayr.localstack;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;

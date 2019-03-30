@@ -91,14 +91,14 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: "Company"
+        - AttributeName: "company"
           AttributeType: "S"
-        - AttributeName: "Tool"
+        - AttributeName: "tool"
           AttributeType: "S"
       KeySchema:
-        - AttributeName: "Company"
+        - AttributeName: "company"
           KeyType: "HASH"
-        - AttributeName: "Tool"
+        - AttributeName: "tool"
           KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 1

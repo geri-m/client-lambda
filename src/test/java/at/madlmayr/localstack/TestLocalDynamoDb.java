@@ -1,5 +1,8 @@
-package at.madlmayr;
+package at.madlmayr.localstack;
 
+import at.madlmayr.ArtifactoryCall;
+import at.madlmayr.ToolCall;
+import at.madlmayr.ToolConfig;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;

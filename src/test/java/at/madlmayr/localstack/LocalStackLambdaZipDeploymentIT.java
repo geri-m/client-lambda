@@ -1,6 +1,5 @@
-package at.madlmayr.lambdasample;
+package at.madlmayr.localstack;
 
-import at.madlmayr.LambdaInvoker;
 import cloud.localstack.DockerTestUtils;
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;

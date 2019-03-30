@@ -18,10 +18,10 @@ public class ToolConfigTest {
     @Test
     public void parseToolConfigFromDynamoDbStructure() throws JsonProcessingException {
         Map<String, AttributeValue> dataFromDynamo = new HashMap<>();
-        dataFromDynamo.put("Company", new AttributeValue("demo company"));
-        dataFromDynamo.put("Bearer", new AttributeValue("some bearer"));
-        dataFromDynamo.put("URL", new AttributeValue("https://www.madlmayr.at"));
-        dataFromDynamo.put("Tool", new AttributeValue("slack"));
+        dataFromDynamo.put("company", new AttributeValue("demo company"));
+        dataFromDynamo.put("bearer", new AttributeValue("some bearer"));
+        dataFromDynamo.put("url", new AttributeValue("https://www.madlmayr.at"));
+        dataFromDynamo.put("tool", new AttributeValue("slack"));
 
         ToolConfig config = new ToolConfig(dataFromDynamo);
 
@@ -34,24 +34,24 @@ public class ToolConfigTest {
         String jsonString = mapper.writeValueAsString(config);
 
         JSONObject configAsJson = new JSONObject(jsonString);
-        assertThat(configAsJson.keySet().contains("Company"));
-        assertThat(configAsJson.keySet().contains("Bearer"));
-        assertThat(configAsJson.keySet().contains("URL"));
-        assertThat(configAsJson.keySet().contains("Tool"));
+        assertThat(configAsJson.keySet().contains("company"));
+        assertThat(configAsJson.keySet().contains("bearer"));
+        assertThat(configAsJson.keySet().contains("url"));
+        assertThat(configAsJson.keySet().contains("tool"));
 
-        assertThat(configAsJson.getString("Company").equals("demo company"));
-        assertThat(configAsJson.getString("Bearer").equals("some bearer"));
-        assertThat(configAsJson.getString("URL").equals("https://www.madlmayr.at"));
-        assertThat(configAsJson.getString("Tool").equals("slack"));
+        assertThat(configAsJson.getString("company").equals("demo company"));
+        assertThat(configAsJson.getString("bearer").equals("some bearer"));
+        assertThat(configAsJson.getString("url").equals("https://www.madlmayr.at"));
+        assertThat(configAsJson.getString("tool").equals("slack"));
 
     }
 
     @Test
     public void missingCompany() {
         Map<String, AttributeValue> dataFromDynamo = new HashMap<>();
-        dataFromDynamo.put("Bearer", new AttributeValue("some bearer"));
-        dataFromDynamo.put("URL", new AttributeValue("https://www.madlmayr.at"));
-        dataFromDynamo.put("Tool", new AttributeValue("slack"));
+        dataFromDynamo.put("bearer", new AttributeValue("some bearer"));
+        dataFromDynamo.put("url", new AttributeValue("https://www.madlmayr.at"));
+        dataFromDynamo.put("tool", new AttributeValue("slack"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
                         () -> new ToolConfig(dataFromDynamo),
@@ -63,9 +63,9 @@ public class ToolConfigTest {
     @Test
     public void missingBearer() {
         Map<String, AttributeValue> dataFromDynamo = new HashMap<>();
-        dataFromDynamo.put("Company", new AttributeValue("demo company"));
-        dataFromDynamo.put("URL", new AttributeValue("https://www.madlmayr.at"));
-        dataFromDynamo.put("Tool", new AttributeValue("slack"));
+        dataFromDynamo.put("company", new AttributeValue("demo company"));
+        dataFromDynamo.put("url", new AttributeValue("https://www.madlmayr.at"));
+        dataFromDynamo.put("tool", new AttributeValue("slack"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
                         () -> new ToolConfig(dataFromDynamo),
@@ -77,9 +77,9 @@ public class ToolConfigTest {
     @Test
     public void missingURL() {
         Map<String, AttributeValue> dataFromDynamo = new HashMap<>();
-        dataFromDynamo.put("Company", new AttributeValue("demo company"));
-        dataFromDynamo.put("Bearer", new AttributeValue("some bearer"));
-        dataFromDynamo.put("Tool", new AttributeValue("slack"));
+        dataFromDynamo.put("company", new AttributeValue("demo company"));
+        dataFromDynamo.put("bearer", new AttributeValue("some bearer"));
+        dataFromDynamo.put("tool", new AttributeValue("slack"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
                         () -> new ToolConfig(dataFromDynamo),
@@ -91,9 +91,9 @@ public class ToolConfigTest {
     @Test
     public void missingTool() {
         Map<String, AttributeValue> dataFromDynamo = new HashMap<>();
-        dataFromDynamo.put("Company", new AttributeValue("demo company"));
-        dataFromDynamo.put("Bearer", new AttributeValue("some bearer"));
-        dataFromDynamo.put("URL", new AttributeValue("https://www.madlmayr.at"));
+        dataFromDynamo.put("company", new AttributeValue("demo company"));
+        dataFromDynamo.put("bearer", new AttributeValue("some bearer"));
+        dataFromDynamo.put("url", new AttributeValue("https://www.madlmayr.at"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
                         () -> new ToolConfig(dataFromDynamo),

@@ -1,4 +1,4 @@
-package at.madlmayr.lambdasample;
+package at.madlmayr.localstack;
 
 public class SameModuleInput {
     private String testProperty;

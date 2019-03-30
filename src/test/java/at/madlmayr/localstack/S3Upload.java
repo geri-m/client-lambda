@@ -1,4 +1,4 @@
-package at.madlmayr.lambdasample;
+package at.madlmayr.localstack;
 
 
 import cloud.localstack.DockerTestUtils;
