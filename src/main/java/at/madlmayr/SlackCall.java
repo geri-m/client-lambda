@@ -2,6 +2,7 @@ package at.madlmayr;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.xray.AWSXRayRecorder;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,10 +22,13 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
     private final static DynamoAbstraction db;
     private static final CloseableHttpClient httpClient;
     private static final ObjectMapper objectMapper;
+    private static final AWSXRayRecorder recorder;
 
     static {
         db = new DynamoAbstraction();
-        httpClient = HttpClientBuilder.create().build();
+        recorder = new AWSXRayRecorder();
+        recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
+        httpClient = HttpClientBuilder.create().setRecorder(recorder).build();
         objectMapper = new ObjectMapper();
     }
 
