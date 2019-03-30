@@ -1,37 +1,23 @@
 package at.madlmayr.lambdasample;
 
-import at.madlmayr.LocalTestUtil;
+import at.madlmayr.LambdaInvoker;
 import cloud.localstack.DockerTestUtils;
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.amazonaws.services.lambda.AWSLambda;
-import com.amazonaws.services.lambda.model.*;
+import com.amazonaws.services.lambda.model.InvokeResult;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.PutObjectResult;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePath;
-import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
-import static com.amazonaws.services.lambda.model.Runtime.Java8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
@@ -45,9 +31,6 @@ class LocalStackLambdaZipDeploymentIT {
     // Initialize the Log4j logger.
     private static final Logger LOGGER = LogManager.getLogger(LocalStackLambdaZipDeploymentIT.class);
 
-    private static final int HTTP_OK = 200;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     private AmazonS3 amazonS3;
     private AWSLambda awsLambda;
 
@@ -57,6 +40,7 @@ class LocalStackLambdaZipDeploymentIT {
         awsLambda = DockerTestUtils.getClientLambda();
     }
 
+
     @Test
     void testSameModuleInputRequestHandler() throws Exception {
 
@@ -64,150 +48,39 @@ class LocalStackLambdaZipDeploymentIT {
         final Class<? extends RequestHandler> handlerClass = SameModuleInputRequestHandler.class;
         final String handlerClassName = handlerClass.getCanonicalName();
         final String lambdaFunctionName = handlerClass.getSimpleName();
+        LambdaInvoker invoker = new LambdaInvoker(amazonS3, awsLambda);
 
-        // Create Lambda archive
-        final JavaArchive lambdaZip = ShrinkWrap.create(JavaArchive.class);
-
-        Class[] classes = LocalTestUtil.getClasses("at.madlmayr");
-
-        for (Class clazz : classes) {
-            LOGGER.info("Class: {}", clazz.getName());
-            lambdaZip.addClass(clazz);
-        }
-
-        lambdaZip.addClasses(handlerClass, SameModuleInput.class);
-        LOGGER.info(lambdaZip.toString(true));
 
         // Create request object
         final SameModuleInput sameModuleInput = new SameModuleInput();
         sameModuleInput.setTestProperty("Testing");
 
         // Invoke Lambda
-        final InvokeResult result = invokeLambda(lambdaZip, sameModuleInput, lambdaFunctionName, handlerClassName);
+        final InvokeResult result = invoker.invokeLambda(sameModuleInput, lambdaFunctionName, handlerClassName);
 
         // Assert post-conditions
-        assertThat(result.getStatusCode()).isEqualTo(HTTP_OK);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.SC_OK);
     }
 
     @Test
-    void testOtherModuleInputRequestHandler() throws IOException {
+    void testOtherModuleInputRequestHandler() throws IOException, ClassNotFoundException {
 
         // RequestHandler under test
         final Class<? extends RequestHandler> handlerClass = OtherModuleInputRequestHandler.class;
         final String handlerClassName = handlerClass.getCanonicalName();
         final String lambdaFunctionName = handlerClass.getSimpleName();
 
-        // Create Lambda archive
-        final JavaArchive lambdaZip = ShrinkWrap.create(JavaArchive.class);
-        lambdaZip.addClasses(handlerClass, OtherModuleInput.class);
-        final ArchivePath archiveLibraryPath = ArchivePaths.create("/lib");
-        Maven.resolver()
-                .loadPomFromFile("pom.xml")
-                .importCompileAndRuntimeDependencies()
-                .resolve()
-                .withTransitivity()
-                .asList(JavaArchive.class)
-                .forEach(javaArchive -> lambdaZip.add(javaArchive, archiveLibraryPath, ZipExporter.class));
-        LOGGER.info(lambdaZip.toString(true));
+        LambdaInvoker invoker = new LambdaInvoker(amazonS3, awsLambda);
 
         // Create request object
         final OtherModuleInput otherModuleInput = new OtherModuleInput();
         otherModuleInput.setOtherTestProperty("Testing");
 
         // Invoke Lambda
-        final InvokeResult result = invokeLambda(lambdaZip, otherModuleInput, lambdaFunctionName, handlerClassName);
+        final InvokeResult result = invoker.invokeLambda(otherModuleInput, lambdaFunctionName, handlerClassName);
 
         // Assert post-conditions
-        assertThat(result.getStatusCode()).isEqualTo(HTTP_OK);
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.SC_OK);
     }
 
-    private InvokeResult invokeLambda(final Archive lambdaArchive, final Object requestObject,
-                                      final String lambdaFunctionName, final String handlerClassName) throws IOException {
-
-        LOGGER.info("invokeLambda");
-        // Create temp file for archive
-        final File tempLambdaZipFile = writeArchiveAsTempFile(lambdaArchive, "lambda-", ".zip");
-
-
-        // Create S3 bucket for archive
-        final String bucketName = "test-bucket";
-        LOGGER.info("Next: Create Bucket");
-        final Bucket s3Bucket = createTestS3Bucket(bucketName);
-        LOGGER.info("Bucket created");
-        assertThat(s3Bucket.getName()).isEqualTo(bucketName);
-
-        // Upload archive to S3
-        final String lambdaZipFileName = "testing.zip";
-        final PutObjectResult putObjectResult = uploadLambdaFunction(bucketName, tempLambdaZipFile, lambdaZipFileName);
-        LOGGER.info("Upload Done");
-        assertThat(putObjectResult.getContentMd5()).isNotNull();
-
-        // Create Lambda Function
-        final CreateFunctionResult createFunctionResult = createLambdaFunction(bucketName, lambdaZipFileName,
-                lambdaFunctionName, handlerClassName);
-        LOGGER.info("Create Lambda Done");
-        assertThat(createFunctionResult.getFunctionArn()).isNotNull();
-
-        // Create Lambda invocation request
-        final InvokeRequest request = createLambdaInvokeRequest(requestObject, lambdaFunctionName);
-
-        // Invoke Lambda
-        return awsLambda.invoke(request);
-    }
-
-    private File writeArchiveAsTempFile(final Archive archive, final String prefix, final String suffix)
-            throws IOException {
-
-        // Create a temp file
-        final Path tempPath = Files.createTempFile(prefix, suffix);
-        final File tempFile = tempPath.toFile();
-
-        // Write the archive to the temp file
-        final ZipExporter zipExporter = archive.as(ZipExporter.class);
-        LOGGER.info("Archiv Done");
-        final boolean writeToExistingTempFile = true;
-        zipExporter.exportTo(tempFile, writeToExistingTempFile);
-        LOGGER.info("Export Done");
-        return tempFile;
-    }
-
-    private Bucket createTestS3Bucket(final String bucketName) {
-
-        return amazonS3.createBucket(bucketName);
-    }
-
-    private PutObjectResult uploadLambdaFunction(final String bucketName, final File file, final String fileName) {
-
-        return amazonS3.putObject(bucketName, fileName, file);
-    }
-
-    private CreateFunctionResult createLambdaFunction(final String bucketName, final String lambdaZipFileName,
-                                                      final String lambdaFunctionName, final String handlerClassName) {
-
-        final FunctionCode functionCode = new FunctionCode()
-                .withS3Bucket(bucketName)
-                .withS3Key(lambdaZipFileName);
-
-        final CreateFunctionRequest createFunctionRequest = new CreateFunctionRequest()
-                .withFunctionName(lambdaFunctionName)
-                .withRuntime(Java8)
-                .withHandler(handlerClassName)
-                .withCode(functionCode)
-                .withDescription("Test Lambda Function")
-                .withTimeout(15)
-                .withMemorySize(128)
-                .withPublish(true);
-
-        return awsLambda.createFunction(createFunctionRequest);
-    }
-
-    private InvokeRequest createLambdaInvokeRequest(final Object eventRequest, final String lambdaFunctionName)
-            throws JsonProcessingException {
-
-        final String eventRequestJson = objectMapper.writeValueAsString(eventRequest);
-
-        return new InvokeRequest()
-                .withFunctionName(lambdaFunctionName)
-                .withPayload(eventRequestJson);
-    }
 }

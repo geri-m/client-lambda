@@ -1,24 +1,20 @@
 package at.madlmayr;
 
 
+import at.madlmayr.lambdasample.SameModuleInput;
 import cloud.localstack.DockerTestUtils;
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.amazonaws.services.lambda.AWSLambda;
-import com.amazonaws.services.lambda.model.CreateFunctionRequest;
-import com.amazonaws.services.lambda.model.InvokeRequest;
+import com.amazonaws.services.lambda.model.InvokeResult;
 import com.amazonaws.services.lambda.model.ListFunctionsResult;
-import com.amazonaws.services.lambda.model.Runtime;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.Bucket;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -29,6 +25,15 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @LocalstackDockerProperties(randomizePorts = false, services = {"s3", "lambda"})
 public class TestWithLocalStack {
 
+
+    private AmazonS3 amazonS3;
+    private AWSLambda awsLambda;
+
+    @BeforeAll
+    void setUp() {
+        amazonS3 = DockerTestUtils.getClientS3();
+        awsLambda = DockerTestUtils.getClientLambda();
+    }
 
     @Test
     public void testLocalLambdaAPI() {
@@ -49,22 +54,25 @@ public class TestWithLocalStack {
 
     @Test
     public void testLocalS3API() throws Exception {
-        AWSLambda lambda = DockerTestUtils.getClientLambda();
-        String functionName = UUID.randomUUID().toString();
-        String streamName = UUID.randomUUID().toString();
 
-        // create function
-        CreateFunctionRequest request = new CreateFunctionRequest();
-        request.setFunctionName(functionName);
-        request.setRuntime(Runtime.Java8);
-        request.setCode(LocalTestUtil.createFunctionCode(ReadConfig.class));
-        request.setHandler(ReadConfig.class.getName());
-        lambda.createFunction(request);
 
-        InvokeRequest ir = new InvokeRequest();
-        ir.setFunctionName("at.madlmayr.ReadConfig::handleRequest");
+        // RequestHandler under test
+        final Class handlerClass = ReadConfig.class;
+        final String handlerClassName = handlerClass.getCanonicalName();
+        final String lambdaFunctionName = handlerClass.getSimpleName();
+        LambdaInvoker invoker = new LambdaInvoker(amazonS3, awsLambda);
 
-        lambda.invoke(ir);
+
+        // Create request object
+        final SameModuleInput sameModuleInput = new SameModuleInput();
+        sameModuleInput.setTestProperty("Testing");
+
+        // Invoke Lambda
+        final InvokeResult result = invoker.invokeLambda(sameModuleInput, lambdaFunctionName, handlerClassName);
+
+        // Assert post-conditions
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+
 
     }
 
