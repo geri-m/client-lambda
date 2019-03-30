@@ -1,5 +1,6 @@
 package at.madlmayr.lambdasample;
 
+import at.madlmayr.LocalTestUtil;
 import cloud.localstack.DockerTestUtils;
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
@@ -57,7 +58,7 @@ class LocalStackLambdaZipDeploymentIT {
     }
 
     @Test
-    void testSameModuleInputRequestHandler() throws IOException {
+    void testSameModuleInputRequestHandler() throws Exception {
 
         // RequestHandler under test
         final Class<? extends RequestHandler> handlerClass = SameModuleInputRequestHandler.class;
@@ -66,6 +67,14 @@ class LocalStackLambdaZipDeploymentIT {
 
         // Create Lambda archive
         final JavaArchive lambdaZip = ShrinkWrap.create(JavaArchive.class);
+
+        Class[] classes = LocalTestUtil.getClasses("at.madlmayr");
+
+        for (Class clazz : classes) {
+            LOGGER.info("Class: {}", clazz.getName());
+            lambdaZip.addClass(clazz);
+        }
+
         lambdaZip.addClasses(handlerClass, SameModuleInput.class);
         LOGGER.info(lambdaZip.toString(true));
 
