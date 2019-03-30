@@ -29,14 +29,12 @@ public class ReadConfig implements RequestStreamHandler {
     private static final Logger LOGGER = LogManager.getLogger(ReadConfig.class);
     private static final String CONFIG_TABLE_NAME = "Config";
 
-
-    private static final AmazonDynamoDB dynamoClient;
-
+    private static final AmazonDynamoDB dynamo;
     private static final AWSLambdaAsync lambda;
 
     static {
-        dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
-        lambda = AWSLambdaAsyncClientBuilder.defaultClient();
+        dynamo = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
+        lambda = AWSLambdaAsyncClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
     }
 
     @Override
@@ -47,7 +45,7 @@ public class ReadConfig implements RequestStreamHandler {
         ScanRequest scanRequest = new ScanRequest()
                 .withTableName(CONFIG_TABLE_NAME);
 
-        ScanResult result = dynamoClient.scan(scanRequest);
+        ScanResult result = dynamo.scan(scanRequest);
         LOGGER.info("Amount of Config found: {}", result.getItems().size());
         seg.putMetadata("Amount of Configs", result.getItems().size());
 
@@ -69,10 +67,7 @@ public class ReadConfig implements RequestStreamHandler {
             }
         }
         AWSXRay.endSubsegment();
-        // });
     }
-
-
 
 
 }

@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Deploy Client API Lambda using Cloudformation.
 Resources:
-  ClientApi:
+  ReadConfig:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: target/client-lambda.jar
@@ -12,7 +12,7 @@ Resources:
       MemorySize: 512
       Timeout: 15
       Role: !GetAtt LambdaExecutionRole.Arn
-      FunctionName: ClientApi
+      FunctionName: ReadConfig
       Tracing: Active
   SlackCall:
     Type: AWS::Serverless::Function
@@ -73,7 +73,7 @@ Resources:
       State: "ENABLED"
       Targets:
         - Arn: !GetAtt
-            - ClientApi
+            - ReadConfig
             - Arn
           Id: RateRuleDailyScheduler
           # Input: "Input"
@@ -83,7 +83,7 @@ Resources:
   InvokeLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt ClientApi.Arn
+      FunctionName: !GetAtt ReadConfig.Arn
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt RateRuleDaily.Arn

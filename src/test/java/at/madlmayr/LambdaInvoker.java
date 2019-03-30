@@ -17,8 +17,7 @@ import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -192,6 +191,10 @@ public class LambdaInvoker {
         // Create Lambda archive
         final JavaArchive lambdaZip = ShrinkWrap.create(JavaArchive.class);
 
+        File file = new File(ClassLoader.getSystemClassLoader().getResource("log4j2.xml").getFile());
+        LOGGER.info("Log4j: {}", file.exists());
+        lambdaZip.addAsResource(file);
+
         Class[] classes = getClasses("at.madlmayr");
 
 
@@ -200,17 +203,34 @@ public class LambdaInvoker {
             lambdaZip.addClass(clazz);
         }
 
-        final ArchivePath archiveLibraryPath = ArchivePaths.create("/lib");
+        final ArchivePath archiveLibraryPath = ArchivePaths.create("/");
         Maven.resolver()
                 .loadPomFromFile("pom.xml")
                 .importCompileAndRuntimeDependencies()
                 .resolve()
                 .withTransitivity()
                 .asList(JavaArchive.class)
-                .forEach(javaArchive -> lambdaZip.add(javaArchive, archiveLibraryPath, ZipExporter.class));
+                // .forEach(javaArchive -> lambdaZip.add(javaArchive, archiveLibraryPath, ZipExporter.class));
+                .forEach(javaArchive -> lambdaZip.merge(javaArchive));
         LOGGER.info(lambdaZip.toString(true));
+
+
+        // Some samples to write stuff to the disk: https://developer.jboss.org/wiki/ShrinkWrap
+        writeInputStreamToFile(lambdaZip.as(ZipExporter.class).exportAsInputStream());
+
 
 
         return lambdaZip;
     }
+
+    private void writeInputStreamToFile(final InputStream initialStream) throws IOException {
+        byte[] buffer = new byte[initialStream.available()];
+        initialStream.read(buffer);
+
+        File targetFile = new File("target/testOutput.zip");
+        OutputStream outStream = new FileOutputStream(targetFile);
+        outStream.write(buffer);
+    }
+
+
 }
