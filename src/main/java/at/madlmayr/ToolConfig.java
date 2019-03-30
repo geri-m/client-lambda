@@ -13,22 +13,27 @@ public class ToolConfig implements Serializable {
     private static final String COLUMN_BEARER = "Bearer";
     private static final String COLUMN_TOOL = "Tool";
 
-    @JsonProperty("url")
+    @JsonProperty(COLUMN_URL)
     private String url;
 
-    @JsonProperty("bearer")
+    @JsonProperty(COLUMN_BEARER)
     private String bearer;
 
-    @JsonProperty("company")
+    @JsonProperty(COLUMN_COMPANY)
     private String company;
 
-    @JsonProperty("tool")
+    @JsonProperty(COLUMN_TOOL)
     private String tool;
 
     // Required for Jackson to create an Object.
     public ToolConfig() {
 
     }
+
+    public ToolConfig(final String url, final String bearer, final String company, final String tool) {
+
+    }
+
 
     public ToolConfig(Map<String, AttributeValue> returnedItems) throws ToolCallException {
 
