@@ -107,7 +107,7 @@ Resources:
       #  ReadCapacityUnits: 1
       #  WriteCapacityUnits: 1
       TableName: "RawData"
-Outputs:
-  TableName:
-    Value: !Ref 'DynamoDBConfigTable'
-    Description: Table name of the newly created DynamoDB table for Configs
+#Outputs:
+#  TableName:
+#    Value: !Ref 'DynamoDBConfigTable'
+#    Description: Table name of the newly created DynamoDB table for Configs
