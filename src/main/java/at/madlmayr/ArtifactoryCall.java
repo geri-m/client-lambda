@@ -2,7 +2,9 @@ package at.madlmayr;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.AWSXRayRecorder;
+import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
@@ -72,11 +74,12 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
                 JSONArray userList = new JSONArray(jsonString);
                 LOGGER.info("Amount of Users: {} ", userList.length());
-                // Do Detailed Calls to fetch more users.
-                // Subsegment userSubSegment = AWSXRay.beginSubsegment("## Fetch Users");
-                JSONArray userDetailList = doClientCallsAsync(userList, bearer);
-                // userSubSegment.putMetadata("Amount of Users", userList.length());
-                // AWSXRay.endSubsegment();
+                // We do the sync call for several reasons
+                // 1) Xray works out of the box
+                // 2) Not much mor expensive than Sync all (yes, 100 % is something, but its cents)
+                // 3) less efford for testing.
+                JSONArray userDetailList = doClientCallsSync(userList, bearer);
+
                 return userDetailList.toString();
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
@@ -107,6 +110,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
     }
 
     private JSONArray doClientCallsAsync(final JSONArray userList, final String bearer) throws IOReactorException, ToolCallException {
+        Subsegment userSubSegment = AWSXRay.beginSubsegment("## Fetch Users");
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
         PoolingNHttpClientConnectionManager cm =
                 new PoolingNHttpClientConnectionManager(ioReactor);
@@ -149,10 +153,14 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             }
             // Wait till all calls come back.
             latchForUserCalls.await();
-
+            userSubSegment.putMetadata("Amount of Users", userList.length());
             return userDetailList;
         } catch (IOException | InterruptedException e) {
+            userSubSegment.addException(e);
             throw new ToolCallException(e);
+        } finally {
+            AWSXRay.endSubsegment();
         }
+
     }
 }

@@ -3,7 +3,7 @@ package at.madlmayr;
 public enum ToolEnum {
 
     SLACK("slack", "SlackCall"),
-    JIRA("jira", "JiraCall"),
+    JIRA("jira", "JiraV2Call"),
     ARTIFACTORY("artifactory", "ArtifactoryCall");
 
     private final String name;

@@ -61,7 +61,7 @@ public class LambdaTest {
             }
         }
         assertThat(jira != null);
-        RequestStreamHandler call = new JiraCall();
+        RequestStreamHandler call = new JiraV2Call();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(jira).toString().getBytes());
         call.handleRequest(targetStream, null, null);
     }
