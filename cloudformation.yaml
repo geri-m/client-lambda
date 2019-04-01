@@ -87,23 +87,7 @@ Resources:
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt RateRuleDaily.Arn
-  DynamoDBConfigTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: "company"
-          AttributeType: "S"
-        - AttributeName: "tool"
-          AttributeType: "S"
-      KeySchema:
-        - AttributeName: "company"
-          KeyType: "HASH"
-        - AttributeName: "tool"
-          KeyType: "RANGE"
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-      TableName: "Config"
+
   DynamoDBRawDataTable:
     Type: AWS::DynamoDB::Table
     Properties:
