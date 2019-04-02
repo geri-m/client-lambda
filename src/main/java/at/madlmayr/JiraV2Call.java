@@ -2,6 +2,7 @@ package at.madlmayr;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.AWSXRayRecorder;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +29,7 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
     // API Version 2
 
     private static final int MAX_RESULT_COUNT_GET_PARAMETER = 1000;
-    private static final int MAX_RECURSION_DEPTH = 4;
+    private static final int MAX_RECURSION_DEPTH = 3;
     private static final char[] SEARCH_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
     private static final Logger LOGGER = LogManager.getLogger(SlackCall.class);
@@ -55,28 +56,20 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
         } catch (IOException e) {
             throw new ToolCallException(e);
         }
-
+        JSONArray users = processCall(toolConfig.getUrl(), toolConfig.getBearer());
+        AWSXRay.getGlobalRecorder().putRuntimeContext("Jira Users:", users.length());
         // DynamoDb allows only 400 K of Data per Record. We have > 1 MB. (4000 Users)
-        // db.writeRawData(toolConfig.generateKey(ToolEnum.JIRA.getName()), processCall(toolConfig.getUrl(), toolConfig.getBearer()));
+        // db.writeRawData(toolConfig.generateKey(ToolEnum.JIRA.getName()),users);
     }
 
     @Override
-    public String processCall(final String url, final String bearer) {
+    public JSONArray processCall(final String url, final String bearer) {
         Map<String, String> allUsers = recursiveCallForUser("", url, bearer);
-        LOGGER.info("Total User: {}", allUsers.size());
-
-        int activeCounter = 0;
         JSONArray userArray = new JSONArray();
         for (Map.Entry<String, String> entry : allUsers.entrySet()) {
             userArray.put(new JSONObject(entry.getValue()));
-
-            if (new JSONObject(entry.getValue()).getBoolean("active"))
-                activeCounter++;
         }
-
-        LOGGER.info("Size of JSON Array for users: {}, active {}", userArray.toString().length(), activeCounter);
-
-        return userArray.toString();
+        return userArray;
     }
 
     private Map<String, String> recursiveCallForUser(final String preFix, final String url, final String bearer) {

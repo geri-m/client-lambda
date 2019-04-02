@@ -2,6 +2,7 @@ package at.madlmayr;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.AWSXRayRecorder;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,11 +45,13 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
         } catch (IOException e) {
             throw new ToolCallException(e);
         }
-        db.writeRawData(toolConfig.generateKey(ToolEnum.SLACK.getName()), processCall(toolConfig.getUrl(), toolConfig.getBearer()));
+        JSONArray users = processCall(toolConfig.getUrl(), toolConfig.getBearer());
+        AWSXRay.getGlobalRecorder().putRuntimeContext("Slack Users:", users.length());
+        db.writeRawData(toolConfig.generateKey(ToolEnum.SLACK.getName()), processCall(toolConfig.getUrl(), toolConfig.getBearer()).toString());
     }
 
     @Override
-    public String processCall(final String url, final String bearer) {
+    public JSONArray processCall(final String url, final String bearer) {
         HttpGet request = new HttpGet(url);
         // Set Bearer Header
         request.setHeader("Authorization", "Bearer " + bearer);
@@ -56,9 +59,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             String jsonString = EntityUtils.toString(response.getEntity());
             if ((response.getStatusLine().getStatusCode() / 100) == 2) {
                 LOGGER.info("HTTP Call to '{}' was successful", url);
-                JSONArray user = new JSONObject(jsonString).getJSONArray("members");
-                LOGGER.info("Currently '{}' members in slack response (aktive, inactive, pp)", user.length());
-                return jsonString;
+                return new JSONObject(jsonString).getJSONArray("members");
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
             }

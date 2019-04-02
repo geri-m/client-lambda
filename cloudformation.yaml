@@ -9,8 +9,8 @@ Resources:
       Handler: 'at.madlmayr.ReadConfig::handleRequest'
       Runtime: java8
       Description: "Client API Lambda"
-      MemorySize: 512
-      Timeout: 15
+      MemorySize: 256
+      Timeout: 60
       Role: !GetAtt LambdaExecutionRole.Arn
       FunctionName: ReadConfig
       Tracing: Active
@@ -20,9 +20,9 @@ Resources:
       CodeUri: target/client-lambda.jar
       Handler: 'at.madlmayr.SlackCall::handleRequest'
       Runtime: java8
-      Description: "Slack Call Lambda"
-      MemorySize: 512
-      Timeout: 15
+      Description: "Slack Call"
+      MemorySize: 256
+      Timeout: 60
       Role: !GetAtt LambdaExecutionRole.Arn
       FunctionName: SlackCall
       Tracing: Active
@@ -32,11 +32,23 @@ Resources:
       CodeUri: target/client-lambda.jar
       Handler: 'at.madlmayr.ArtifactoryCall::handleRequest'
       Runtime: java8
-      Description: "Artifactory Call Lambda"
-      MemorySize: 512
-      Timeout: 15
+      Description: "Artifactory Call"
+      MemorySize: 256
+      Timeout: 60
       Role: !GetAtt LambdaExecutionRole.Arn
       FunctionName: ArtifactoryCall
+      Tracing: Active
+  JiraV2Call:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: target/client-lambda.jar
+      Handler: 'at.madlmayr.JiraV2Call::handleRequest'
+      Runtime: java8
+      Description: "JiraV2Call Call"
+      MemorySize: 256
+      Timeout: 60
+      Role: !GetAtt LambdaExecutionRole.Arn
+      FunctionName: JiraV2Call
       Tracing: Active
   LambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -123,6 +135,25 @@ Resources:
       #  ReadCapacityUnits: 1
       #  WriteCapacityUnits: 1
       TableName: "RawData"
+  DynamoDBUserDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "companyTool"
+          AttributeType: "S"
+        - AttributeName: "timestamp"
+          AttributeType: "N"
+      KeySchema:
+        - AttributeName: "companyTool"
+          KeyType: "HASH"
+        - AttributeName: "timestamp"
+          KeyType: "RANGE"
+      # Require
+      BillingMode: PAY_PER_REQUEST
+      #ProvisionedThroughput:
+      #  ReadCapacityUnits: 1
+      #  WriteCapacityUnits: 1
+      TableName: "UserData"
 Outputs:
   TableName:
     Value: !Ref 'DynamoDBConfigTable'

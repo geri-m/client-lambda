@@ -57,11 +57,17 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
         } catch (IOException e) {
             throw new ToolCallException(e);
         }
-        db.writeRawData(toolConfig.generateKey(ToolEnum.ARTIFACTORY.getName()), processCall(toolConfig.getUrl(), toolConfig.getBearer()));
+        JSONArray users = processCall(toolConfig.getUrl(), toolConfig.getBearer());
+        AWSXRay.getGlobalRecorder().putRuntimeContext("Artifactory Users:", users.length());
+        db.writeRawData(toolConfig.generateKey(ToolEnum.ARTIFACTORY.getName()), users.toString());
+
+
+
+
     }
 
     @Override
-    public String processCall(final String url, final String bearer) {
+    public JSONArray processCall(final String url, final String bearer) {
 
         HttpGet request = new HttpGet(url);
         // Set Bearer Header
@@ -78,9 +84,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                 // 1) Xray works out of the box
                 // 2) Not much mor expensive than Sync all (yes, 100 % is something, but its cents)
                 // 3) less efford for testing.
-                JSONArray userDetailList = doClientCallsSync(userList, bearer);
-
-                return userDetailList.toString();
+                return doClientCallsSync(userList, bearer);
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
             }
