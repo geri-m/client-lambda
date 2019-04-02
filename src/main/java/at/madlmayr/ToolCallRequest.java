@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ToolConfig implements Serializable {
+public class ToolCallRequest implements Serializable {
 
     private static final String COLUMN_COMPANY = "company";
     private static final String COLUMN_TOOL = "tool";
@@ -34,13 +34,13 @@ public class ToolConfig implements Serializable {
 
 
     // Required for Jackson to create an Object.
-    public ToolConfig() {
+    public ToolCallRequest() {
 
     }
 
-    public ToolConfig(final String[] values, final long timestamp) throws ToolCallException {
+    public ToolCallRequest(final String[] values, final long timestamp) throws ToolCallException {
         if (values.length != AMOUNT_OF_PARAMETER) {
-            throw new IllegalArgumentException(String.format("Incorrect Length of Parameter to create ToolConfig. Required %s, given '%s'", AMOUNT_OF_PARAMETER, values.length));
+            throw new IllegalArgumentException(String.format("Incorrect Length of Parameter to create ToolCallRequest. Required %s, given '%s'", AMOUNT_OF_PARAMETER, values.length));
         }
 
         Map<String, AttributeValue> dataFromDynamo = new HashMap<>();
@@ -53,7 +53,7 @@ public class ToolConfig implements Serializable {
     }
 
 
-    public ToolConfig(Map<String, AttributeValue> dataFromDynamo, final long timestamp) throws ToolCallException {
+    public ToolCallRequest(Map<String, AttributeValue> dataFromDynamo, final long timestamp) throws ToolCallException {
         assignLocalVales(dataFromDynamo, timestamp);
     }
 
@@ -80,6 +80,10 @@ public class ToolConfig implements Serializable {
         this.company = dataFromDynamo.get(COLUMN_COMPANY).getS();
         this.tool = dataFromDynamo.get(COLUMN_TOOL).getS();
         this.timestamp = timestamp;
+    }
+
+    public String getCompany() {
+        return company;
     }
 
     public String getUrl() {

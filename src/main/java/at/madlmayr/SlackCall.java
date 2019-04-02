@@ -37,19 +37,20 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
 
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
-        ToolConfig toolConfig;
+        ToolCallRequest toolCallRequest;
         try {
             // Handling De-Serialization myself
             // https://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-req-resp.html
-            toolConfig = objectMapper.readValue(inputStream, ToolConfig.class);
+            toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
         } catch (IOException e) {
             throw new ToolCallException(e);
         }
-        JSONArray users = processCall(toolConfig.getUrl(), toolConfig.getBearer());
-        db.writeRawData(toolConfig.generateKey(ToolEnum.SLACK.getName()), users.toString(), toolConfig.getTimestamp());
+        JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
+        db.writeRawData(toolCallRequest.generateKey(ToolEnum.SLACK.getName()), users.toString(), toolCallRequest.getTimestamp());
 
         try {
-            outputStream.write(Integer.toString(users.length()).getBytes());
+            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length());
+            outputStream.write(objectMapper.writeValueAsString(result).getBytes());
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getCurrentSegment().addException(e);

@@ -1,6 +1,7 @@
 package at.madlmayr;
 
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -16,12 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Disabled
 public class LambdaTest {
 
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Test
     public void testSlackCall() throws IOException {
-        List<ToolConfig> configList = CallUtils.readToolConfigFromCVSFile();
-        ToolConfig slack = null;
-        for (ToolConfig config : configList) {
+        List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
+        ToolCallRequest slack = null;
+        for (ToolCallRequest config : configList) {
             if (config.getTool().equals(ToolEnum.SLACK.getName())) {
                 slack = config;
                 break;
@@ -32,15 +34,16 @@ public class LambdaTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
-        assertThat(Integer.parseInt(outputStream.toString()) >= 0);
+        ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
+        assertThat(resultFromCall.getAmountOfUsers() >= 0);
     }
 
 
     @Test
     public void testArtifactoryCall() throws IOException {
-        List<ToolConfig> configList = CallUtils.readToolConfigFromCVSFile();
-        ToolConfig artifactory = null;
-        for (ToolConfig config : configList) {
+        List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
+        ToolCallRequest artifactory = null;
+        for (ToolCallRequest config : configList) {
             if (config.getTool().equals(ToolEnum.ARTIFACTORY.getName())) {
                 artifactory = config;
                 break;
@@ -51,15 +54,15 @@ public class LambdaTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(artifactory).toString().getBytes());
         call.handleRequest(targetStream, null, null);
-        assertThat(Integer.parseInt(outputStream.toString()) >= 0);
+        ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
+        assertThat(resultFromCall.getAmountOfUsers() >= 0);
     }
-
 
     @Test
     public void testJiraCall() throws IOException {
-        List<ToolConfig> configList = CallUtils.readToolConfigFromCVSFile();
-        ToolConfig jira = null;
-        for (ToolConfig config : configList) {
+        List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
+        ToolCallRequest jira = null;
+        for (ToolCallRequest config : configList) {
             if (config.getTool().equals(ToolEnum.JIRA.getName())) {
                 jira = config;
                 break;
@@ -70,6 +73,7 @@ public class LambdaTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(jira).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
-        assertThat(Integer.parseInt(outputStream.toString()) >= 0);
+        ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
+        assertThat(resultFromCall.getAmountOfUsers() >= 0);
     }
 }

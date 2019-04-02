@@ -20,13 +20,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 
@@ -39,11 +39,14 @@ public class ReadConfig implements RequestStreamHandler {
     private static final AmazonDynamoDB dynamo;
     private static final AWSLambdaAsync lambda;
     private static final AWSXRayRecorder recorder;
+    private static final ObjectMapper mapper;
+
     static {
         recorder = new AWSXRayRecorder();
         recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
         dynamo = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(recorder)).build();
         lambda = AWSLambdaAsyncClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(recorder)).build();
+        mapper = new ObjectMapper();
     }
 
     @Override
@@ -67,12 +70,11 @@ public class ReadConfig implements RequestStreamHandler {
         for (Map<String, AttributeValue> returnedItems : result.getItems()) {
             if (returnedItems != null) {
                 try {
-                    ToolConfig toolConfig = new ToolConfig(returnedItems, timestampOfBatch);
-                    LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolConfig.getTool().toUpperCase()).getName());
-                    ObjectMapper mapper = new ObjectMapper();
+                    ToolCallRequest toolCallRequest = new ToolCallRequest(returnedItems, timestampOfBatch);
+                    LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getName());
                     InvokeRequest req = new InvokeRequest()
-                            .withFunctionName(ToolEnum.valueOf(toolConfig.getTool().toUpperCase()).getFunctionName())
-                            .withPayload(mapper.writeValueAsString(toolConfig));
+                            .withFunctionName(ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getFunctionName())
+                            .withPayload(mapper.writeValueAsString(toolCallRequest));
                     futures.add(lambda.invokeAsync(req));
                 } catch (Exception e) {
                     LOGGER.error(e);
@@ -91,8 +93,10 @@ public class ReadConfig implements RequestStreamHandler {
                 // futures which are done, but not yet in the finished list.
                 if (localFuture.isDone() && !futuresFinished.contains(localFuture)) {
                     try {
-                        LOGGER.info("{} {}", localFuture.get().getLogResult(), localFuture.get().getPayload().toString());
-                    } catch (InterruptedException | ExecutionException e) {
+                        // getLogResult() is null
+                        ToolCallResult resultFromCall = mapper.readValue(inputStream, ToolCallResult.class);
+                        LOGGER.info("Response from Method '{}'", mapper.writeValueAsString(resultFromCall));
+                    } catch (final IOException e) {
                         LOGGER.error(e.getMessage());
                     }
 
