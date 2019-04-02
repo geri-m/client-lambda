@@ -20,10 +20,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,8 +92,15 @@ public class ReadConfig implements RequestStreamHandler {
                 if (localFuture.isDone() && !futuresFinished.contains(localFuture)) {
                     try {
                         // getLogResult() is null
-                        ToolCallResult resultFromCall = mapper.readValue(inputStream, ToolCallResult.class);
-                        LOGGER.info("Response from Method '{}'", resultFromCall.toString());
+                        // ToolCallResult resultFromCall = mapper.readValue(inputStream, ToolCallResult.class);
+                        // LOGGER.info("Response from Method '{}'", resultFromCall.toString());
+                        BufferedReader streamReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                        StringBuilder responseStrBuilder = new StringBuilder();
+                        String inputStr;
+                        while ((inputStr = streamReader.readLine()) != null)
+                            responseStrBuilder.append(inputStr);
+
+                        LOGGER.info("Response from Method '{}'", new JSONObject(responseStrBuilder.toString()));
                     } catch (final IOException e) {
                         LOGGER.error(e.getMessage());
                     }
