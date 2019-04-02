@@ -1,28 +1,15 @@
 package at.madlmayr.localstack;
 
-import at.madlmayr.ArtifactoryCall;
-import at.madlmayr.ToolCall;
-import at.madlmayr.ToolConfig;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -188,98 +175,4 @@ public class TestLocalDynamoDb {
         }
         LOGGER.info("Done!");
     }
-
-    @Test
-    public void testHttpCallToSlack(){
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet("https://slack.com/api/users.list/");
-        // Set Bearer Header
-        request.setHeader("Authorization", "Bearer " + "xoxb");
-        boolean is2xx = false;
-
-        LOGGER.info(request.toString());
-
-        try {
-            HttpResponse response = httpClient.execute(request);
-            String jsonString = EntityUtils.toString(response.getEntity());
-
-            // TODO: https://stackoverflow.com/questions/27500749/dynamodb-object-to-attributevalue
-            // TODO: https://www.baeldung.com/java-org-json
-            JSONObject jsonResponse = new JSONObject(jsonString);
-            is2xx = (response.getStatusLine().getStatusCode() / 100) == 2;
-            LOGGER.info("Result: {}", jsonResponse.toString(2));
-            LOGGER.debug("Status Code: {}", is2xx);
-        } catch (IOException ioe) {
-            LOGGER.error(ioe);
-        }
-    }
-
-
-    @Test
-    public void testHttpCallToArtifactory(){
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet("https://p7s1.jfrog.io/p7s1/api/security/users");
-        // Set Bearer Header
-        request.setHeader("X-JFrog-Art-Api", null);
-        boolean is2xx = false;
-
-        LOGGER.info(request.toString());
-
-        try {
-            HttpResponse response = httpClient.execute(request);
-            String jsonString = EntityUtils.toString(response.getEntity());
-
-            // TODO: https://stackoverflow.com/questions/27500749/dynamodb-object-to-attributevalue
-            // TODO: https://www.baeldung.com/java-org-json
-            JSONArray userList = new JSONArray(jsonString);
-            LOGGER.info("Amount of Users: {} ", userList.length());
-
-            JSONArray userDetailList = new JSONArray();
-            for(int i = 0; i < userList.length(); i++){
-                // LOGGER.info(new JSONObject(userList.get(i).toString()).get("uri"));
-                HttpGet requestForUser = new HttpGet(new JSONObject(userList.get(i).toString()).get("uri").toString());
-                requestForUser.setHeader("X-JFrog-Art-Api", null);
-                HttpResponse responseForUser = httpClient.execute(requestForUser);
-                String jsonStringForUser = EntityUtils.toString(responseForUser.getEntity());
-                userDetailList.put(new JSONObject(jsonStringForUser));
-            }
-
-            LOGGER.info(userDetailList);
-
-            is2xx = (response.getStatusLine().getStatusCode() / 100) == 2;
-            LOGGER.debug("Status Code: {}", is2xx);
-        } catch (IOException ioe) {
-            LOGGER.error(ioe);
-        }
-    }
-
-    @Test
-    public void testArtifactoryCall() {
-        ToolCall call = new ArtifactoryCall();
-        call.processCall("https://p7s1.jfrog.io/p7s1/api/security/users", "AKCp5budNy64P21YRwWgW6S38U3bLeCmjPY4BMBeBRVjC5ib6kFtpPDevaQCfPfKcmEL7yzFQ");
-    }
-
-    @Test
-    public void testJsonOutput(){
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, AttributeValue> map = new HashMap<>();
-        map.put("Company", new AttributeValue("Company"));
-        map.put("URL", new AttributeValue("Company"));
-        map.put("Bearer", new AttributeValue("Company"));
-        map.put("Tool", new AttributeValue("Company"));
-        ToolConfig obj = new ToolConfig(map);
-
-        try {
-            LOGGER.info(mapper.writeValueAsString(obj));
-            ToolConfig result = mapper.readValue(mapper.writeValueAsString(obj), ToolConfig.class);
-            LOGGER.info(mapper.writeValueAsString(result));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
 }

@@ -59,7 +59,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
         }
         JSONArray users = processCall(toolConfig.getUrl(), toolConfig.getBearer());
         AWSXRay.getGlobalRecorder().putRuntimeContext("Artifactory Users:", users.length());
-        db.writeRawData(toolConfig.generateKey(ToolEnum.ARTIFACTORY.getName()), users.toString());
+        db.writeRawData(toolConfig.generateKey(ToolEnum.ARTIFACTORY.getName()), users.toString(), toolConfig.getTimestamp());
 
 
 

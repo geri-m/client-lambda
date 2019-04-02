@@ -9,7 +9,6 @@ import com.amazonaws.xray.handlers.TracingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,10 +24,10 @@ public class DynamoAbstraction {
         dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(recorder)).build();
     }
 
-    public void writeRawData(final String key, final String rawData) {
+    public void writeRawData(final String key, final String rawData, final long timestamp) {
         Map<String, AttributeValue> item = new HashMap<>();
         item.put("CompanyTool", new AttributeValue().withS(key));
-        item.put("Timestamp", new AttributeValue().withN("" + Instant.now().getEpochSecond()));
+        item.put("Timestamp", new AttributeValue().withN("" + timestamp));
         item.put("Data", new AttributeValue().withS(rawData));
         dynamoClient.putItem(RAWDATA_TABLE_NAME, item);
         LOGGER.info("Data successfully stored in RawData Table");

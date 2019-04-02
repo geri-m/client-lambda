@@ -23,12 +23,13 @@ public class ToolConfigTest {
         dataFromDynamo.put("url", new AttributeValue("https://www.madlmayr.at"));
         dataFromDynamo.put("tool", new AttributeValue("slack"));
 
-        ToolConfig config = new ToolConfig(dataFromDynamo);
+        ToolConfig config = new ToolConfig(dataFromDynamo, 1234);
 
         assertThat(config.getBearer().equals("some bearer"));
         assertThat(config.getUrl().equals("https://www.madlmayr.at"));
         assertThat(config.getTool().equals("slack"));
         assertThat(config.generateKey("slack").equals("demo company#slack"));
+        assertThat(config.getTimestamp() == (1234));
 
         ObjectMapper mapper = new ObjectMapper();
         String jsonString = mapper.writeValueAsString(config);
@@ -38,11 +39,13 @@ public class ToolConfigTest {
         assertThat(configAsJson.keySet().contains("bearer"));
         assertThat(configAsJson.keySet().contains("url"));
         assertThat(configAsJson.keySet().contains("tool"));
+        assertThat(configAsJson.keySet().contains("timestamp"));
 
         assertThat(configAsJson.getString("company").equals("demo company"));
         assertThat(configAsJson.getString("bearer").equals("some bearer"));
         assertThat(configAsJson.getString("url").equals("https://www.madlmayr.at"));
         assertThat(configAsJson.getString("tool").equals("slack"));
+        assertThat(configAsJson.getLong("timestamp") == 1234);
 
     }
 
@@ -54,7 +57,7 @@ public class ToolConfigTest {
         dataFromDynamo.put("tool", new AttributeValue("slack"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
-                        () -> new ToolConfig(dataFromDynamo),
+                        () -> new ToolConfig(dataFromDynamo, 1234),
                         "Company not present in Record");
 
         assertTrue(thrown.getMessage().contains("Company not present in Record"));
@@ -68,7 +71,7 @@ public class ToolConfigTest {
         dataFromDynamo.put("tool", new AttributeValue("slack"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
-                        () -> new ToolConfig(dataFromDynamo),
+                        () -> new ToolConfig(dataFromDynamo, 1234),
                         "Bearer not present in Record");
 
         assertTrue(thrown.getMessage().contains("Bearer not present in Record"));
@@ -82,7 +85,7 @@ public class ToolConfigTest {
         dataFromDynamo.put("tool", new AttributeValue("slack"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
-                        () -> new ToolConfig(dataFromDynamo),
+                        () -> new ToolConfig(dataFromDynamo, 1234),
                         "URL not present in Record");
 
         assertTrue(thrown.getMessage().contains("URL not present in Record"));
@@ -96,7 +99,7 @@ public class ToolConfigTest {
         dataFromDynamo.put("url", new AttributeValue("https://www.madlmayr.at"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
-                        () -> new ToolConfig(dataFromDynamo),
+                        () -> new ToolConfig(dataFromDynamo, 1234),
                         "Tool not present in Record");
 
         assertTrue(thrown.getMessage().contains("Tool not present in Record"));

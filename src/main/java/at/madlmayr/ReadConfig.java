@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.Instant;
 import java.util.Map;
 
 
@@ -52,10 +53,13 @@ public class ReadConfig implements RequestStreamHandler {
         LOGGER.info("Amount of Config found: {}", result.getItems().size());
         seg.putMetadata("Amount of Configs", result.getItems().size());
 
+
+        long timestampOfBatch = Instant.now().getEpochSecond();
+
         for (Map<String, AttributeValue> returnedItems : result.getItems()) {
             if (returnedItems != null) {
                 try {
-                    ToolConfig toolConfig = new ToolConfig(returnedItems);
+                    ToolConfig toolConfig = new ToolConfig(returnedItems, timestampOfBatch);
                     LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolConfig.getTool().toUpperCase()).getName());
                     ObjectMapper mapper = new ObjectMapper();
                     InvokeRequest req = new InvokeRequest()

@@ -47,7 +47,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
         }
         JSONArray users = processCall(toolConfig.getUrl(), toolConfig.getBearer());
         AWSXRay.getGlobalRecorder().putRuntimeContext("Slack Users:", users.length());
-        db.writeRawData(toolConfig.generateKey(ToolEnum.SLACK.getName()), processCall(toolConfig.getUrl(), toolConfig.getBearer()).toString());
+        db.writeRawData(toolConfig.generateKey(ToolEnum.SLACK.getName()), users.toString(), toolConfig.getTimestamp());
     }
 
     @Override
