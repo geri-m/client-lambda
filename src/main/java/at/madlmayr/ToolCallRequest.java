@@ -32,10 +32,8 @@ public class ToolCallRequest implements Serializable {
     @JsonProperty(TIME_STAMP)
     private long timestamp;
 
-
     // Required for Jackson to create an Object.
     public ToolCallRequest() {
-
     }
 
     public ToolCallRequest(final String[] values, final long timestamp) throws ToolCallException {

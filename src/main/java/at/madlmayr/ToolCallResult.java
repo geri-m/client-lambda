@@ -9,12 +9,16 @@ public class ToolCallResult implements Serializable {
     private static final String COLUMN_COMPANY = "company";
     private static final String COLUMN_TOOL = "tool";
     private static final String COLUMN_AMOUNT_OF_USER = "amountOfUsers";
+    private static final String COLUMN_VERSION = "version";
 
     @JsonProperty(COLUMN_COMPANY)
     private String company;
 
     @JsonProperty(COLUMN_TOOL)
     private String tool;
+
+    @JsonProperty(COLUMN_VERSION)
+    private String version;
 
     @JsonProperty(COLUMN_AMOUNT_OF_USER)
     private int amountOfUsers;
