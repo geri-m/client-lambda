@@ -43,4 +43,14 @@ public class ToolCallResult implements Serializable {
     public int getAmountOfUsers() {
         return amountOfUsers;
     }
+
+    @Override
+    public String toString() {
+        return "ToolCallResult{" +
+                "company='" + company + '\'' +
+                ", tool='" + tool + '\'' +
+                ", version='" + version + '\'' +
+                ", amountOfUsers=" + amountOfUsers +
+                '}';
+    }
 }

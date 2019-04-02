@@ -6,6 +6,7 @@ import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.AWSXRayRecorder;
 import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -44,6 +45,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
         // We use XRay, hence the {@link HttpClients.createDefault();} is not used
         httpClient = HttpClientBuilder.create().setRecorder(recorder).build();
         objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     }
 
     @Override

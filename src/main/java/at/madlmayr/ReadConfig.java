@@ -16,6 +16,7 @@ import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.AWSXRayRecorder;
 import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.handlers.TracingHandler;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,6 +48,7 @@ public class ReadConfig implements RequestStreamHandler {
         dynamo = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(recorder)).build();
         lambda = AWSLambdaAsyncClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(recorder)).build();
         mapper = new ObjectMapper();
+        mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     }
 
     @Override
@@ -61,11 +63,8 @@ public class ReadConfig implements RequestStreamHandler {
         LOGGER.info("Amount of Config found: {}", result.getItems().size());
         seg.putMetadata("Amount of Configs", result.getItems().size());
 
-
         long timestampOfBatch = Instant.now().getEpochSecond();
-
         List<Future<InvokeResult>> futures = new ArrayList<>();
-
 
         for (Map<String, AttributeValue> returnedItems : result.getItems()) {
             if (returnedItems != null) {
@@ -95,7 +94,7 @@ public class ReadConfig implements RequestStreamHandler {
                     try {
                         // getLogResult() is null
                         ToolCallResult resultFromCall = mapper.readValue(inputStream, ToolCallResult.class);
-                        LOGGER.info("Response from Method '{}'", mapper.writeValueAsString(resultFromCall));
+                        LOGGER.info("Response from Method '{}'", resultFromCall.toString());
                     } catch (final IOException e) {
                         LOGGER.error(e.getMessage());
                     }
