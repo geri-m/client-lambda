@@ -58,10 +58,14 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             throw new ToolCallException(e);
         }
         JSONArray users = processCall(toolConfig.getUrl(), toolConfig.getBearer());
-        AWSXRay.getGlobalRecorder().putRuntimeContext("Artifactory Users:", users.length());
         db.writeRawData(toolConfig.generateKey(ToolEnum.ARTIFACTORY.getName()), users.toString(), toolConfig.getTimestamp());
 
-
+        try {
+            outputStream.write(Integer.toString(users.length()).getBytes());
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+            AWSXRay.getCurrentSegment().addException(e);
+        }
 
 
     }

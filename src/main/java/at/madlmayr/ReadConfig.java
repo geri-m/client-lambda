@@ -9,6 +9,7 @@ import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.lambda.AWSLambdaAsync;
 import com.amazonaws.services.lambda.AWSLambdaAsyncClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
+import com.amazonaws.services.lambda.model.InvokeResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
@@ -22,7 +23,11 @@ import org.apache.logging.log4j.Logger;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 
 public class ReadConfig implements RequestStreamHandler {
@@ -56,6 +61,9 @@ public class ReadConfig implements RequestStreamHandler {
 
         long timestampOfBatch = Instant.now().getEpochSecond();
 
+        List<Future<InvokeResult>> futures = new ArrayList<>();
+
+
         for (Map<String, AttributeValue> returnedItems : result.getItems()) {
             if (returnedItems != null) {
                 try {
@@ -65,7 +73,7 @@ public class ReadConfig implements RequestStreamHandler {
                     InvokeRequest req = new InvokeRequest()
                             .withFunctionName(ToolEnum.valueOf(toolConfig.getTool().toUpperCase()).getFunctionName())
                             .withPayload(mapper.writeValueAsString(toolConfig));
-                    lambda.invokeAsync(req);
+                    futures.add(lambda.invokeAsync(req));
                 } catch (Exception e) {
                     LOGGER.error(e);
                 }
@@ -73,6 +81,23 @@ public class ReadConfig implements RequestStreamHandler {
                 LOGGER.info("No item found in Config Table");
             }
         }
+
+        while (futures.size() > 0) {
+            for (Future<InvokeResult> localFuture : futures) {
+                if (localFuture.isDone()) {
+                    try {
+                        LOGGER.info("{} {}", localFuture.get().getLogResult(), localFuture.get().getPayload().toString());
+                    } catch (InterruptedException | ExecutionException e) {
+                        LOGGER.error(e.getMessage());
+                    }
+
+                    // remove Future, as it is done
+                    futures.remove(localFuture);
+                }
+            }
+        }
+
+
         AWSXRay.endSubsegment();
     }
 
