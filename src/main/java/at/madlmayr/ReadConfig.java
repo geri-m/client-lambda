@@ -20,13 +20,16 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 
@@ -91,17 +94,9 @@ public class ReadConfig implements RequestStreamHandler {
                 // futures which are done, but not yet in the finished list.
                 if (localFuture.isDone() && !futuresFinished.contains(localFuture)) {
                     try {
-                        // getLogResult() is null
-                        // ToolCallResult resultFromCall = mapper.readValue(inputStream, ToolCallResult.class);
-                        // LOGGER.info("Response from Method '{}'", resultFromCall.toString());
-                        BufferedReader streamReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-                        StringBuilder responseStrBuilder = new StringBuilder();
-                        String inputStr;
-                        while ((inputStr = streamReader.readLine()) != null)
-                            responseStrBuilder.append(inputStr);
-
-                        LOGGER.info("Response from Method '{}'", new JSONObject(responseStrBuilder.toString()));
-                    } catch (final IOException e) {
+                        ToolCallResult resultFromCall = mapper.readValue(new String(localFuture.get().getPayload().array(), StandardCharsets.UTF_8), ToolCallResult.class);
+                        LOGGER.info("Response from Method '{}', # Users: '{}'", resultFromCall.getTool(), resultFromCall.getAmountOfUsers());
+                    } catch (final IOException | InterruptedException | ExecutionException e) {
                         LOGGER.error(e.getMessage());
                     }
 
