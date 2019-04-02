@@ -82,17 +82,22 @@ public class ReadConfig implements RequestStreamHandler {
             }
         }
 
-        while (futures.size() > 0) {
+        // remove of the List causes ConcurrentModificationException
+        List<Future<InvokeResult>> futuresFinished = new ArrayList<>();
+
+        // loop over the futures as long as input list is not the same size as finished list.
+        while (futuresFinished.size() != futures.size()) {
             for (Future<InvokeResult> localFuture : futures) {
-                if (localFuture.isDone()) {
+                // futures which are done, but not yet in the finished list.
+                if (localFuture.isDone() && !futuresFinished.contains(localFuture)) {
                     try {
                         LOGGER.info("{} {}", localFuture.get().getLogResult(), localFuture.get().getPayload().toString());
                     } catch (InterruptedException | ExecutionException e) {
                         LOGGER.error(e.getMessage());
                     }
 
-                    // remove Future, as it is done
-                    futures.remove(localFuture);
+                    // finished Features go into a separate list.
+                    futuresFinished.add(localFuture);
                 }
             }
         }
