@@ -39,13 +39,12 @@ public class ReadConfig implements RequestStreamHandler {
     private static final Logger LOGGER = LogManager.getLogger(ReadConfig.class);
     private static final String CONFIG_TABLE_NAME = "Config";
 
-    private static final AmazonDynamoDB dynamo;
-    private static final AWSLambdaAsync lambda;
-    private static final AWSXRayRecorder recorder;
-    private static final ObjectMapper mapper;
+    private final AmazonDynamoDB dynamo;
+    private final AWSLambdaAsync lambda;
+    private final ObjectMapper mapper;
 
-    static {
-        recorder = new AWSXRayRecorder();
+    public ReadConfig() {
+        AWSXRayRecorder recorder = new AWSXRayRecorder();
         recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
         dynamo = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(recorder)).build();
         lambda = AWSLambdaAsyncClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(recorder)).build();
@@ -85,7 +84,7 @@ public class ReadConfig implements RequestStreamHandler {
             }
         }
 
-        // remove of the List causes ConcurrentModificationException
+        // 'remove()' of the List causes ConcurrentModificationException
         List<Future<InvokeResult>> futuresFinished = new ArrayList<>();
 
         // loop over the futures as long as input list is not the same size as finished list.

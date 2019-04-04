@@ -34,14 +34,13 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
     private static final char[] SEARCH_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
     private static final Logger LOGGER = LogManager.getLogger(SlackCall.class);
-    private final static DynamoAbstraction db;
-    private static final CloseableHttpClient httpClient;
-    private static final ObjectMapper objectMapper;
-    private static final AWSXRayRecorder recorder;
+    private final DynamoAbstraction db;
+    private final CloseableHttpClient httpClient;
+    private final ObjectMapper objectMapper;
 
-    static {
+    public JiraV2Call() {
         db = new DynamoAbstraction();
-        recorder = new AWSXRayRecorder();
+        AWSXRayRecorder recorder = new AWSXRayRecorder();
         recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
         httpClient = HttpClientBuilder.create().setRecorder(recorder).build();
         objectMapper = new ObjectMapper();
@@ -69,8 +68,6 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             LOGGER.error(e.getMessage());
             AWSXRay.getCurrentSegment().addException(e);
         }
-
-
     }
 
     @Override

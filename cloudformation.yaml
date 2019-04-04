@@ -10,7 +10,7 @@ Resources:
       Runtime: java8
       Description: "Client API Lambda"
       MemorySize: 256
-      Timeout: 60
+      Timeout: 120
       Role: !GetAtt LambdaExecutionRole.Arn
       FunctionName: ReadConfig
       Tracing: Active
@@ -46,7 +46,7 @@ Resources:
       Runtime: java8
       Description: "JiraV2Call Call"
       MemorySize: 256
-      Timeout: 60
+      Timeout: 120
       Role: !GetAtt LambdaExecutionRole.Arn
       FunctionName: JiraV2Call
       Tracing: Active

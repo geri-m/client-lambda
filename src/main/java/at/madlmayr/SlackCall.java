@@ -23,14 +23,13 @@ import java.io.OutputStream;
 public class SlackCall implements RequestStreamHandler, ToolCall {
 
     private static final Logger LOGGER = LogManager.getLogger(SlackCall.class);
-    private final static DynamoAbstraction db;
-    private static final CloseableHttpClient httpClient;
-    private static final ObjectMapper objectMapper;
-    private static final AWSXRayRecorder recorder;
+    private final DynamoAbstraction db;
+    private final CloseableHttpClient httpClient;
+    private final ObjectMapper objectMapper;
 
-    static {
+    public SlackCall() {
         db = new DynamoAbstraction();
-        recorder = new AWSXRayRecorder();
+        AWSXRayRecorder recorder = new AWSXRayRecorder();
         recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
         httpClient = HttpClientBuilder.create().setRecorder(recorder).build();
         objectMapper = new ObjectMapper();
@@ -41,8 +40,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
         ToolCallRequest toolCallRequest;
         try {
-            // Handling De-Serialization myself
-            // https://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-req-resp.html
+
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
         } catch (IOException e) {
             throw new ToolCallException(e);

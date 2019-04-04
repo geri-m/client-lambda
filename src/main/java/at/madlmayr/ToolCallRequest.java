@@ -9,8 +9,11 @@ import java.util.Map;
 
 public class ToolCallRequest implements Serializable {
 
-    private static final String COLUMN_COMPANY = "company";
-    private static final String COLUMN_TOOL = "tool";
+
+    static final String TABLE_NAME = "config";
+
+    static final String COLUMN_COMPANY = "company";
+    static final String COLUMN_TOOL = "tool";
     private static final String COLUMN_BEARER = "bearer";
     private static final String COLUMN_URL = "url";
     private static final String TIME_STAMP = "timestamp";

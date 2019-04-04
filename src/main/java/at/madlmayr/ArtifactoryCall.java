@@ -32,15 +32,15 @@ import java.util.concurrent.CountDownLatch;
 
 public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
-    private static final Logger LOGGER = LogManager.getLogger(ArtifactoryCall.class);
-    private final static DynamoAbstraction db;
-    private static final CloseableHttpClient httpClient;
-    private static final AWSXRayRecorder recorder;
-    private static final ObjectMapper objectMapper;
+    private final static Logger LOGGER = LogManager.getLogger(ArtifactoryCall.class);
+    private final DynamoAbstraction db;
+    private final CloseableHttpClient httpClient;
+    private final ObjectMapper objectMapper;
 
-    static {
+
+    public ArtifactoryCall() {
         db = new DynamoAbstraction();
-        recorder = new AWSXRayRecorder();
+        AWSXRayRecorder recorder = new AWSXRayRecorder();
         recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
         // We use XRay, hence the {@link HttpClients.createDefault();} is not used
         httpClient = HttpClientBuilder.create().setRecorder(recorder).build();
