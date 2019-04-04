@@ -36,7 +36,7 @@ public class DynamoFactory {
         }
 
         public DynamoAbstraction(final URL serviceEndpoint) {
-            dynamoClient = AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(serviceEndpoint.toString(), Regions.EU_CENTRAL_1.getName())).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
+            dynamoClient = AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(serviceEndpoint.toString(), Regions.EU_CENTRAL_1.getName())).build();
         }
 
 

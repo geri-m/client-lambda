@@ -48,3 +48,7 @@ Handling De-Serialization myself
 
 This allows us to better test the functions without AWS involved.
 
+## Using Dynamo DB Mapper
+
+https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/DynamoDBMapper.html
+

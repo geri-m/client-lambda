@@ -35,7 +35,6 @@ public class ReadConfig implements RequestStreamHandler {
 
     // Initialize the Log4j logger.
     private static final Logger LOGGER = LogManager.getLogger(ReadConfig.class);
-    private static final String CONFIG_TABLE_NAME = "Config";
 
     private final AmazonDynamoDB dynamo;
     private final AWSLambdaAsync lambda;
@@ -52,7 +51,7 @@ public class ReadConfig implements RequestStreamHandler {
 
         // Get all Element from the Table
         ScanRequest scanRequest = new ScanRequest()
-                .withTableName(CONFIG_TABLE_NAME);
+                .withTableName(ToolCallRequest.TABLE_NAME);
 
         ScanResult result = dynamo.scan(scanRequest);
         LOGGER.info("Amount of Config found: {}", result.getItems().size());

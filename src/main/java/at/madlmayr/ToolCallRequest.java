@@ -1,5 +1,6 @@
 package at.madlmayr;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,11 +8,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+
+@DynamoDBTable(tableName = ToolCallRequest.TABLE_NAME)
 public class ToolCallRequest implements Serializable {
-
-
     static final String TABLE_NAME = "config";
-
     static final String COLUMN_COMPANY = "company";
     static final String COLUMN_TOOL = "tool";
     private static final String COLUMN_BEARER = "bearer";
@@ -49,7 +49,6 @@ public class ToolCallRequest implements Serializable {
         dataFromDynamo.put(COLUMN_TOOL, new AttributeValue(values[1].trim()));
         dataFromDynamo.put(COLUMN_BEARER, new AttributeValue(values[2].trim()));
         dataFromDynamo.put(COLUMN_URL, new AttributeValue(values[3].trim()));
-
         assignLocalVales(dataFromDynamo, timestamp);
     }
 
@@ -83,26 +82,47 @@ public class ToolCallRequest implements Serializable {
         this.timestamp = timestamp;
     }
 
+    @DynamoDBHashKey(attributeName = ToolCallRequest.COLUMN_COMPANY)
     public String getCompany() {
         return company;
     }
 
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    @DynamoDBAttribute(attributeName = ToolCallRequest.COLUMN_URL)
     public String getUrl() {
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @DynamoDBAttribute(attributeName = ToolCallRequest.COLUMN_BEARER)
     public String getBearer() {
         return bearer;
     }
 
+    public void setBearer(String bearer) {
+        this.bearer = bearer;
+    }
+
+    @DynamoDBRangeKey(attributeName = ToolCallRequest.COLUMN_TOOL)
     public String getTool() {
         return tool;
+    }
+
+    public void setTool(String tool) {
+        this.tool = tool;
     }
 
     public String generateKey(final String tool){
         return company + "#" + tool;
     }
 
+    @DynamoDBIgnore
     public long getTimestamp() {
         return timestamp;
     }
