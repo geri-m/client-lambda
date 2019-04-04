@@ -3,9 +3,7 @@ package at.madlmayr;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.AWSXRayRecorder;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -34,17 +32,13 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
     private static final char[] SEARCH_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
     private static final Logger LOGGER = LogManager.getLogger(SlackCall.class);
-    private final DynamoAbstraction db;
+    private final DynamoFactory.DynamoAbstraction db;
     private final CloseableHttpClient httpClient;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public JiraV2Call() {
-        db = new DynamoAbstraction();
-        AWSXRayRecorder recorder = new AWSXRayRecorder();
-        recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
-        httpClient = HttpClientBuilder.create().setRecorder(recorder).build();
-        objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+        db = new DynamoFactory().create();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
     }
 
     @Override

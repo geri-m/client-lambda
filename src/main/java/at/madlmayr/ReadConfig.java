@@ -13,10 +13,8 @@ import com.amazonaws.services.lambda.model.InvokeResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.AWSXRayRecorder;
 import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.handlers.TracingHandler;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,15 +39,11 @@ public class ReadConfig implements RequestStreamHandler {
 
     private final AmazonDynamoDB dynamo;
     private final AWSLambdaAsync lambda;
-    private final ObjectMapper mapper;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public ReadConfig() {
-        AWSXRayRecorder recorder = new AWSXRayRecorder();
-        recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
-        dynamo = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(recorder)).build();
-        lambda = AWSLambdaAsyncClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(recorder)).build();
-        mapper = new ObjectMapper();
-        mapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+        dynamo = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
+        lambda = AWSLambdaAsyncClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
     }
 
     @Override
@@ -104,8 +98,6 @@ public class ReadConfig implements RequestStreamHandler {
                 }
             }
         }
-
-
         AWSXRay.endSubsegment();
     }
 

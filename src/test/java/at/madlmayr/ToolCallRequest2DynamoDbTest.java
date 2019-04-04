@@ -19,10 +19,6 @@ public class ToolCallRequest2DynamoDbTest {
                 .build();
     }
 
-    private AmazonDynamoDB getConnectionDefault() {
-        return AmazonDynamoDBClientBuilder.defaultClient();
-    }
-
     private void createConfigTable() {
         CreateTableRequest request = new CreateTableRequest()
                 .withAttributeDefinitions(new AttributeDefinition(

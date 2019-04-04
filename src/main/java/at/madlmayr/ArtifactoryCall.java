@@ -3,10 +3,8 @@ package at.madlmayr;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.AWSXRayRecorder;
 import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -33,19 +31,15 @@ import java.util.concurrent.CountDownLatch;
 public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
     private final static Logger LOGGER = LogManager.getLogger(ArtifactoryCall.class);
-    private final DynamoAbstraction db;
+    private final DynamoFactory.DynamoAbstraction db;
     private final CloseableHttpClient httpClient;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     public ArtifactoryCall() {
-        db = new DynamoAbstraction();
-        AWSXRayRecorder recorder = new AWSXRayRecorder();
-        recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
+        db = new DynamoFactory().create();
         // We use XRay, hence the {@link HttpClients.createDefault();} is not used
-        httpClient = HttpClientBuilder.create().setRecorder(recorder).build();
-        objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
     }
 
     @Override

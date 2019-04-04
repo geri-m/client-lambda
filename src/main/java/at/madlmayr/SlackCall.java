@@ -3,9 +3,7 @@ package at.madlmayr;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.AWSXRayRecorder;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -19,22 +17,26 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
+
 
 public class SlackCall implements RequestStreamHandler, ToolCall {
 
     private static final Logger LOGGER = LogManager.getLogger(SlackCall.class);
-    private final DynamoAbstraction db;
+    private final DynamoFactory.DynamoAbstraction db;
     private final CloseableHttpClient httpClient;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SlackCall() {
-        db = new DynamoAbstraction();
-        AWSXRayRecorder recorder = new AWSXRayRecorder();
-        recorder.setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
-        httpClient = HttpClientBuilder.create().setRecorder(recorder).build();
-        objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+        db = new DynamoFactory().create();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
     }
+
+    public SlackCall(final URL serviceEndpoint) {
+        db = new DynamoFactory().create(serviceEndpoint);
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
+    }
+
 
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {

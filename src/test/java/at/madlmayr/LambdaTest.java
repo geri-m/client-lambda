@@ -1,8 +1,12 @@
 package at.madlmayr;
 
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.xray.AWSXRay;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -16,8 +20,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Disabled
 public class LambdaTest {
-
+    private static final Logger LOGGER = LogManager.getLogger(LambdaTest.class);
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    @BeforeAll
+    public static void beforeAllTests() {
+        // handle issues, in case segments are not there and disalbe therefore xray.
+        AWSXRay.getGlobalRecorder().setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
+
+    }
 
     @Test
     public void testSlackCall() throws IOException {
@@ -60,6 +71,8 @@ public class LambdaTest {
 
     @Test
     public void testJiraCall() throws IOException {
+
+
         List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
         ToolCallRequest jira = null;
         for (ToolCallRequest config : configList) {
