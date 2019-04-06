@@ -110,11 +110,39 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Adding DynamoDBLocal for Integration Testing, uses SQLite4Java -->
+        <!-- DynamoDBLocal for Integration Testing, uses SQLite4Java -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>DynamoDBLocal</artifactId>
             <version>1.11.86</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- Simulating the Endpoint for the HTTP Requests -->
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock-jre8</artifactId>
+            <version>2.22.0</version>
+            <!-- Exclude Jetty, as DynamoDB Local comes with Jetty 8, Wiremock with Jetty 9 -->
+            <exclusions>
+                <exclusion>
+                    <artifactId>jetty-server</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-servlet</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-servlets</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-webapp</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+            </exclusions>
             <scope>test</scope>
         </dependency>
 
