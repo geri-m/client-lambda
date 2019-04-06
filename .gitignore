@@ -35,5 +35,8 @@ target/
 # Credentials for Testing
 toolconfig.txt
 
+# Raw JSON Data
+*.raw
+
 # SQLite4Java not be checked in
 native-libs/

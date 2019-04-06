@@ -63,4 +63,148 @@ public class SlackMember implements Serializable {
     public SlackMember() {
     }
 
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(String teamId) {
+        this.teamId = teamId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public String getTz() {
+        return tz;
+    }
+
+    public void setTz(String tz) {
+        this.tz = tz;
+    }
+
+    public String getTzLabel() {
+        return tzLabel;
+    }
+
+    public void setTzLabel(String tzLabel) {
+        this.tzLabel = tzLabel;
+    }
+
+    public int getTzOffset() {
+        return tzOffset;
+    }
+
+    public void setTzOffset(int tzOffset) {
+        this.tzOffset = tzOffset;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    public boolean isOwner() {
+        return owner;
+    }
+
+    public void setOwner(boolean owner) {
+        this.owner = owner;
+    }
+
+    public boolean isPrimaryOwner() {
+        return primaryOwner;
+    }
+
+    public void setPrimaryOwner(boolean primaryOwner) {
+        this.primaryOwner = primaryOwner;
+    }
+
+    public boolean isRestricted() {
+        return restricted;
+    }
+
+    public void setRestricted(boolean restricted) {
+        this.restricted = restricted;
+    }
+
+    public boolean isUltraRestricted() {
+        return ultraRestricted;
+    }
+
+    public void setUltraRestricted(boolean ultraRestricted) {
+        this.ultraRestricted = ultraRestricted;
+    }
+
+    public boolean isBot() {
+        return bot;
+    }
+
+    public void setBot(boolean bot) {
+        this.bot = bot;
+    }
+
+    public boolean isAppUser() {
+        return appUser;
+    }
+
+    public void setAppUser(boolean appUser) {
+        this.appUser = appUser;
+    }
+
+    public long getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(long updated) {
+        this.updated = updated;
+    }
+
+    public SlackProfile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(SlackProfile profile) {
+        this.profile = profile;
+    }
 }

@@ -19,5 +19,27 @@ public class SlackResponse implements Serializable {
 
     }
 
+    public boolean isOk() {
+        return ok;
+    }
 
+    public void setOk(boolean ok) {
+        this.ok = ok;
+    }
+
+    public SlackMember[] getMembers() {
+        return members;
+    }
+
+    public void setMembers(SlackMember[] members) {
+        this.members = members;
+    }
+
+    public int getCache_ts() {
+        return cache_ts;
+    }
+
+    public void setCache_ts(int cache_ts) {
+        this.cache_ts = cache_ts;
+    }
 }
