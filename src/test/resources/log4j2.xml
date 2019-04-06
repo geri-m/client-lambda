@@ -8,6 +8,8 @@
   </Lambda>
 </Appenders>
 <Loggers>
+  <!-- we set this to WARN, as LocalDynamoDBServerHandler l is going to print our AccessKey (!!) -->
+  <Logger name="com.amazonaws.services.dynamodbv2.local" level="WARN"/>
   <Root level="debug">
     <AppenderRef ref="Lambda" />
   </Root>

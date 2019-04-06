@@ -79,7 +79,7 @@ public class ToolCallRequest2DynamoDbTest {
     private static void deleteTable() {
         final AmazonDynamoDB ddb = getConnectionLocalhost();
         DeleteTableResult result = ddb.deleteTable(ToolCallRequest.TABLE_NAME);
-        LOGGER.info("Table '{}' created", result.getTableDescription().getTableName());
+        LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
     }
 
     @Test

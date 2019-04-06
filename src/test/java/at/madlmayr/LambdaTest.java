@@ -25,8 +25,8 @@ public class LambdaTest {
 
     @BeforeAll
     public static void beforeAllTests() {
-        // handle issues, in case segments are not there and disalbe therefore xray.
-        AWSXRay.getGlobalRecorder().setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is missing"));
+        // handle issues, in case segments are not there and disable therefore xray.
+        AWSXRay.getGlobalRecorder().setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay unset for Testing"));
 
     }
 
@@ -71,8 +71,6 @@ public class LambdaTest {
 
     @Test
     public void testJiraCall() throws IOException {
-
-
         List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
         ToolCallRequest jira = null;
         for (ToolCallRequest config : configList) {

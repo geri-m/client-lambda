@@ -115,16 +115,6 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>DynamoDBLocal</artifactId>
             <version>1.11.86</version>
-            <scope>test</scope>
-        </dependency>
-
-
-        <!-- Simulating the Endpoint for the HTTP Requests -->
-        <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-jre8</artifactId>
-            <version>2.22.0</version>
-            <!-- Exclude Jetty, as DynamoDB Local comes with Jetty 8, Wiremock with Jetty 9 -->
             <exclusions>
                 <exclusion>
                     <artifactId>jetty-server</artifactId>
@@ -142,7 +132,22 @@
                     <artifactId>jetty-webapp</artifactId>
                     <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>jetty-client</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
             </exclusions>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- Simulating the Endpoint for the HTTP Requests -->
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock-jre8</artifactId>
+            <version>2.22.0</version>
+            <!-- Exclude Jetty, as DynamoDB Local comes with Jetty 8, Wiremock with Jetty 9 -->
+
             <scope>test</scope>
         </dependency>
 
