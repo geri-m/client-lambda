@@ -1,5 +1,6 @@
-package at.madlmayr;
+package at.madlmayr.slack;
 
+import at.madlmayr.*;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
@@ -69,6 +70,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             String jsonString = EntityUtils.toString(response.getEntity());
             if ((response.getStatusLine().getStatusCode() / 100) == 2) {
                 LOGGER.info("HTTP Call to '{}' was successful", url);
+                objectMapper.readValue(jsonString, SlackResponse.class);
                 return new JSONObject(jsonString).getJSONArray("members");
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));

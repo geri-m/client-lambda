@@ -18,7 +18,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: target/client-lambda.jar
-      Handler: 'at.madlmayr.SlackCall::handleRequest'
+      Handler: 'at.madlmayr.slack.SlackCall::handleRequest'
       Runtime: java8
       Description: "Slack Call"
       MemorySize: 256

@@ -38,7 +38,7 @@ public class ReadConfig implements RequestStreamHandler {
 
     private final AmazonDynamoDB dynamo;
     private final AWSLambdaAsync lambda;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ReadConfig() {
         dynamo = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
@@ -67,7 +67,7 @@ public class ReadConfig implements RequestStreamHandler {
                     LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getName());
                     InvokeRequest req = new InvokeRequest()
                             .withFunctionName(ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getFunctionName())
-                            .withPayload(mapper.writeValueAsString(toolCallRequest));
+                            .withPayload(objectMapper.writeValueAsString(toolCallRequest));
                     futures.add(lambda.invokeAsync(req));
                 } catch (Exception e) {
                     LOGGER.error(e);
@@ -86,7 +86,7 @@ public class ReadConfig implements RequestStreamHandler {
                 // futures which are done, but not yet in the finished list.
                 if (localFuture.isDone() && !futuresFinished.contains(localFuture)) {
                     try {
-                        ToolCallResult resultFromCall = mapper.readValue(new String(localFuture.get().getPayload().array(), StandardCharsets.UTF_8), ToolCallResult.class);
+                        ToolCallResult resultFromCall = objectMapper.readValue(new String(localFuture.get().getPayload().array(), StandardCharsets.UTF_8), ToolCallResult.class);
                         LOGGER.info("Response from Method '{}', # Users: '{}'", resultFromCall.getTool(), resultFromCall.getAmountOfUsers());
                     } catch (final IOException | InterruptedException | ExecutionException e) {
                         LOGGER.error(e.getMessage());
