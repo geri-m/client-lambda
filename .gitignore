@@ -32,9 +32,8 @@ target/
 *.iws
 .idea/*
 
-
- # Ansbile
- .retry
-
- # Credentials for Testing
+# Credentials for Testing
 toolconfig.txt
+
+# SQLite4Java not be checked in
+native-libs/

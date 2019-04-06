@@ -6,12 +6,13 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.local.main.ServerRunner;
+import com.amazonaws.services.dynamodbv2.local.server.DynamoDBProxyServer;
 import com.amazonaws.services.dynamodbv2.model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -19,21 +20,27 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
 public class ToolCallRequest2DynamoDbTest {
 
     private static final Logger LOGGER = LogManager.getLogger(ToolCallRequest2DynamoDbTest.class);
+    private static DynamoDBProxyServer server;
 
 
     @BeforeAll
-    public static void beforeAll() throws IOException {
+    public static void beforeAll() throws Exception {
+        System.setProperty("sqlite4java.library.path", "native-libs");
+        String port = "8000";
+        server = ServerRunner.createServerFromCommandLineArgs(
+                new String[]{"-inMemory", "-port", port});
+        server.start();
         createConfigTable();
         insertData();
     }
 
     @AfterAll
-    public static void afterAll() {
+    public static void afterAll() throws Exception {
         deleteTable();
+        server.stop();
     }
 
     private static AmazonDynamoDB getConnectionLocalhost() {
@@ -82,7 +89,6 @@ public class ToolCallRequest2DynamoDbTest {
 
         DynamoDBQueryExpression<ToolCallRequest> queryExpression = new DynamoDBQueryExpression<ToolCallRequest>()
                 .withHashKeyValues(query);
-
 
         List<ToolCallRequest> itemList = mapper.query(ToolCallRequest.class, queryExpression);
         LOGGER.info("Amount of Element '{}'", itemList.size());
