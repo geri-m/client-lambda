@@ -1,6 +1,5 @@
 package at.madlmayr;
 
-import at.madlmayr.localstack.TestLocalDynamoDb;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -12,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -19,9 +19,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Disabled
 public class ToolCallRequest2DynamoDbTest {
 
-    private static final Logger LOGGER = LogManager.getLogger(TestLocalDynamoDb.class);
+    private static final Logger LOGGER = LogManager.getLogger(ToolCallRequest2DynamoDbTest.class);
 
 
     @BeforeAll

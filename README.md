@@ -52,3 +52,9 @@ This allows us to better test the functions without AWS involved.
 
 https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/DynamoDBMapper.html
 
+## For Local Testing we us
+- DynamoDb Local:
+  - https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/DynamoDBLocal.Maven.html
+  - https://www.baeldung.com/dynamodb-local-integration-tests
+- WireMock:
+  - http://wiremock.org/docs/getting-started/

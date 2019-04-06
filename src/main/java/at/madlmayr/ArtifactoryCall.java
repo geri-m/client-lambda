@@ -84,7 +84,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                 // We do the sync call for several reasons
                 // 1) Xray works out of the box
                 // 2) Not much mor expensive than Sync all (yes, 100 % is something, but its cents)
-                // 3) less efford for testing.
+                // 3) less effort for testing.
                 return doClientCallsSync(userList, bearer);
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
