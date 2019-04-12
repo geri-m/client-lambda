@@ -1,9 +1,11 @@
 package at.madlmayr;
 
+import at.madlmayr.slack.SlackMember;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.handlers.TracingHandler;
@@ -39,6 +41,10 @@ public class DynamoFactory {
             dynamoClient = AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(serviceEndpoint.toString(), Regions.EU_CENTRAL_1.getName())).build();
         }
 
+        public void writeSlackMember(final SlackMember member) {
+            DynamoDBMapper mapper = new DynamoDBMapper(dynamoClient);
+            mapper.save(member);
+        }
 
         public void writeRawData(final String key, final String rawData, final long timestamp) {
             Map<String, AttributeValue> item = new HashMap<>();

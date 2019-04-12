@@ -28,6 +28,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
     private final CloseableHttpClient httpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+
     public SlackCall() {
         db = new DynamoFactory().create();
         httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
@@ -43,22 +44,25 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
         ToolCallRequest toolCallRequest;
         try {
-
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
-        } catch (IOException e) {
-            throw new ToolCallException(e);
-        }
-        JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
-        db.writeRawData(toolCallRequest.generateKey(ToolEnum.SLACK.getName()), users.toString(), toolCallRequest.getTimestamp());
 
-        try {
+            JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
+            SlackMember[] r = objectMapper.readValue(users.toString(), SlackMember[].class);
+
+            for (SlackMember member : r) {
+                member.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
+                member.setId(member.getId());
+                db.writeSlackMember(member);
+            }
+
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());
+
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getCurrentSegment().addException(e);
+            throw new ToolCallException(e);
         }
-
     }
 
     @Override
@@ -70,7 +74,6 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             String jsonString = EntityUtils.toString(response.getEntity());
             if ((response.getStatusLine().getStatusCode() / 100) == 2) {
                 LOGGER.info("HTTP Call to '{}' was successful", url);
-                objectMapper.readValue(jsonString, SlackResponse.class);
                 return new JSONObject(jsonString).getJSONArray("members");
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));

@@ -94,7 +94,7 @@ public class ToolCallRequest2DynamoDbTest {
 
         List<ToolCallRequest> itemList = mapper.query(ToolCallRequest.class, queryExpression);
 
-        assertThat(itemList.size() == 3);
+        assertThat(itemList.size()).isEqualTo(3);
 
         Set<String> toolNames = new HashSet<>();
         for (ToolCallRequest call : itemList) {

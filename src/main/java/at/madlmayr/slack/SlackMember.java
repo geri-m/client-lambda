@@ -1,11 +1,28 @@
 package at.madlmayr.slack;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.net.URL;
 
+@DynamoDBTable(tableName = SlackMember.TABLE_NAME)
 public class SlackMember implements Serializable {
+
+
+    public static final String TABLE_NAME = "Accounts";
+    public static final String COLUMN_COMPANY_TOOL = "companyToolTimestamp";
+    public static final String COLUMN_ID = "id";
+    private String companyToolTimestamp;
+
+    @DynamoDBHashKey(attributeName = SlackMember.COLUMN_COMPANY_TOOL)
+    public String getCompanyToolTimestamp() {
+        return companyToolTimestamp;
+    }
+
+    public void setCompanyToolTimestamp(String companyToolTimestamp) {
+        this.companyToolTimestamp = companyToolTimestamp;
+    }
 
     @JsonProperty("id")
     private String id;
@@ -64,7 +81,7 @@ public class SlackMember implements Serializable {
     public SlackMember() {
     }
 
-
+    @DynamoDBRangeKey(attributeName = COLUMN_ID)
     public String getId() {
         return id;
     }
@@ -73,6 +90,7 @@ public class SlackMember implements Serializable {
         this.id = id;
     }
 
+    @DynamoDBAttribute(attributeName = "teamId")
     public String getTeamId() {
         return teamId;
     }
@@ -81,6 +99,7 @@ public class SlackMember implements Serializable {
         this.teamId = teamId;
     }
 
+    @DynamoDBAttribute(attributeName = "name")
     public String getName() {
         return name;
     }
@@ -89,6 +108,7 @@ public class SlackMember implements Serializable {
         this.name = name;
     }
 
+    @DynamoDBAttribute(attributeName = "deleted")
     public boolean isDeleted() {
         return deleted;
     }
@@ -105,6 +125,7 @@ public class SlackMember implements Serializable {
         this.color = color;
     }
 
+    @DynamoDBAttribute(attributeName = "realName")
     public String getRealName() {
         return realName;
     }
@@ -177,6 +198,7 @@ public class SlackMember implements Serializable {
         this.ultraRestricted = ultraRestricted;
     }
 
+    @DynamoDBAttribute(attributeName = "bot")
     public boolean isBot() {
         return bot;
     }
@@ -209,6 +231,7 @@ public class SlackMember implements Serializable {
         this.profile = profile;
     }
 
+    @DynamoDBDocument
     public static class SlackProfile implements Serializable {
 
         @JsonProperty("title")
