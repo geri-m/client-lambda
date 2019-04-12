@@ -69,7 +69,6 @@ public class ToolCallRequest2DynamoDbTest {
     private static void insertData() {
         AmazonDynamoDB ddb = getConnectionLocalhost();
         DynamoDBMapper mapper = new DynamoDBMapper(ddb);
-
         mapper.save(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.SLACK.getName(), "somekey", "http://localhost:8080/api/users.list/"}, 1L));
         mapper.save(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.ARTIFACTORY.getName(), "somekey", "http://localhost:8080/gma/api/security/users"}, 1L));
         mapper.save(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.JIRA.getName(), "somekey", "http://localhost:8080/rest/api/2/user/search"}, 1L));
@@ -83,7 +82,7 @@ public class ToolCallRequest2DynamoDbTest {
     }
 
     @Test
-    public void checkAmountOfElementsInDB() {
+    public void checkAmountOfElementsInDBTest() {
         final AmazonDynamoDB ddb = getConnectionLocalhost();
         DynamoDBMapper mapper = new DynamoDBMapper(ddb);
 

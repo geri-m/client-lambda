@@ -34,7 +34,7 @@ public class SlackCallTest {
     @BeforeAll
     public static void beforeAll() {
         // handle issues, in case segments are not there and disable therefore xray.
-        AWSXRay.getGlobalRecorder().setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay  is unset for Testing"));
+        AWSXRay.getGlobalRecorder().setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is unset for Testing"));
         wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort()); //No-args constructor will start on port 8080, no HTTPS
         wireMockServer.start();
         WireMock.configureFor("localhost", wireMockServer.port());

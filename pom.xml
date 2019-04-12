@@ -147,7 +147,14 @@
             <artifactId>wiremock-jre8</artifactId>
             <version>2.22.0</version>
             <!-- Exclude Jetty, as DynamoDB Local comes with Jetty 8, Wiremock with Jetty 9 -->
+            <scope>test</scope>
+        </dependency>
 
+        <!-- Require to have Logging from Wiremock. Make sure the version is the same as in wiremock -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.12</version> <!-- as in Version 2.22.0 of wiremock-jre8 -->
             <scope>test</scope>
         </dependency>
 
