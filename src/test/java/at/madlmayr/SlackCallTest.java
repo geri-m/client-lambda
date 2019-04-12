@@ -42,7 +42,7 @@ public class SlackCallTest {
     private static LocalDynamoDbServer server;
 
     @BeforeAll
-    public static void beforeAll() throws Exception {
+    public static void beforeAll() {
         // handle issues, in case segments are not there and disable therefore xray.
         AWSXRay.getGlobalRecorder().setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is unset for Testing"));
         wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort()); //No-args constructor will start on port 8080, no HTTPS
@@ -55,8 +55,6 @@ public class SlackCallTest {
         LOGGER.debug("DynamoDB: {}", server.getPort());
         server.createAccountTable();
     }
-
-
 
     @AfterAll
     public static void afterAll() {

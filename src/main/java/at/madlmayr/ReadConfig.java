@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class ReadConfig implements RequestStreamHandler {
         LOGGER.info("Amount of Config found: {}", result.getItems().size());
         seg.putMetadata("Amount of Configs", result.getItems().size());
 
-        long timestampOfBatch = Instant.now().getEpochSecond();
+        long timestampOfBatch = System.currentTimeMillis();
         List<Future<InvokeResult>> futures = new ArrayList<>();
 
         for (Map<String, AttributeValue> returnedItems : result.getItems()) {

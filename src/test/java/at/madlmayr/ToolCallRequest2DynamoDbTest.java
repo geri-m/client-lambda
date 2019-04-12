@@ -24,7 +24,7 @@ public class ToolCallRequest2DynamoDbTest {
     private static final String FAKE_COMPANY_2 = "another";
 
     @BeforeAll
-    public static void beforeAll() throws Exception {
+    public static void beforeAll() {
         server = new LocalDynamoDbServer();
         server.start();
         LOGGER.debug("DynamoDB: {}", server.getPort());
@@ -33,7 +33,7 @@ public class ToolCallRequest2DynamoDbTest {
     }
 
     @AfterAll
-    public static void afterAll() throws Exception {
+    public static void afterAll() {
         server.deleteTable();
         server.stop();
     }
