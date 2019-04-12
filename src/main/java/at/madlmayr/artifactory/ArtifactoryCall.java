@@ -1,5 +1,6 @@
-package at.madlmayr;
+package at.madlmayr.artifactory;
 
+import at.madlmayr.*;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
@@ -79,7 +80,11 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                 LOGGER.info("HTTP Call to '{}' was successful (fetching list of Users)", url);
 
                 JSONArray userList = new JSONArray(jsonString);
+
+                ArtifactorySimpleUser[] userArray = objectMapper.readValue(userList.toString(), ArtifactorySimpleUser[].class);
+
                 LOGGER.info("Amount of Users: {} ", userList.length());
+                LOGGER.info("Amount of Users: {} ", userArray.length);
                 // We do the sync call for several reasons
                 // 1) Xray works out of the box
                 // 2) Not much mor expensive than Sync all (yes, 100 % is something, but its cents)
@@ -102,6 +107,9 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             try (CloseableHttpResponse responseForUser = httpClient.execute(requestForUser)) {
                 if ((responseForUser.getStatusLine().getStatusCode() / 100) == 2) {
                     String jsonStringForUser = EntityUtils.toString(responseForUser.getEntity());
+
+                    ArtifactoryUser singleUser = objectMapper.readValue(jsonStringForUser, ArtifactoryUser.class);
+
                     userDetailList.put(new JSONObject(jsonStringForUser));
                 } else {
                     LOGGER.error("Failed to to Detailed User Call using URL '{}'", uri);

@@ -1,5 +1,6 @@
 package at.madlmayr;
 
+import at.madlmayr.artifactory.ArtifactoryCall;
 import at.madlmayr.slack.SlackCall;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;

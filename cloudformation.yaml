@@ -30,7 +30,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: target/client-lambda.jar
-      Handler: 'at.madlmayr.ArtifactoryCall::handleRequest'
+      Handler: 'at.madlmayr.artifactory.ArtifactoryCall::handleRequest'
       Runtime: java8
       Description: "Artifactory Call"
       MemorySize: 256
