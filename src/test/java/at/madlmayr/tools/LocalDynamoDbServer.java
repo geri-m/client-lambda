@@ -1,11 +1,11 @@
 package at.madlmayr.tools;
 
+import at.madlmayr.DynamoFactory;
 import at.madlmayr.ToolCallRequest;
 import at.madlmayr.slack.SlackMember;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.local.main.ServerRunner;
 import com.amazonaws.services.dynamodbv2.local.server.DynamoDBProxyServer;
 import com.amazonaws.services.dynamodbv2.model.*;
@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.List;
 
 /**
  * Starts up a DynamoDB server using the command line launcher and returns an AmazonDynamoDB client that
@@ -30,9 +31,11 @@ public class LocalDynamoDbServer {
     private final int port;
     private DynamoDBProxyServer server;
     private boolean running;
+    private final DynamoFactory.DynamoAbstraction db;
 
     public LocalDynamoDbServer() {
         this.port = getRandomPort();
+        db = new DynamoFactory().create(port);
     }
 
     /*
@@ -40,6 +43,7 @@ public class LocalDynamoDbServer {
      */
     public LocalDynamoDbServer(int port) {
         this.port = port;
+        db = new DynamoFactory().create(port);
     }
 
     /**
@@ -70,7 +74,7 @@ public class LocalDynamoDbServer {
                 throw new RuntimeException(e);
             }
         }
-        return getClient();
+        return db.getClient();
     }
 
     /**
@@ -94,14 +98,6 @@ public class LocalDynamoDbServer {
     public int getPort() {
         return port;
     }
-
-    /**
-     * Returns a client that can be used to connect to the server.
-     */
-    public AmazonDynamoDB getClient() {
-        return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:" + port, Regions.EU_CENTRAL_1.getName())).build();
-    }
-
 
     public void createAccountTable() {
         CreateTableRequest request = new CreateTableRequest()
@@ -128,23 +124,55 @@ public class LocalDynamoDbServer {
         createTable(request);
     }
 
-    private void createTable(CreateTableRequest request) {
+    public void insertConfig(final List<ToolCallRequest> calls) {
+        AmazonDynamoDB ddb = db.getClient();
+        DynamoDBMapper mapper = new DynamoDBMapper(ddb);
 
-        final AmazonDynamoDB ddb = getClient();
+        for (ToolCallRequest call : calls) {
+            mapper.save(call);
+        }
+    }
+
+    private void createTable(CreateTableRequest request) {
+        final AmazonDynamoDB ddb = db.getClient();
         CreateTableResult result = ddb.createTable(request);
         LOGGER.info("Table '{}' created", result.getTableDescription().getTableName());
     }
 
+    public List<SlackMember> getSlackMemberListByCompanyToolTimestamp(final String companyToolTimestamp) {
+        final AmazonDynamoDB ddb = db.getClient();
+        DynamoDBMapper dbMapper = new DynamoDBMapper(ddb);
+        SlackMember query = new SlackMember();
+        query.setCompanyToolTimestamp(companyToolTimestamp);
+        DynamoDBQueryExpression<SlackMember> queryExpression = new DynamoDBQueryExpression<SlackMember>()
+                .withHashKeyValues(query);
+
+        return dbMapper.query(SlackMember.class, queryExpression);
+    }
+
+    public List<ToolCallRequest> getToolCallRequests(final String companyTool) {
+        final AmazonDynamoDB ddb = db.getClient();
+        DynamoDBMapper mapper = new DynamoDBMapper(ddb);
+
+        ToolCallRequest query = new ToolCallRequest();
+        query.setCompany(companyTool);
+
+        DynamoDBQueryExpression<ToolCallRequest> queryExpression = new DynamoDBQueryExpression<ToolCallRequest>()
+                .withHashKeyValues(query);
+
+        return mapper.query(ToolCallRequest.class, queryExpression);
+    }
+
 
     public void deleteAccountTable() {
-        final AmazonDynamoDB ddb = getClient();
+        final AmazonDynamoDB ddb = db.getClient();
         DeleteTableResult result = ddb.deleteTable(SlackMember.TABLE_NAME);
         LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
     }
 
 
     public void deleteTable() {
-        final AmazonDynamoDB ddb = getClient();
+        final AmazonDynamoDB ddb = db.getClient();
         DeleteTableResult result = ddb.deleteTable(ToolCallRequest.TABLE_NAME);
         LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
     }

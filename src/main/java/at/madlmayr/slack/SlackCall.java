@@ -18,8 +18,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-
 
 public class SlackCall implements RequestStreamHandler, ToolCall {
 
@@ -34,8 +32,8 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
         httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
     }
 
-    public SlackCall(final URL serviceEndpoint) {
-        db = new DynamoFactory().create(serviceEndpoint);
+    public SlackCall(int port) {
+        db = new DynamoFactory().create(port);
         httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
     }
 

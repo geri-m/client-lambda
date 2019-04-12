@@ -11,34 +11,39 @@ import com.amazonaws.xray.handlers.TracingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.net.URL;
-
 public class DynamoFactory {
 
     public DynamoAbstraction create() {
         return new DynamoAbstraction();
     }
 
-    public DynamoAbstraction create(final URL serviceEndpoint) {
-        return new DynamoAbstraction(serviceEndpoint);
+    public DynamoAbstraction create(int port) {
+        return new DynamoAbstraction(port);
     }
 
     public static class DynamoAbstraction {
 
         private static final Logger LOGGER = LogManager.getLogger(DynamoFactory.class);
-        private final AmazonDynamoDB dynamoClient;
-
+        private int port = 0;
 
         private DynamoAbstraction() {
-            dynamoClient = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
+
         }
 
-        public DynamoAbstraction(final URL serviceEndpoint) {
-            dynamoClient = AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(serviceEndpoint.toString(), Regions.EU_CENTRAL_1.getName())).build();
+        public DynamoAbstraction(int port) {
+            this.port = port;
+        }
+
+        public AmazonDynamoDB getClient() {
+            if (port != 0) {
+                return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:" + port, Regions.EU_CENTRAL_1.getName())).build();
+            } else {
+                return AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
+            }
         }
 
         public void writeSlackMember(final SlackMember member) {
-            DynamoDBMapper mapper = new DynamoDBMapper(dynamoClient);
+            DynamoDBMapper mapper = new DynamoDBMapper(getClient());
             mapper.save(member);
         }
     }
