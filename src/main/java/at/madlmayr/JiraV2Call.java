@@ -53,8 +53,6 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             throw new ToolCallException(e);
         }
         JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
-        // DynamoDb allows only 400 K of Data per Record. We have > 1 MB. (4000 Users)
-        // db.writeRawData(toolCallRequest.generateKey(ToolEnum.JIRA.getName()),users, toolCallRequest.getTimestamp());
 
         try {
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length());

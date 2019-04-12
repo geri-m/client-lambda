@@ -6,15 +6,12 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.handlers.TracingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DynamoFactory {
 
@@ -28,7 +25,6 @@ public class DynamoFactory {
 
     public static class DynamoAbstraction {
 
-        private static final String RAWDATA_TABLE_NAME = "RawData";
         private static final Logger LOGGER = LogManager.getLogger(DynamoFactory.class);
         private final AmazonDynamoDB dynamoClient;
 
@@ -44,15 +40,6 @@ public class DynamoFactory {
         public void writeSlackMember(final SlackMember member) {
             DynamoDBMapper mapper = new DynamoDBMapper(dynamoClient);
             mapper.save(member);
-        }
-
-        public void writeRawData(final String key, final String rawData, final long timestamp) {
-            Map<String, AttributeValue> item = new HashMap<>();
-            item.put("CompanyTool", new AttributeValue().withS(key));
-            item.put("Timestamp", new AttributeValue().withN("" + timestamp));
-            item.put("Data", new AttributeValue().withS(rawData));
-            dynamoClient.putItem(RAWDATA_TABLE_NAME, item);
-            LOGGER.info("Data successfully stored in RawData Table");
         }
     }
 }
