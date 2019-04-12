@@ -4,15 +4,10 @@ import at.madlmayr.slack.SlackCall;
 import at.madlmayr.slack.SlackMember;
 import at.madlmayr.slack.SlackResponse;
 import at.madlmayr.tools.FileUtils;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
+import at.madlmayr.tools.LocalDynamoDbServer;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.local.main.ServerRunner;
-import com.amazonaws.services.dynamodbv2.local.server.DynamoDBProxyServer;
-import com.amazonaws.services.dynamodbv2.model.*;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,7 +39,7 @@ public class SlackCallTest {
     private static final Logger LOGGER = LogManager.getLogger(LambdaTest.class);
     // TODO: Check if @Rule would be more suitable for handling the tests
     private static WireMockServer wireMockServer;
-    private static DynamoDBProxyServer server;
+    private static LocalDynamoDbServer server;
 
     @BeforeAll
     public static void beforeAll() throws Exception {
@@ -54,52 +49,25 @@ public class SlackCallTest {
         wireMockServer.start();
         WireMock.configureFor("localhost", wireMockServer.port());
 
-        System.setProperty("sqlite4java.library.path", "native-libs");
-        String port = "8000";
-        server = ServerRunner.createServerFromCommandLineArgs(
-                new String[]{"-inMemory", "-port", port});
+        server = new LocalDynamoDbServer();
         server.start();
-        createRawDataTable();
-
+        LOGGER.debug("Wiremock: {}", wireMockServer.port());
+        LOGGER.debug("DynamoDB: {}", server.getPort());
+        server.createAccountTable();
     }
 
-    private static AmazonDynamoDB getConnectionLocalhost() {
-        return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
-                new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", Regions.EU_CENTRAL_1.getName()))
-                .build();
-    }
 
-    private static void createRawDataTable() {
-        CreateTableRequest request = new CreateTableRequest()
-                .withAttributeDefinitions(new AttributeDefinition(
-                        SlackMember.COLUMN_COMPANY_TOOL, ScalarAttributeType.S))
-                .withAttributeDefinitions(new AttributeDefinition(
-                        SlackMember.COLUMN_ID, ScalarAttributeType.S))
-                .withKeySchema(new KeySchemaElement(SlackMember.COLUMN_COMPANY_TOOL, KeyType.HASH), new KeySchemaElement(SlackMember.COLUMN_ID, KeyType.RANGE))
-                .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
-                .withTableName(SlackMember.TABLE_NAME);
-
-        final AmazonDynamoDB ddb = getConnectionLocalhost();
-        CreateTableResult result = ddb.createTable(request);
-        LOGGER.info("Table '{}' created", result.getTableDescription().getTableName());
-    }
-
-    private static void deleteTable() {
-        final AmazonDynamoDB ddb = getConnectionLocalhost();
-        DeleteTableResult result = ddb.deleteTable(SlackMember.TABLE_NAME);
-        LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
-    }
 
     @AfterAll
     public static void afterAll() {
-        deleteTable();
+        server.deleteAccountTable();
+        server.stop();
         wireMockServer.stop();
     }
 
     @Test
     public void userListTest() throws Exception {
         WireMock.reset();
-        LOGGER.debug("Port: {}", wireMockServer.port());
         String response = FileUtils.readFromFile("/slackdata_01.json");
 
         List<String> memberIds = new ArrayList<>();
@@ -117,7 +85,7 @@ public class SlackCallTest {
                         .withBody(response)));
 
         ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.SLACK.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L);
-        RequestStreamHandler call = new SlackCall(new URL("http://localhost:8000"));
+        RequestStreamHandler call = new SlackCall(new URL("http://localhost:" + server.getPort()));
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
@@ -125,7 +93,7 @@ public class SlackCallTest {
         ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
         assertThat(resultFromCall.getAmountOfUsers()).isEqualTo(163);
 
-        final AmazonDynamoDB ddb = getConnectionLocalhost();
+        final AmazonDynamoDB ddb = server.getClient();
         DynamoDBMapper dbMapper = new DynamoDBMapper(ddb);
         SlackMember query = new SlackMember();
         query.setCompanyToolTimestamp("gma#" + ToolEnum.SLACK.getName() + "#" + Utils.standardTimeFormat(1L));

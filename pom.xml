@@ -115,6 +115,7 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>DynamoDBLocal</artifactId>
             <version>1.11.86</version>
+            <!-- we remove jetty 8, as we also have wiremock with jetty 9 in the classpath -->
             <exclusions>
                 <exclusion>
                     <artifactId>jetty-server</artifactId>

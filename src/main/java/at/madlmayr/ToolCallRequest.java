@@ -11,9 +11,9 @@ import java.util.Map;
 
 @DynamoDBTable(tableName = ToolCallRequest.TABLE_NAME)
 public class ToolCallRequest implements Serializable {
-    static final String TABLE_NAME = "Config";
-    static final String COLUMN_COMPANY = "company";
-    static final String COLUMN_TOOL = "tool";
+    public static final String TABLE_NAME = "Config";
+    public static final String COLUMN_COMPANY = "company";
+    public static final String COLUMN_TOOL = "tool";
     private static final String COLUMN_BEARER = "bearer";
     private static final String COLUMN_URL = "url";
     private static final String TIME_STAMP = "timestamp";
