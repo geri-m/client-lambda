@@ -54,7 +54,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             throw new ToolCallException(e);
         }
         JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
-        db.writeRawData(toolCallRequest.generateKey(ToolEnum.ARTIFACTORY.getName()), users.toString(), toolCallRequest.getTimestamp());
+        // db.writeRawData(toolCallRequest.generateKey(ToolEnum.ARTIFACTORY.getName()), users.toString(), toolCallRequest.getTimestamp());
 
         try {
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length());
