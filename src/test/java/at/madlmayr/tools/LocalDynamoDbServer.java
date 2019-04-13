@@ -4,6 +4,7 @@ import at.madlmayr.Account;
 import at.madlmayr.DynamoFactory;
 import at.madlmayr.ToolCallRequest;
 import at.madlmayr.artifactory.ArtifactoryUser;
+import at.madlmayr.jira.JiraSearchResultElement;
 import at.madlmayr.slack.SlackMember;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -161,6 +162,18 @@ public class LocalDynamoDbServer {
                 .withHashKeyValues(query);
 
         return dbMapper.query(ArtifactoryUser.class, queryExpression);
+    }
+
+
+    public List<JiraSearchResultElement> getJiraUserListByCompanyToolTimestamp(final String companyToolTimestamp) {
+        final AmazonDynamoDB ddb = db.getClient();
+        DynamoDBMapper dbMapper = new DynamoDBMapper(ddb);
+        JiraSearchResultElement query = new JiraSearchResultElement();
+        query.setCompanyToolTimestamp(companyToolTimestamp);
+        DynamoDBQueryExpression<JiraSearchResultElement> queryExpression = new DynamoDBQueryExpression<JiraSearchResultElement>()
+                .withHashKeyValues(query);
+
+        return dbMapper.query(JiraSearchResultElement.class, queryExpression);
     }
 
     public List<ToolCallRequest> getToolCallRequests(final String companyTool) {

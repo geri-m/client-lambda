@@ -12,7 +12,7 @@ import java.util.List;
 public class ArtifactoryDataHarmonizer {
 
     private static final Logger LOGGER = LogManager.getLogger(ArtifactoryDataHarmonizer.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String inputFile;
     private final String outputFile;
@@ -23,7 +23,7 @@ public class ArtifactoryDataHarmonizer {
         this.inputFile = inputFile;
         this.outputFile = outputFile;
         // make the structure more beautyful
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     public static void main(final String[] args) throws Exception {
@@ -42,7 +42,7 @@ public class ArtifactoryDataHarmonizer {
     }
 
     private String replaceName(final String inputJson) throws Exception {
-        ArtifactoryListElementWithUser[] response = mapper.readValue(inputJson, ArtifactoryListElementWithUser[].class);
+        ArtifactoryListElementWithUser[] response = objectMapper.readValue(inputJson, ArtifactoryListElementWithUser[].class);
 
         for (ArtifactoryListElementWithUser member : response) {
             LOGGER.info(member.getUser().getName()); // so this the UPN
@@ -61,7 +61,7 @@ public class ArtifactoryDataHarmonizer {
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
             member.getListElement().setUri(uri.toASCIIString());
         }
-        return mapper.writeValueAsString(response);
+        return objectMapper.writeValueAsString(response);
     }
 
 

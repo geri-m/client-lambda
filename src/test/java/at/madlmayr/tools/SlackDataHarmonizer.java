@@ -15,7 +15,7 @@ import java.util.Map;
 public class SlackDataHarmonizer {
 
     private static final Logger LOGGER = LogManager.getLogger(SlackDataHarmonizer.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String inputFile;
     private final String outputFile;
@@ -26,7 +26,7 @@ public class SlackDataHarmonizer {
         this.inputFile = inputFile;
         this.outputFile = outputFile;
         // make the structure more beautyful
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     public static void main(final String[] args) throws Exception {
@@ -45,7 +45,7 @@ public class SlackDataHarmonizer {
     }
 
     private String replaceName(final String inputJson) throws Exception {
-        SlackResponse response = mapper.readValue(inputJson, SlackResponse.class);
+        SlackResponse response = objectMapper.readValue(inputJson, SlackResponse.class);
 
         Map<String, String> lastNameList = new HashMap<>();
         Map<String, String> firstNameList = new HashMap<>();
@@ -84,7 +84,7 @@ public class SlackDataHarmonizer {
             // Replace the name in the member object
             replaceNames(member, replaceLastName, replaceFirstName);
         }
-        return mapper.writeValueAsString(response);
+        return objectMapper.writeValueAsString(response);
     }
 
     private String createNewLastName(final SlackMember member, Map<String, String> lastNameList) {

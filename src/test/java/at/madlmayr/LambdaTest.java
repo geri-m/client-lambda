@@ -3,6 +3,8 @@ package at.madlmayr;
 import at.madlmayr.artifactory.ArtifactoryCall;
 import at.madlmayr.artifactory.ArtifactoryListElement;
 import at.madlmayr.artifactory.ArtifactoryUser;
+import at.madlmayr.jira.JiraSearchResultElement;
+import at.madlmayr.jira.JiraV2Call;
 import at.madlmayr.slack.SlackCall;
 import at.madlmayr.tools.ArtifactoryListElementWithUser;
 import at.madlmayr.tools.FileUtils;
@@ -29,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Disabled
 public class LambdaTest {
     private static final Logger LOGGER = LogManager.getLogger(LambdaTest.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeAll
     public static void beforeAllTests() {
@@ -51,7 +53,7 @@ public class LambdaTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
-        ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
+        ToolCallResult resultFromCall = objectMapper.readValue(outputStream.toString(), ToolCallResult.class);
         assertThat(resultFromCall.getAmountOfUsers() >= 0);
     }
 
@@ -71,7 +73,7 @@ public class LambdaTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(artifactory).toString().getBytes());
         call.handleRequest(targetStream, null, null);
-        ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
+        ToolCallResult resultFromCall = objectMapper.readValue(outputStream.toString(), ToolCallResult.class);
         assertThat(resultFromCall.getAmountOfUsers() >= 0);
     }
 
@@ -90,7 +92,7 @@ public class LambdaTest {
 
 
         JSONArray listElements = call.processCall(artifactory.getUrl(), artifactory.getBearer());
-        ArtifactoryListElement[] userArray = mapper.readValue(listElements.toString(), ArtifactoryListElement[].class);
+        ArtifactoryListElement[] userArray = objectMapper.readValue(listElements.toString(), ArtifactoryListElement[].class);
         LOGGER.info("Amount of Users: {} ", userArray.length);
 
         // We do the sync call for several reasons
@@ -104,22 +106,20 @@ public class LambdaTest {
             JSONArray singleElementARray = new JSONArray();
             singleElementARray.put(singleListElement);
             JSONArray detailUsers = call.doClientCallsSync(singleElementARray, artifactory.getBearer());
-            ArtifactoryUser[] userArrayDetails = mapper.readValue(detailUsers.toString(), ArtifactoryUser[].class);
 
-
-            ArtifactoryListElement[] listElement = mapper.readValue(singleElementARray.toString(), ArtifactoryListElement[].class);
-            ArtifactoryUser[] userElement = mapper.readValue(detailUsers.toString(), ArtifactoryUser[].class);
+            ArtifactoryListElement[] listElement = objectMapper.readValue(singleElementARray.toString(), ArtifactoryListElement[].class);
+            ArtifactoryUser[] userElement = objectMapper.readValue(detailUsers.toString(), ArtifactoryUser[].class);
 
             ArtifactoryListElementWithUser fullElement = new ArtifactoryListElementWithUser();
             fullElement.setListElement(listElement[0]);
             fullElement.setUser(userElement[0]);
             fullUserList.add(fullElement);
         }
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        LOGGER.info(mapper.writeValueAsString(fullUserList));
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        LOGGER.info(objectMapper.writeValueAsString(fullUserList));
         LOGGER.info("Amount of Users: {} ", fullUserList.size());
 
-        FileUtils.writeToFile(mapper.writeValueAsString(fullUserList), "artifactory_01.raw");
+        FileUtils.writeToFile(objectMapper.writeValueAsString(fullUserList), "artifactory_01.raw");
 
     }
 
@@ -139,8 +139,27 @@ public class LambdaTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(jira).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
-        ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
+        ToolCallResult resultFromCall = objectMapper.readValue(outputStream.toString(), ToolCallResult.class);
         assertThat(resultFromCall.getAmountOfUsers() >= 0);
+    }
+
+    @Test
+    public void testJiraTestDataCall() throws Exception {
+        List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
+        ToolCallRequest jira = null;
+        for (ToolCallRequest config : configList) {
+            if (config.getTool().equals(ToolEnum.JIRA.getName())) {
+                jira = config;
+                break;
+            }
+        }
+        assertThat(jira != null);
+        JiraV2Call call = new JiraV2Call();
+        JSONArray listElements = call.processCall(jira.getUrl(), jira.getBearer());
+        JiraSearchResultElement[] userList = objectMapper.readValue(listElements.toString(), JiraSearchResultElement[].class);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        LOGGER.info("Amount of Users: {} ", userList.length);
+        FileUtils.writeToFile(objectMapper.writeValueAsString(userList), "jira_01.raw");
     }
 
 }

@@ -1,10 +1,12 @@
-package at.madlmayr;
+package at.madlmayr.jira;
 
+import at.madlmayr.*;
 import at.madlmayr.slack.SlackCall;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -28,9 +30,9 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
     // JIRA v7.4.3 - https://docs.atlassian.com/software/jira/docs/api/REST/7.4.3/
     // API Version 2
 
-    private static final int MAX_RESULT_COUNT_GET_PARAMETER = 1000;
-    private static final int MAX_RECURSION_DEPTH = 3;
-    private static final char[] SEARCH_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+    public static final int MAX_RESULT_COUNT_GET_PARAMETER = 1000;
+    public static final int MAX_RECURSION_DEPTH = 3;
+    public static final char[] SEARCH_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
     private static final Logger LOGGER = LogManager.getLogger(SlackCall.class);
     private final DynamoFactory.DynamoAbstraction db;
@@ -42,6 +44,11 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
         httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
     }
 
+    public JiraV2Call(int port) {
+        db = new DynamoFactory().create(port);
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
+    }
+
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
         ToolCallRequest toolCallRequest;
@@ -49,33 +56,42 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             // Handling De-Serialization myself
             // https://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-req-resp.html
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
-        } catch (IOException e) {
-            throw new ToolCallException(e);
-        }
-        JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
+            JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
 
-        try {
+            JiraSearchResultElement[] userArrayDetails = objectMapper.readValue(users.toString(), JiraSearchResultElement[].class);
+            LOGGER.info("Amount of Users: {} ", userArrayDetails.length);
+
+            for (JiraSearchResultElement user : userArrayDetails) {
+                user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
+                db.writeJiraUser(user);
+            }
+
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getCurrentSegment().addException(e);
+            throw new ToolCallException(e);
         }
     }
 
     @Override
     public JSONArray processCall(final String url, final String bearer) {
-        Map<String, String> allUsers = recursiveCallForUser("", url, bearer);
+        Map<String, JiraSearchResultElement> allUsers = recursiveCallForUser("", url, bearer);
         JSONArray userArray = new JSONArray();
-        for (Map.Entry<String, String> entry : allUsers.entrySet()) {
-            userArray.put(new JSONObject(entry.getValue()));
+        for (Map.Entry<String, JiraSearchResultElement> entry : allUsers.entrySet()) {
+            try {
+                userArray.put(new JSONObject(objectMapper.writeValueAsString(entry.getValue())));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
         return userArray;
     }
 
-    private Map<String, String> recursiveCallForUser(final String preFix, final String url, final String bearer) {
+    private Map<String, JiraSearchResultElement> recursiveCallForUser(final String preFix, final String url, final String bearer) {
 
-        Map<String, String> result = new HashMap<>();
+        Map<String, JiraSearchResultElement> result = new HashMap<>();
 
         for (char searchChar : SEARCH_CHARS) {
             HttpGet request;
@@ -97,22 +113,22 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
                     LOGGER.info("HTTP Call to '{}' was successful", request.getURI().toURL());
                     JSONArray users = new JSONArray(jsonString);
 
-                    LOGGER.info("Currently '{}' members in jira response (active, inactive, pp)", users.length());
+                    JiraSearchResultElement[] userList = objectMapper.readValue(users.toString(), JiraSearchResultElement[].class);
+                    LOGGER.info("Currently '{}' members in jira response (active, inactive, pp)", userList.length);
 
                     // run a recursion, if the amount of result exceeds the max results
                     // Issue: the search also goes thru the email, so if the string matches the email, you will get all users.
                     if (users.length() == MAX_RESULT_COUNT_GET_PARAMETER) {
                         if ((preFix + searchChar).length() >= MAX_RECURSION_DEPTH) {
                             LOGGER.warn("Not Crawling deeper on prefix '{}'.", preFix + searchChar);
-                            break;
+                        } else {
+                            Map<String, JiraSearchResultElement> resultFromRecursion = recursiveCallForUser(preFix + searchChar, url, bearer);
+                            result.putAll(resultFromRecursion);
                         }
-                        Map<String, String> resultFromRecursion = recursiveCallForUser(preFix + searchChar, url, bearer);
-                        result.putAll(resultFromRecursion);
                     } else {
                         for (Object user : users) {
-                            // remove Avator URL, in order to save some space.
-                            ((JSONObject) user).remove("avatarUrls");
-                            result.put(((JSONObject) user).getString("name"), user.toString());
+                            JiraSearchResultElement singleUser = objectMapper.readValue(user.toString(), JiraSearchResultElement.class);
+                            result.put(singleUser.getKey(), singleUser);
                         }
                     }
                 } else {

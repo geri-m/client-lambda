@@ -42,7 +42,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: target/client-lambda.jar
-      Handler: 'at.madlmayr.JiraV2Call::handleRequest'
+      Handler: 'at.madlmayr.jira.JiraV2Call::handleRequest'
       Runtime: java8
       Description: "JiraV2Call Call"
       MemorySize: 256

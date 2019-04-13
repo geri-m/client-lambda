@@ -71,11 +71,9 @@ public class ArtifactoryCallTest {
         for (ArtifactoryListElementWithUser user : responseFromFile) {
             memberIds.add(user.getUser().getName());
 
-
             URL originalUrl = new URL(user.getListElement().getUri());
             URL newUrl = new URL(originalUrl.getProtocol(), originalUrl.getHost(), wireMockServer.port(), originalUrl.getFile());
             user.getListElement().setUri(newUrl.toString());
-
 
             // put each user into wiremock
             stubFor(get(urlEqualTo(newUrl.getPath()))
