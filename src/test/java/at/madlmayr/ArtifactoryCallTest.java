@@ -1,8 +1,9 @@
 package at.madlmayr;
 
-import at.madlmayr.slack.SlackCall;
-import at.madlmayr.slack.SlackMember;
-import at.madlmayr.slack.SlackResponse;
+import at.madlmayr.artifactory.ArtifactoryCall;
+import at.madlmayr.artifactory.ArtifactoryListElement;
+import at.madlmayr.artifactory.ArtifactoryUser;
+import at.madlmayr.tools.ArtifactoryListElementWithUser;
 import at.madlmayr.tools.FileUtils;
 import at.madlmayr.tools.LocalDynamoDbServer;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,39 +63,57 @@ public class ArtifactoryCallTest {
     @Test
     public void userListTest() throws Exception {
         WireMock.reset();
-        String response = FileUtils.readFromFile("/slackdata_01.json");
+        String response = FileUtils.readFromFile("/artifactory_01.json");
 
         List<String> memberIds = new ArrayList<>();
-        SlackResponse responseFromFile = mapper.readValue(response, SlackResponse.class);
-        for (SlackMember m : responseFromFile.getMembers()) {
-            memberIds.add(m.getId());
+        List<ArtifactoryListElement> list = new ArrayList<>();
+        ArtifactoryListElementWithUser[] responseFromFile = mapper.readValue(response, ArtifactoryListElementWithUser[].class);
+        for (ArtifactoryListElementWithUser user : responseFromFile) {
+            memberIds.add(user.getUser().getName());
+
+
+            URL originalUrl = new URL(user.getListElement().getUri());
+            URL newUrl = new URL(originalUrl.getProtocol(), originalUrl.getHost(), wireMockServer.port(), originalUrl.getFile());
+            user.getListElement().setUri(newUrl.toString());
+
+
+            // put each user into wiremock
+            stubFor(get(urlEqualTo(newUrl.getPath()))
+                    .willReturn(aResponse()
+                            .withStatus(200)
+                            .withHeader("Content-Type", "application/json; charset=utf-8")
+                            .withBody(mapper.writeValueAsString(user.getUser()))));
+
+            list.add(user.getListElement());
         }
 
-        // WireMock.reset();
-        stubFor(get(urlEqualTo("/api/users.list/"))
+        // Put the whole user List into Wiremock
+        stubFor(get(urlEqualTo("/gma/api/security/users"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json; charset=utf-8")
-                        .withBody(response)));
+                        .withBody(mapper.writeValueAsString(list))));
 
-        ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.SLACK.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L);
-        RequestStreamHandler call = new SlackCall(localDynamoDbServer.getPort());
+
+        ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.ARTIFACTORY.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L);
+        RequestStreamHandler call = new ArtifactoryCall(localDynamoDbServer.getPort());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
 
         ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
-        assertThat(resultFromCall.getAmountOfUsers()).isEqualTo(163);
+        assertThat(resultFromCall.getAmountOfUsers()).isEqualTo(103);
 
-        List<SlackMember> itemList = localDynamoDbServer.getSlackMemberListByCompanyToolTimestamp("gma#" + ToolEnum.SLACK.getName() + "#" + Utils.standardTimeFormat(1L));
+        List<ArtifactoryUser> artifactoryUserList = localDynamoDbServer.getArtifactoryUserListByCompanyToolTimestamp("gma#" + ToolEnum.ARTIFACTORY.getName() + "#" + Utils.standardTimeFormat(1L));
 
-        for (SlackMember m : itemList) {
-            assertThat(memberIds.contains(m.getId()));
-            memberIds.remove(m.getId());
+        for (ArtifactoryUser artifactoryUser : artifactoryUserList) {
+            assertThat(memberIds.contains(artifactoryUser.getName()));
+            memberIds.remove(artifactoryUser.getName());
         }
 
         assertThat(memberIds.size()).isEqualTo(0);
-        assertThat(itemList.size()).isEqualTo(163);
+        assertThat(artifactoryUserList.size()).isEqualTo(103);
+
     }
 
 }

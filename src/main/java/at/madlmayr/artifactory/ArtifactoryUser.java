@@ -1,10 +1,24 @@
 package at.madlmayr.artifactory;
 
+import at.madlmayr.Account;
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
+@DynamoDBTable(tableName = Account.TABLE_NAME)
 public class ArtifactoryUser implements Serializable {
+
+    private String companyToolTimestamp;
+
+    @DynamoDBHashKey(attributeName = Account.COLUMN_COMPANY_TOOL)
+    public String getCompanyToolTimestamp() {
+        return companyToolTimestamp;
+    }
+
+    public void setCompanyToolTimestamp(String companyToolTimestamp) {
+        this.companyToolTimestamp = companyToolTimestamp;
+    }
 
     @JsonProperty("name")
     private String name;
@@ -42,6 +56,8 @@ public class ArtifactoryUser implements Serializable {
     public ArtifactoryUser() {
     }
 
+
+    @DynamoDBRangeKey(attributeName = Account.COLUMN_ID)
     public String getName() {
         return name;
     }
@@ -50,6 +66,7 @@ public class ArtifactoryUser implements Serializable {
         this.name = name;
     }
 
+    @DynamoDBAttribute(attributeName = "email")
     public String getEmail() {
         return email;
     }
@@ -82,6 +99,8 @@ public class ArtifactoryUser implements Serializable {
         this.internalPasswordDisabled = internalPasswordDisabled;
     }
 
+    // we cant't write arrays to DynamoDB without having a dedicated datatype for them.
+    @DynamoDBIgnore
     public String[] getGroups() {
         return groups;
     }

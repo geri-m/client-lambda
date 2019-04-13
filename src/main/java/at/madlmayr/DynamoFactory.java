@@ -1,5 +1,6 @@
 package at.madlmayr;
 
+import at.madlmayr.artifactory.ArtifactoryUser;
 import at.madlmayr.slack.SlackMember;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
@@ -43,6 +44,11 @@ public class DynamoFactory {
         }
 
         public void writeSlackMember(final SlackMember member) {
+            DynamoDBMapper mapper = new DynamoDBMapper(getClient());
+            mapper.save(member);
+        }
+
+        public void writeArtifactoryUser(final ArtifactoryUser member) {
             DynamoDBMapper mapper = new DynamoDBMapper(getClient());
             mapper.save(member);
         }

@@ -1,0 +1,2356 @@
+[
+  {
+    "user": {
+      "name": "Natividad",
+      "email": "Natividad.Astto@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Natividad",
+      "realm": "internal",
+      "name": "Natividad"
+    }
+  },
+  {
+    "user": {
+      "name": "cyb6715j",
+      "email": "Jenn.Cybill@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "scheduling-pro-developers",
+        "sales-qfs-readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-02-21T08:45:47.873Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/cyb6715j",
+      "realm": "internal",
+      "name": "cyb6715j"
+    }
+  },
+  {
+    "user": {
+      "name": "N.McClees",
+      "email": "Nadia.McClees@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-10-20T09:19:46.805Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/N.McClees",
+      "realm": "internal",
+      "name": "N.McClees"
+    }
+  },
+  {
+    "user": {
+      "name": "N.Krum",
+      "email": "Natividad.Krum@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-liferay-developers"
+      ],
+      "lastLoggedIn": "2019-04-10T15:40:52.706Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/N.Krum",
+      "realm": "internal",
+      "name": "N.Krum"
+    }
+  },
+  {
+    "user": {
+      "name": "K.Elisabet",
+      "email": "Kirsti.Elisabet@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers",
+        "admin",
+        "sales"
+      ],
+      "lastLoggedIn": "2018-02-20T19:57:38.283Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/K.Elisabet",
+      "realm": "internal",
+      "name": "K.Elisabet"
+    }
+  },
+  {
+    "user": {
+      "name": "A.Reuven",
+      "email": "Ardyth.Reuven@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/A.Reuven",
+      "realm": "internal",
+      "name": "A.Reuven"
+    }
+  },
+  {
+    "user": {
+      "name": "M.Warrin",
+      "email": "Minerva.Warrin@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-12T11:19:25.385Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/M.Warrin",
+      "realm": "internal",
+      "name": "M.Warrin"
+    }
+  },
+  {
+    "user": {
+      "name": "M.Adna",
+      "email": "Melisande.Adna@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2018-11-13T12:42:34.111Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/M.Adna",
+      "realm": "internal",
+      "name": "M.Adna"
+    }
+  },
+  {
+    "user": {
+      "name": "Bree Sauveur",
+      "email": "Bree.Sauveur@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2019-02-11T16:14:58.080Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Bree%20Sauveur",
+      "realm": "internal",
+      "name": "Bree Sauveur"
+    }
+  },
+  {
+    "user": {
+      "name": "R.Noguchi",
+      "email": "Rebecca.Noguchi@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/R.Noguchi",
+      "realm": "internal",
+      "name": "R.Noguchi"
+    }
+  },
+  {
+    "user": {
+      "name": "Sonny",
+      "email": "Sonny.Lorant@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-10-21T07:44:58.775Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Sonny",
+      "realm": "internal",
+      "name": "Sonny"
+    }
+  },
+  {
+    "user": {
+      "name": "T.Konopka",
+      "email": "Tamara.Konopka@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "admin",
+        "sales-bookit-developers",
+        "sales-isa-developers"
+      ],
+      "lastLoggedIn": "2019-04-10T15:21:18.828Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/T.Konopka",
+      "realm": "internal",
+      "name": "T.Konopka"
+    }
+  },
+  {
+    "user": {
+      "name": "agu9253h",
+      "email": "Hermione.Agustin@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-isa-developers"
+      ],
+      "lastLoggedIn": "2019-04-10T14:56:24.172Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/agu9253h",
+      "realm": "internal",
+      "name": "agu9253h"
+    }
+  },
+  {
+    "user": {
+      "name": "N.Westfahl",
+      "email": "Nelia.Westfahl@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-qfs-readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-03-21T09:15:48.231Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/N.Westfahl",
+      "realm": "internal",
+      "name": "N.Westfahl"
+    }
+  },
+  {
+    "user": {
+      "name": "A.Kyriako",
+      "email": "Ardyth.Kyriako@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-01-22T07:07:25.583Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/A.Kyriako",
+      "realm": "internal",
+      "name": "A.Kyriako"
+    }
+  },
+  {
+    "user": {
+      "name": "A.Munafo",
+      "email": "Ardyth.Munafo@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-isa-developers"
+      ],
+      "lastLoggedIn": "2019-03-05T13:55:30.246Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/A.Munafo",
+      "realm": "internal",
+      "name": "A.Munafo"
+    }
+  },
+  {
+    "user": {
+      "name": "Cathy Gilbye",
+      "email": "Cathy.Gilbye@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-10-21T07:45:07.726Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Cathy%20Gilbye",
+      "realm": "internal",
+      "name": "Cathy Gilbye"
+    }
+  },
+  {
+    "user": {
+      "name": "lev4567t",
+      "email": "Talya.Levona@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "admin"
+      ],
+      "lastLoggedIn": "2019-03-28T09:10:59.290Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/lev4567t",
+      "realm": "internal",
+      "name": "lev4567t"
+    }
+  },
+  {
+    "user": {
+      "name": "H.Jephthah",
+      "email": "Haley.Jephthah@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-10-05T12:41:57.693Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/H.Jephthah",
+      "realm": "internal",
+      "name": "H.Jephthah"
+    }
+  },
+  {
+    "user": {
+      "name": "B.Ailsun",
+      "email": "Becca.Ailsun@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2018-10-10T09:14:35.466Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/B.Ailsun",
+      "realm": "internal",
+      "name": "B.Ailsun"
+    }
+  },
+  {
+    "user": {
+      "name": "W.Parrish",
+      "email": "Winni.Parrish@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "appops",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-10T14:20:49.207Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/W.Parrish",
+      "realm": "internal",
+      "name": "W.Parrish"
+    }
+  },
+  {
+    "user": {
+      "name": "Astrid Karlie",
+      "email": "Astrid.Karlie@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-02-14T11:34:56.851Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Astrid%20Karlie",
+      "realm": "internal",
+      "name": "Astrid Karlie"
+    }
+  },
+  {
+    "user": {
+      "name": "V.Tedman",
+      "email": "Vita.Tedman@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "admin"
+      ],
+      "lastLoggedIn": "2019-04-11T13:58:32.391Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/V.Tedman",
+      "realm": "internal",
+      "name": "V.Tedman"
+    }
+  },
+  {
+    "user": {
+      "name": "Jessy Daile",
+      "email": "Jessy.Daile@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": true,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2018-11-23T15:00:35.422Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "saml"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Jessy%20Daile",
+      "realm": "saml",
+      "name": "Jessy Daile"
+    }
+  },
+  {
+    "user": {
+      "name": "J.Bannister",
+      "email": "Janet.Bannister@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-qfs-readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-12T11:51:41.167Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/J.Bannister",
+      "realm": "internal",
+      "name": "J.Bannister"
+    }
+  },
+  {
+    "user": {
+      "name": "Melloney",
+      "email": "Melloney.Hendon@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-isa-developers"
+      ],
+      "lastLoggedIn": "2019-01-10T15:09:32.485Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Melloney",
+      "realm": "internal",
+      "name": "Melloney"
+    }
+  },
+  {
+    "user": {
+      "name": "Marlane",
+      "email": "Marlane.Fredela@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2018-09-24T08:58:05.268Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Marlane",
+      "realm": "internal",
+      "name": "Marlane"
+    }
+  },
+  {
+    "user": {
+      "name": "M.Hazeghi",
+      "email": "Mellisent.Hazeghi@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-10-12T10:09:42.031Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/M.Hazeghi",
+      "realm": "internal",
+      "name": "M.Hazeghi"
+    }
+  },
+  {
+    "user": {
+      "name": "Leandra Biancha",
+      "email": "Leandra.Biancha@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-03-18T13:28:17.162Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Leandra%20Biancha",
+      "realm": "internal",
+      "name": "Leandra Biancha"
+    }
+  },
+  {
+    "user": {
+      "name": "K.Sparhawk",
+      "email": "Kate.Sparhawk@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2018-08-07T12:14:45.665Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/K.Sparhawk",
+      "realm": "internal",
+      "name": "K.Sparhawk"
+    }
+  },
+  {
+    "user": {
+      "name": "R.Koah",
+      "email": "Ranee.Koah@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-qfs-readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-12T12:10:06.838Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/R.Koah",
+      "realm": "internal",
+      "name": "R.Koah"
+    }
+  },
+  {
+    "user": {
+      "name": "O.Limoli",
+      "email": "Orelee.Limoli@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-liferay-developers"
+      ],
+      "lastLoggedIn": "2019-03-11T08:22:22.973Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/O.Limoli",
+      "realm": "internal",
+      "name": "O.Limoli"
+    }
+  },
+  {
+    "user": {
+      "name": "J.Meares",
+      "email": "Jany.Meares@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers",
+        "sales-qfs-readers",
+        "sales-isa-developers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-09T11:56:12.308Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/J.Meares",
+      "realm": "internal",
+      "name": "J.Meares"
+    }
+  },
+  {
+    "user": {
+      "name": "J.Annmaria",
+      "email": "Jacquelynn.Annmaria@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "appops",
+        "liferay-pro-read"
+      ],
+      "lastLoggedIn": "2018-09-19T13:20:35.540Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/J.Annmaria",
+      "realm": "internal",
+      "name": "J.Annmaria"
+    }
+  },
+  {
+    "user": {
+      "name": "Rasla",
+      "email": "Rasla.Sumner@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Rasla",
+      "realm": "internal",
+      "name": "Rasla"
+    }
+  },
+  {
+    "user": {
+      "name": "Micky",
+      "email": "Micky.Hera@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-liferay-developers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Micky",
+      "realm": "internal",
+      "name": "Micky"
+    }
+  },
+  {
+    "user": {
+      "name": "A.Chemaram",
+      "email": "Anthe.Chemaram@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "scheduling-pro-developers",
+        "sales-qfs-readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-10T11:53:17.168Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/A.Chemaram",
+      "realm": "internal",
+      "name": "A.Chemaram"
+    }
+  },
+  {
+    "user": {
+      "name": "fab5346a",
+      "email": "Albertine.Fabiano@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/fab5346a",
+      "realm": "internal",
+      "name": "fab5346a"
+    }
+  },
+  {
+    "user": {
+      "name": "sea4852l",
+      "email": "Lexi.Searby@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/sea4852l",
+      "realm": "internal",
+      "name": "sea4852l"
+    }
+  },
+  {
+    "user": {
+      "name": "A.Annabal",
+      "email": "Aeriel.Annabal@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "appops",
+        "admin"
+      ],
+      "lastLoggedIn": "2019-04-11T08:38:00.891Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/A.Annabal",
+      "realm": "internal",
+      "name": "A.Annabal"
+    }
+  },
+  {
+    "user": {
+      "name": "H.Millford",
+      "email": "Harri.Millford@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-02-07T05:48:18.443Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/H.Millford",
+      "realm": "internal",
+      "name": "H.Millford"
+    }
+  },
+  {
+    "user": {
+      "name": "Issy Fording",
+      "email": "Issy.Fording@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Issy%20Fording",
+      "realm": "internal",
+      "name": "Issy Fording"
+    }
+  },
+  {
+    "user": {
+      "name": "sau3849a",
+      "email": "Adara.Saucy@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/sau3849a",
+      "realm": "internal",
+      "name": "sau3849a"
+    }
+  },
+  {
+    "user": {
+      "name": "Norine Frey",
+      "email": "Norine.Frey@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers"
+      ],
+      "lastLoggedIn": "2018-11-22T13:30:59.379Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Norine%20Frey",
+      "realm": "internal",
+      "name": "Norine Frey"
+    }
+  },
+  {
+    "user": {
+      "name": "Claudette",
+      "email": "Claudette.Kolb@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "appops",
+        "sales-bookit-developers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-11T10:58:35.674Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Claudette",
+      "realm": "internal",
+      "name": "Claudette"
+    }
+  },
+  {
+    "user": {
+      "name": "Shelagh Cerallua",
+      "email": "Shelagh.Cerallua@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-03-14T09:47:28.562Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Shelagh%20Cerallua",
+      "realm": "internal",
+      "name": "Shelagh Cerallua"
+    }
+  },
+  {
+    "user": {
+      "name": "G.Wilmar",
+      "email": "Garnette.Wilmar@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "appops",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-02-11T09:07:47.362Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/G.Wilmar",
+      "realm": "internal",
+      "name": "G.Wilmar"
+    }
+  },
+  {
+    "user": {
+      "name": "L.Emmie",
+      "email": "Lela.Emmie@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "appops",
+        "readers"
+      ],
+      "lastLoggedIn": "2019-04-12T11:18:47.338Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/L.Emmie",
+      "realm": "internal",
+      "name": "L.Emmie"
+    }
+  },
+  {
+    "user": {
+      "name": "kin4497t",
+      "email": "Tanya.Kincaid@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "appops",
+        "readers"
+      ],
+      "lastLoggedIn": "2019-03-22T14:04:26.065Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/kin4497t",
+      "realm": "internal",
+      "name": "kin4497t"
+    }
+  },
+  {
+    "user": {
+      "name": "Vyky Dugaid",
+      "email": "Vyky.Dugaid@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "appops",
+        "sales-liferay-developers",
+        "liferay-pro-read",
+        "sales-isa-developers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-11T08:57:02.149Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Vyky%20Dugaid",
+      "realm": "internal",
+      "name": "Vyky Dugaid"
+    }
+  },
+  {
+    "user": {
+      "name": "lil7801g",
+      "email": "Genia.Lilli@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-isa-developers"
+      ],
+      "lastLoggedIn": "2019-04-12T05:35:16.512Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/lil7801g",
+      "realm": "internal",
+      "name": "lil7801g"
+    }
+  },
+  {
+    "user": {
+      "name": "xyl9099s",
+      "email": "Shawna.Xylon@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2018-03-01T10:14:04.395Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/xyl9099s",
+      "realm": "internal",
+      "name": "xyl9099s"
+    }
+  },
+  {
+    "user": {
+      "name": "T.Manson",
+      "email": "Twyla.Manson@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2018-08-16T10:45:51.609Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/T.Manson",
+      "realm": "internal",
+      "name": "T.Manson"
+    }
+  },
+  {
+    "user": {
+      "name": "G.Radferd",
+      "email": "Gwennie.Radferd@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "admin"
+      ],
+      "lastLoggedIn": "2019-04-09T06:09:51.917Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/G.Radferd",
+      "realm": "internal",
+      "name": "G.Radferd"
+    }
+  },
+  {
+    "user": {
+      "name": "E.Saint",
+      "email": "Elianore.Saint@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/E.Saint",
+      "realm": "internal",
+      "name": "E.Saint"
+    }
+  },
+  {
+    "user": {
+      "name": "A.Redmond",
+      "email": "Amii.Redmond@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "scheduling-pro-developers"
+      ],
+      "lastLoggedIn": "2019-04-11T13:19:03.702Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/A.Redmond",
+      "realm": "internal",
+      "name": "A.Redmond"
+    }
+  },
+  {
+    "user": {
+      "name": "M.Ottilie",
+      "email": "Milena.Ottilie@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-10-20T07:27:17.190Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/M.Ottilie",
+      "realm": "internal",
+      "name": "M.Ottilie"
+    }
+  },
+  {
+    "user": {
+      "name": "chr8896h",
+      "email": "Hollyanne.Christabelle@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-liferay-developers",
+        "liferay-pro-read"
+      ],
+      "lastLoggedIn": "2019-03-27T12:44:36.540Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/chr8896h",
+      "realm": "internal",
+      "name": "chr8896h"
+    }
+  },
+  {
+    "user": {
+      "name": "ace5667s",
+      "email": "Sher.Acey@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "admin"
+      ],
+      "lastLoggedIn": "2019-04-03T07:46:21.483Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/ace5667s",
+      "realm": "internal",
+      "name": "ace5667s"
+    }
+  },
+  {
+    "user": {
+      "name": "Camilla Koffman",
+      "email": "Camilla.Koffman@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "appops",
+        "readers"
+      ],
+      "lastLoggedIn": "2019-04-11T12:17:01.793Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Camilla%20Koffman",
+      "realm": "internal",
+      "name": "Camilla Koffman"
+    }
+  },
+  {
+    "user": {
+      "name": "Demetria",
+      "email": "Demetria.Ulysses@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-01-23T10:41:46.912Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Demetria",
+      "realm": "internal",
+      "name": "Demetria"
+    }
+  },
+  {
+    "user": {
+      "name": "F.Roseann",
+      "email": "Farand.Roseann@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/F.Roseann",
+      "realm": "internal",
+      "name": "F.Roseann"
+    }
+  },
+  {
+    "user": {
+      "name": "J.Heinrich",
+      "email": "Janean.Heinrich@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/J.Heinrich",
+      "realm": "internal",
+      "name": "J.Heinrich"
+    }
+  },
+  {
+    "user": {
+      "name": "Jessie Esbenshade",
+      "email": "Jessie.Esbenshade@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-isa-developers"
+      ],
+      "lastLoggedIn": "2019-03-26T07:45:46.651Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Jessie%20Esbenshade",
+      "realm": "internal",
+      "name": "Jessie Esbenshade"
+    }
+  },
+  {
+    "user": {
+      "name": "Deni Ollayos",
+      "email": "Deni.Ollayos@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-05-01T08:30:42.308Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Deni%20Ollayos",
+      "realm": "internal",
+      "name": "Deni Ollayos"
+    }
+  },
+  {
+    "user": {
+      "name": "Maryellen",
+      "email": "Maryellen.Muriah@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-isa-developers"
+      ],
+      "lastLoggedIn": "2019-04-08T07:36:27.925Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Maryellen",
+      "realm": "internal",
+      "name": "Maryellen"
+    }
+  },
+  {
+    "user": {
+      "name": "E.Pfaff",
+      "email": "Engracia.Pfaff@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": true,
+      "groups": [
+        "readers",
+        "admin"
+      ],
+      "lastLoggedIn": "2018-11-23T15:06:59.495Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "saml"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/E.Pfaff",
+      "realm": "saml",
+      "name": "E.Pfaff"
+    }
+  },
+  {
+    "user": {
+      "name": "S.Gildea",
+      "email": "Sally.Gildea@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-02-05T14:26:36.527Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/S.Gildea",
+      "realm": "internal",
+      "name": "S.Gildea"
+    }
+  },
+  {
+    "user": {
+      "name": "oss6780p",
+      "email": "Pru.Ossie@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-10-16T10:52:39.907Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/oss6780p",
+      "realm": "internal",
+      "name": "oss6780p"
+    }
+  },
+  {
+    "user": {
+      "name": "M.Winshell",
+      "email": "Mirelle.Winshell@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-10-19T12:42:14.907Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/M.Winshell",
+      "realm": "internal",
+      "name": "M.Winshell"
+    }
+  },
+  {
+    "user": {
+      "name": "swo8452c",
+      "email": "Claire.Swope@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-qfs-readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-12T11:12:23.067Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/swo8452c",
+      "realm": "internal",
+      "name": "swo8452c"
+    }
+  },
+  {
+    "user": {
+      "name": "C.Eugenia",
+      "email": "Cristy.Eugenia@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "appops",
+        "readers"
+      ],
+      "lastLoggedIn": "2019-04-11T08:49:40.119Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/C.Eugenia",
+      "realm": "internal",
+      "name": "C.Eugenia"
+    }
+  },
+  {
+    "user": {
+      "name": "V.Annmaria",
+      "email": "Virgie.Annmaria@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "appops",
+        "readers"
+      ],
+      "lastLoggedIn": "2019-01-24T13:51:10.589Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/V.Annmaria",
+      "realm": "internal",
+      "name": "V.Annmaria"
+    }
+  },
+  {
+    "user": {
+      "name": "R.Trescha",
+      "email": "Rosmunda.Trescha@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2019-03-18T13:23:08.822Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/R.Trescha",
+      "realm": "internal",
+      "name": "R.Trescha"
+    }
+  },
+  {
+    "user": {
+      "name": "con1430g",
+      "email": "Glenine.Constancy@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/con1430g",
+      "realm": "internal",
+      "name": "con1430g"
+    }
+  },
+  {
+    "user": {
+      "name": "Rosie",
+      "email": "Rosie.Roskes@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": null,
+      "lastLoggedIn": "2018-08-14T15:17:50.955Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Rosie",
+      "realm": "internal",
+      "name": "Rosie"
+    }
+  },
+  {
+    "user": {
+      "name": "I.Thirion",
+      "email": "Ilsa.Thirion@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/I.Thirion",
+      "realm": "internal",
+      "name": "I.Thirion"
+    }
+  },
+  {
+    "user": {
+      "name": "pep1780l",
+      "email": "Lindsay.Peppel@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/pep1780l",
+      "realm": "internal",
+      "name": "pep1780l"
+    }
+  },
+  {
+    "user": {
+      "name": "K.Dody",
+      "email": "Kath.Dody@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-liferay-developers",
+        "liferay-pro-read"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/K.Dody",
+      "realm": "internal",
+      "name": "K.Dody"
+    }
+  },
+  {
+    "user": {
+      "name": "nor8120e",
+      "email": "Emelina.North@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "appops",
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/nor8120e",
+      "realm": "internal",
+      "name": "nor8120e"
+    }
+  },
+  {
+    "user": {
+      "name": "Peg Clifton",
+      "email": "Peg.Clifton@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-04-11T11:56:03.297Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Peg%20Clifton",
+      "realm": "internal",
+      "name": "Peg Clifton"
+    }
+  },
+  {
+    "user": {
+      "name": "Blanche Nikita",
+      "email": "Blanche.Nikita@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "scheduling-pro-developers",
+        "sales-qfs-readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-03-27T12:13:36.538Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Blanche%20Nikita",
+      "realm": "internal",
+      "name": "Blanche Nikita"
+    }
+  },
+  {
+    "user": {
+      "name": "Maudie Bassett",
+      "email": "Maudie.Bassett@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-03-14T07:27:02.137Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Maudie%20Bassett",
+      "realm": "internal",
+      "name": "Maudie Bassett"
+    }
+  },
+  {
+    "user": {
+      "name": "C.Morice",
+      "email": "Cariotta.Morice@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers"
+      ],
+      "lastLoggedIn": "2019-03-05T10:41:32.916Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/C.Morice",
+      "realm": "internal",
+      "name": "C.Morice"
+    }
+  },
+  {
+    "user": {
+      "name": "cal9223r",
+      "email": "Rhiamon.Calloway@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": true,
+      "groups": [
+        "readers",
+        "admin"
+      ],
+      "lastLoggedIn": "2018-11-23T14:59:00.079Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "saml"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/cal9223r",
+      "realm": "saml",
+      "name": "cal9223r"
+    }
+  },
+  {
+    "user": {
+      "name": "J.Farrand",
+      "email": "Jacinta.Farrand@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/J.Farrand",
+      "realm": "internal",
+      "name": "J.Farrand"
+    }
+  },
+  {
+    "user": {
+      "name": "A.Elodea",
+      "email": "April.Elodea@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "appops",
+        "admin",
+        "sales-bookit-developers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-03-11T09:36:23.438Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/A.Elodea",
+      "realm": "internal",
+      "name": "A.Elodea"
+    }
+  },
+  {
+    "user": {
+      "name": "S.Darleen",
+      "email": "Sal.Darleen@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2018-10-21T01:35:32.845Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/S.Darleen",
+      "realm": "internal",
+      "name": "S.Darleen"
+    }
+  },
+  {
+    "user": {
+      "name": "M.Kironde",
+      "email": "Malva.Kironde@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2018-10-04T09:15:13.195Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/M.Kironde",
+      "realm": "internal",
+      "name": "M.Kironde"
+    }
+  },
+  {
+    "user": {
+      "name": "P.Ram",
+      "email": "Philomena.Ram@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "procompose",
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/P.Ram",
+      "realm": "internal",
+      "name": "P.Ram"
+    }
+  },
+  {
+    "user": {
+      "name": "col6392a",
+      "email": "Annamarie.Colville@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2018-11-08T12:24:41.125Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/col6392a",
+      "realm": "internal",
+      "name": "col6392a"
+    }
+  },
+  {
+    "user": {
+      "name": "K.Werbel",
+      "email": "Keri.Werbel@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "scheduling-pro-developers",
+        "sales-qfs-readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2018-12-10T09:54:40.632Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/K.Werbel",
+      "realm": "internal",
+      "name": "K.Werbel"
+    }
+  },
+  {
+    "user": {
+      "name": "cer3216m",
+      "email": "Mina.Cerell@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-liferay-developers"
+      ],
+      "lastLoggedIn": "2019-03-07T14:49:24.625Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/cer3216m",
+      "realm": "internal",
+      "name": "cer3216m"
+    }
+  },
+  {
+    "user": {
+      "name": "B.Chee",
+      "email": "Brietta.Chee@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": "2019-03-18T13:57:44.053Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/B.Chee",
+      "realm": "internal",
+      "name": "B.Chee"
+    }
+  },
+  {
+    "user": {
+      "name": "lom5788r",
+      "email": "Roz.Lomax@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-liferay-developers"
+      ],
+      "lastLoggedIn": "2019-03-07T14:46:45.151Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/lom5788r",
+      "realm": "internal",
+      "name": "lom5788r"
+    }
+  },
+  {
+    "user": {
+      "name": "Z.Earlene",
+      "email": "Zsazsa.Earlene@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-liferay-developers"
+      ],
+      "lastLoggedIn": "2019-03-07T14:48:46.113Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Z.Earlene",
+      "realm": "internal",
+      "name": "Z.Earlene"
+    }
+  },
+  {
+    "user": {
+      "name": "T.Ambros",
+      "email": "Tuesday.Ambros@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "appops",
+        "readers"
+      ],
+      "lastLoggedIn": "2019-02-25T12:47:54.572Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/T.Ambros",
+      "realm": "internal",
+      "name": "T.Ambros"
+    }
+  },
+  {
+    "user": {
+      "name": "P.Huff",
+      "email": "Peggie.Huff@example.com",
+      "admin": true,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "appops",
+        "sales"
+      ],
+      "lastLoggedIn": "2018-10-19T07:51:18.570Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/P.Huff",
+      "realm": "internal",
+      "name": "P.Huff"
+    }
+  },
+  {
+    "user": {
+      "name": "B.Hailey",
+      "email": "Bonita.Hailey@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "scheduling-pro-developers"
+      ],
+      "lastLoggedIn": "2019-04-04T08:29:35.830Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/B.Hailey",
+      "realm": "internal",
+      "name": "B.Hailey"
+    }
+  },
+  {
+    "user": {
+      "name": "mac5849k",
+      "email": "Kevyn.MacKenzie@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales"
+      ],
+      "lastLoggedIn": "2019-03-28T08:57:17.153Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/mac5849k",
+      "realm": "internal",
+      "name": "mac5849k"
+    }
+  },
+  {
+    "user": {
+      "name": "Lenora",
+      "email": "Lenora.Rozamond@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "scheduling-pro-developers"
+      ],
+      "lastLoggedIn": "2019-04-09T11:46:42.121Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Lenora",
+      "realm": "internal",
+      "name": "Lenora"
+    }
+  },
+  {
+    "user": {
+      "name": "mai4238l",
+      "email": "Lacie.Maidy@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers",
+        "sales-liferay-developers"
+      ],
+      "lastLoggedIn": "2019-03-07T14:47:53.513Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/mai4238l",
+      "realm": "internal",
+      "name": "mai4238l"
+    }
+  },
+  {
+    "user": {
+      "name": "Jewel",
+      "email": "Jewel.Chick@example.com",
+      "admin": false,
+      "profileUpdatable": true,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "appops",
+        "readers"
+      ],
+      "lastLoggedIn": "2018-08-13T13:55:45.431Z",
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": false,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Jewel",
+      "realm": "internal",
+      "name": "Jewel"
+    }
+  }
+]

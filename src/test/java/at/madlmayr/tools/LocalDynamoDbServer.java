@@ -1,7 +1,9 @@
 package at.madlmayr.tools;
 
+import at.madlmayr.Account;
 import at.madlmayr.DynamoFactory;
 import at.madlmayr.ToolCallRequest;
+import at.madlmayr.artifactory.ArtifactoryUser;
 import at.madlmayr.slack.SlackMember;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -102,12 +104,12 @@ public class LocalDynamoDbServer {
     public void createAccountTable() {
         CreateTableRequest request = new CreateTableRequest()
                 .withAttributeDefinitions(new AttributeDefinition(
-                        SlackMember.COLUMN_COMPANY_TOOL, ScalarAttributeType.S))
+                        Account.COLUMN_COMPANY_TOOL, ScalarAttributeType.S))
                 .withAttributeDefinitions(new AttributeDefinition(
-                        SlackMember.COLUMN_ID, ScalarAttributeType.S))
-                .withKeySchema(new KeySchemaElement(SlackMember.COLUMN_COMPANY_TOOL, KeyType.HASH), new KeySchemaElement(SlackMember.COLUMN_ID, KeyType.RANGE))
+                        Account.COLUMN_ID, ScalarAttributeType.S))
+                .withKeySchema(new KeySchemaElement(Account.COLUMN_COMPANY_TOOL, KeyType.HASH), new KeySchemaElement(Account.COLUMN_ID, KeyType.RANGE))
                 .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
-                .withTableName(SlackMember.TABLE_NAME);
+                .withTableName(Account.TABLE_NAME);
         createTable(request);
     }
 
@@ -150,6 +152,17 @@ public class LocalDynamoDbServer {
         return dbMapper.query(SlackMember.class, queryExpression);
     }
 
+    public List<ArtifactoryUser> getArtifactoryUserListByCompanyToolTimestamp(final String companyToolTimestamp) {
+        final AmazonDynamoDB ddb = db.getClient();
+        DynamoDBMapper dbMapper = new DynamoDBMapper(ddb);
+        ArtifactoryUser query = new ArtifactoryUser();
+        query.setCompanyToolTimestamp(companyToolTimestamp);
+        DynamoDBQueryExpression<ArtifactoryUser> queryExpression = new DynamoDBQueryExpression<ArtifactoryUser>()
+                .withHashKeyValues(query);
+
+        return dbMapper.query(ArtifactoryUser.class, queryExpression);
+    }
+
     public List<ToolCallRequest> getToolCallRequests(final String companyTool) {
         final AmazonDynamoDB ddb = db.getClient();
         DynamoDBMapper mapper = new DynamoDBMapper(ddb);
@@ -166,7 +179,7 @@ public class LocalDynamoDbServer {
 
     public void deleteAccountTable() {
         final AmazonDynamoDB ddb = db.getClient();
-        DeleteTableResult result = ddb.deleteTable(SlackMember.TABLE_NAME);
+        DeleteTableResult result = ddb.deleteTable(Account.TABLE_NAME);
         LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
     }
 

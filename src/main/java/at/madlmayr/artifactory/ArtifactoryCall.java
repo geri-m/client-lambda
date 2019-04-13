@@ -43,6 +43,12 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
         httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
     }
 
+    public ArtifactoryCall(int port) {
+        db = new DynamoFactory().create(port);
+        // We use XRay, hence the {@link HttpClients.createDefault();} is not used
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
+    }
+
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
 
@@ -63,6 +69,12 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             JSONArray detailUsers = doClientCallsSync(listElements, toolCallRequest.getBearer());
             ArtifactoryUser[] userArrayDetails = objectMapper.readValue(detailUsers.toString(), ArtifactoryUser[].class);
             LOGGER.info("Amount of Users: {} ", userArrayDetails.length);
+
+            for (ArtifactoryUser user : userArrayDetails) {
+                user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
+                db.writeArtifactoryUser(user);
+            }
+
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());

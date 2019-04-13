@@ -1,20 +1,18 @@
 package at.madlmayr.slack;
 
+import at.madlmayr.Account;
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.net.URL;
 
-@DynamoDBTable(tableName = SlackMember.TABLE_NAME)
+@DynamoDBTable(tableName = Account.TABLE_NAME)
 public class SlackMember implements Serializable {
 
-    public static final String TABLE_NAME = "Accounts";
-    public static final String COLUMN_COMPANY_TOOL = "companyToolTimestamp";
-    public static final String COLUMN_ID = "id";
     private String companyToolTimestamp;
 
-    @DynamoDBHashKey(attributeName = SlackMember.COLUMN_COMPANY_TOOL)
+    @DynamoDBHashKey(attributeName = Account.COLUMN_COMPANY_TOOL)
     public String getCompanyToolTimestamp() {
         return companyToolTimestamp;
     }
@@ -80,7 +78,7 @@ public class SlackMember implements Serializable {
     public SlackMember() {
     }
 
-    @DynamoDBRangeKey(attributeName = COLUMN_ID)
+    @DynamoDBRangeKey(attributeName = Account.COLUMN_ID)
     public String getId() {
         return id;
     }
