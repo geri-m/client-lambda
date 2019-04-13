@@ -142,4 +142,5 @@ public class LambdaTest {
         ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
         assertThat(resultFromCall.getAmountOfUsers() >= 0);
     }
+
 }

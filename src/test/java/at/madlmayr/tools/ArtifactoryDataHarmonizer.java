@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.List;
 
 public class ArtifactoryDataHarmonizer {
@@ -53,8 +55,11 @@ public class ArtifactoryDataHarmonizer {
 
             member.getUser().setName(newName);
             member.getUser().setEmail(replaceFirstName + "." + replaceLastName + "@example.com");
-            member.getListElement().setUri("http://localhost/gma/api/security/users/" + newName);
             member.getListElement().setName(newName);
+
+            URL url = new URL("http://localhost/gma/api/security/users/" + newName);
+            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+            member.getListElement().setUri(uri.toASCIIString());
         }
         return mapper.writeValueAsString(response);
     }
