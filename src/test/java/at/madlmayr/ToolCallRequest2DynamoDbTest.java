@@ -23,6 +23,7 @@ public class ToolCallRequest2DynamoDbTest {
 
     @BeforeAll
     public static void beforeAll() {
+        CallUtils.disableXray();
         localDynamoDbServer = new LocalDynamoDbServer();
         localDynamoDbServer.start();
         LOGGER.debug("DynamoDB: {}", localDynamoDbServer.getPort());

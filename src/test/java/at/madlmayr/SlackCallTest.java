@@ -6,7 +6,6 @@ import at.madlmayr.slack.SlackResponse;
 import at.madlmayr.tools.FileUtils;
 import at.madlmayr.tools.LocalDynamoDbServer;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
-import com.amazonaws.xray.AWSXRay;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -40,7 +39,7 @@ public class SlackCallTest {
     @BeforeAll
     public static void beforeAll() {
         // handle issues, in case segments are not there and disable therefore xray.
-        AWSXRay.getGlobalRecorder().setContextMissingStrategy((s, aClass) -> LOGGER.warn("Context for XRay is unset for Testing"));
+        CallUtils.disableXray();
         wireMockServer = new WireMockServer(wireMockConfig().dynamicPort().dynamicHttpsPort()); //No-args constructor will start on port 8080, no HTTPS
         wireMockServer.start();
         WireMock.configureFor("localhost", wireMockServer.port());

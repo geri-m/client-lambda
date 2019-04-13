@@ -51,20 +51,26 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             // Handling De-Serialization myself
             // https://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-req-resp.html
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
-        } catch (IOException e) {
-            throw new ToolCallException(e);
-        }
-        JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
 
-        try {
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length());
+            JSONArray listElements = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
+            ArtifactoryListElement[] userArray = objectMapper.readValue(listElements.toString(), ArtifactoryListElement[].class);
+            LOGGER.info("Amount of Users: {} ", userArray.length);
+
+            // We do the sync call for several reasons
+            // 1) Xray works out of the box
+            // 2) Not much mor expensive than Sync all (yes, 100 % is something, but its cents)
+            // 3) less effort for testing.
+            JSONArray detailUsers = doClientCallsSync(listElements, toolCallRequest.getBearer());
+            ArtifactoryUser[] userArrayDetails = objectMapper.readValue(detailUsers.toString(), ArtifactoryUser[].class);
+            LOGGER.info("Amount of Users: {} ", userArrayDetails.length);
+
+            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getCurrentSegment().addException(e);
+            throw new ToolCallException(e);
         }
-
-
     }
 
     @Override
@@ -78,18 +84,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             String jsonString = EntityUtils.toString(response.getEntity());
             if ((response.getStatusLine().getStatusCode() / 100) == 2) {
                 LOGGER.info("HTTP Call to '{}' was successful (fetching list of Users)", url);
-
-                JSONArray userList = new JSONArray(jsonString);
-
-                ArtifactorySimpleUser[] userArray = objectMapper.readValue(userList.toString(), ArtifactorySimpleUser[].class);
-
-                LOGGER.info("Amount of Users: {} ", userList.length());
-                LOGGER.info("Amount of Users: {} ", userArray.length);
-                // We do the sync call for several reasons
-                // 1) Xray works out of the box
-                // 2) Not much mor expensive than Sync all (yes, 100 % is something, but its cents)
-                // 3) less effort for testing.
-                return doClientCallsSync(userList, bearer);
+                return new JSONArray(jsonString);
             } else {
                 throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
             }
@@ -98,7 +93,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
         }
     }
 
-    private JSONArray doClientCallsSync(final JSONArray userList, final String bearer) {
+    public JSONArray doClientCallsSync(final JSONArray userList, final String bearer) {
         JSONArray userDetailList = new JSONArray();
         for (Object jsonUserObject : userList) {
             String uri = ((JSONObject) jsonUserObject).get("uri").toString();
@@ -107,9 +102,6 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             try (CloseableHttpResponse responseForUser = httpClient.execute(requestForUser)) {
                 if ((responseForUser.getStatusLine().getStatusCode() / 100) == 2) {
                     String jsonStringForUser = EntityUtils.toString(responseForUser.getEntity());
-
-                    ArtifactoryUser singleUser = objectMapper.readValue(jsonStringForUser, ArtifactoryUser.class);
-
                     userDetailList.put(new JSONObject(jsonStringForUser));
                 } else {
                     LOGGER.error("Failed to to Detailed User Call using URL '{}'", uri);

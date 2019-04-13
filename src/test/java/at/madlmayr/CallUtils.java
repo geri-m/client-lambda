@@ -1,5 +1,9 @@
 package at.madlmayr;
 
+import com.amazonaws.xray.AWSXRay;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,6 +15,7 @@ public class CallUtils {
 
     private final static String CREDENTIAL_FILE = "toolconfig.txt";
     private final static String COMMA_DELIMITER = ",";
+    private static final Logger LOGGER = LogManager.getLogger(CallUtils.class);
 
     public static List<ToolCallRequest> readToolConfigFromCVSFile() throws IOException {
         List<ToolCallRequest> records = new ArrayList<>();
@@ -30,5 +35,9 @@ public class CallUtils {
         return records;
     }
 
+    public static void disableXray() {
+        // handle issues, in case segments are not there and disable therefore xray.
+        AWSXRay.getGlobalRecorder().setContextMissingStrategy((s, aClass) -> LOGGER.trace("Context for XRay unset for Testing"));
+    }
 
 }

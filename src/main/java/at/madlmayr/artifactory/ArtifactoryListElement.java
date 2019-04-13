@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 
-public class ArtifactorySimpleUser implements Serializable {
+public class ArtifactoryListElement implements Serializable {
 
     @JsonProperty("uri")
     private String uri;
@@ -16,7 +16,7 @@ public class ArtifactorySimpleUser implements Serializable {
     @JsonProperty("name")
     private String name;
 
-    public ArtifactorySimpleUser() {
+    public ArtifactoryListElement() {
     }
 
     public String getUri() {
