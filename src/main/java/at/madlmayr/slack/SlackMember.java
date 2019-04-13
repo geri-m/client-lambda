@@ -1,7 +1,10 @@
 package at.madlmayr.slack;
 
 import at.madlmayr.Account;
-import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
@@ -87,7 +90,6 @@ public class SlackMember implements Serializable {
         this.id = id;
     }
 
-    @DynamoDBAttribute(attributeName = "teamId")
     public String getTeamId() {
         return teamId;
     }
@@ -96,7 +98,6 @@ public class SlackMember implements Serializable {
         this.teamId = teamId;
     }
 
-    @DynamoDBAttribute(attributeName = "name")
     public String getName() {
         return name;
     }
@@ -105,7 +106,6 @@ public class SlackMember implements Serializable {
         this.name = name;
     }
 
-    @DynamoDBAttribute(attributeName = "deleted")
     public boolean isDeleted() {
         return deleted;
     }
@@ -122,7 +122,6 @@ public class SlackMember implements Serializable {
         this.color = color;
     }
 
-    @DynamoDBAttribute(attributeName = "realName")
     public String getRealName() {
         return realName;
     }
@@ -195,7 +194,6 @@ public class SlackMember implements Serializable {
         this.ultraRestricted = ultraRestricted;
     }
 
-    @DynamoDBAttribute(attributeName = "bot")
     public boolean isBot() {
         return bot;
     }
