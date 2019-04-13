@@ -9,9 +9,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
-public class ArtifactoryDataHarmonizer {
+public class ArtifactoryDataPseudonymizer {
 
-    private static final Logger LOGGER = LogManager.getLogger(ArtifactoryDataHarmonizer.class);
+    private static final Logger LOGGER = LogManager.getLogger(ArtifactoryDataPseudonymizer.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String inputFile;
@@ -19,7 +19,7 @@ public class ArtifactoryDataHarmonizer {
     private List<String> newLastNames;
     private List<String> newFirstNames;
 
-    public ArtifactoryDataHarmonizer(final String inputFile, final String outputFile) {
+    public ArtifactoryDataPseudonymizer(final String inputFile, final String outputFile) {
         this.inputFile = inputFile;
         this.outputFile = outputFile;
         // make the structure more beautyful
@@ -27,7 +27,7 @@ public class ArtifactoryDataHarmonizer {
     }
 
     public static void main(final String[] args) throws Exception {
-        ArtifactoryDataHarmonizer harmonizer = new ArtifactoryDataHarmonizer("artifactory_01.raw", "artifactory_01.json");
+        ArtifactoryDataPseudonymizer harmonizer = new ArtifactoryDataPseudonymizer("artifactory_01.raw", "artifactory_01.json");
         harmonizer.processData();
     }
 

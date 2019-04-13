@@ -61,16 +61,13 @@ public class JiraCallTest {
     @Test
     public void userListTest() throws Exception {
         WireMock.reset();
-        String response = FileUtils.readFromFile("/jira_01.raw");
+        String response = FileUtils.readFromFile("/jira_01.json");
 
         Set<String> memberIds = new HashSet<>();
         JiraSearchResultElement[] responseFromFile = mapper.readValue(response, JiraSearchResultElement[].class);
-        LOGGER.info("Read from File: {}", responseFromFile.length);
-
         Map<String, List<JiraSearchResultElement>> result = search("", responseFromFile, 1);
 
         for (Map.Entry<String, List<JiraSearchResultElement>> entry : result.entrySet()) {
-
             stubFor(get(urlEqualTo(String.format("/rest/api/2/user/search?maxResults=%s&username=%s", JiraV2Call.MAX_RESULT_COUNT_GET_PARAMETER, entry.getKey())))
                     .willReturn(aResponse()
                             .withStatus(200)
@@ -79,12 +76,9 @@ public class JiraCallTest {
 
         }
 
-
         for (JiraSearchResultElement m : responseFromFile) {
             memberIds.add(m.getKey());
         }
-
-        LOGGER.info("Member: {}", memberIds.size());
 
         ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.JIRA.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/rest/api/2/user/search"}, 1L);
         RequestStreamHandler call = new JiraV2Call(localDynamoDbServer.getPort());
@@ -93,7 +87,7 @@ public class JiraCallTest {
         call.handleRequest(targetStream, outputStream, null);
 
         ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
-        assertThat(resultFromCall.getAmountOfUsers()).isEqualTo(4206);
+        assertThat(resultFromCall.getAmountOfUsers()).isEqualTo(4197);
 
         List<JiraSearchResultElement> itemList = localDynamoDbServer.getJiraUserListByCompanyToolTimestamp("gma#" + ToolEnum.JIRA.getName() + "#" + Utils.standardTimeFormat(1L));
 
@@ -102,8 +96,9 @@ public class JiraCallTest {
             memberIds.remove(m.getKey());
         }
 
+        // make sure, each and every key was found (and remove from the temporary list
         assertThat(memberIds.size()).isEqualTo(0);
-        assertThat(itemList.size()).isEqualTo(4206);
+        assertThat(itemList.size()).isEqualTo(4197);
     }
 
     private Map<String, List<JiraSearchResultElement>> search(final String prefix, JiraSearchResultElement[] userList, int deep) {

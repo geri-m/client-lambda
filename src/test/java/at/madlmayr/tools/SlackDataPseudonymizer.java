@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SlackDataHarmonizer {
+public class SlackDataPseudonymizer {
 
-    private static final Logger LOGGER = LogManager.getLogger(SlackDataHarmonizer.class);
+    private static final Logger LOGGER = LogManager.getLogger(SlackDataPseudonymizer.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String inputFile;
@@ -22,7 +22,7 @@ public class SlackDataHarmonizer {
     private List<String> newLastNames;
     private List<String> newFirstNames;
 
-    public SlackDataHarmonizer(final String inputFile, final String outputFile) {
+    public SlackDataPseudonymizer(final String inputFile, final String outputFile) {
         this.inputFile = inputFile;
         this.outputFile = outputFile;
         // make the structure more beautyful
@@ -30,7 +30,7 @@ public class SlackDataHarmonizer {
     }
 
     public static void main(final String[] args) throws Exception {
-        SlackDataHarmonizer harmonizer = new SlackDataHarmonizer("slackdata_01.raw", "slackdata_01.json");
+        SlackDataPseudonymizer harmonizer = new SlackDataPseudonymizer("slackdata_01.raw", "slackdata_01.json");
         harmonizer.processData();
     }
 

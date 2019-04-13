@@ -1,7 +1,6 @@
 package at.madlmayr.jira;
 
 import at.madlmayr.*;
-import at.madlmayr.slack.SlackCall;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
@@ -34,7 +33,7 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
     public static final int MAX_RECURSION_DEPTH = 3;
     public static final char[] SEARCH_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
-    private static final Logger LOGGER = LogManager.getLogger(SlackCall.class);
+    private static final Logger LOGGER = LogManager.getLogger(JiraV2Call.class);
     private final DynamoFactory.DynamoAbstraction db;
     private final CloseableHttpClient httpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -110,11 +109,9 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 String jsonString = EntityUtils.toString(response.getEntity());
                 if ((response.getStatusLine().getStatusCode() / 100) == 2) {
-                    LOGGER.info("HTTP Call to '{}' was successful", request.getURI().toURL());
                     JSONArray users = new JSONArray(jsonString);
 
                     JiraSearchResultElement[] userList = objectMapper.readValue(users.toString(), JiraSearchResultElement[].class);
-                    LOGGER.info("Currently '{}' members in jira response (active, inactive, pp)", userList.length);
 
                     // run a recursion, if the amount of result exceeds the max results
                     // Issue: the search also goes thru the email, so if the string matches the email, you will get all users.
