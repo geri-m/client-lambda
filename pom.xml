@@ -238,6 +238,12 @@
                         <version>${junit.version}</version>
                     </dependency>
                 </dependencies>
+                <!-- https://stackoverflow.com/questions/23260057/the-forked-vm-terminated-without-saying-properly-goodbye-vm-crash-or-system-exi/38925634 -->
+                <configuration>
+                    <forkCount>3</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>
