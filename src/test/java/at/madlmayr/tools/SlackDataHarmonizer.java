@@ -1,6 +1,5 @@
 package at.madlmayr.tools;
 
-import at.madlmayr.CallUtils;
 import at.madlmayr.slack.SlackMember;
 import at.madlmayr.slack.SlackResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,11 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +19,8 @@ public class SlackDataHarmonizer {
 
     private final String inputFile;
     private final String outputFile;
-    private List<String> newNames;
-    private List<String> newFirstName;
+    private List<String> newLastNames;
+    private List<String> newFirstNames;
 
     public SlackDataHarmonizer(final String inputFile, final String outputFile) {
         this.inputFile = inputFile;
@@ -39,37 +34,11 @@ public class SlackDataHarmonizer {
         harmonizer.processData();
     }
 
-    private static String generateRandomName(final String firstname, final String name) {
-        switch ((firstname + name).hashCode() % 3) {
-            case 0:
-                // mad0001g
-                if (name.length() >= 3)
-                    return (name.substring(0, 3) + ((firstname + name).hashCode() + "").substring(4, 8) + firstname.substring(0, 1)).toLowerCase();
-                else
-                    return firstname;
-            case 1:
-                return firstname;
-            case 2:
-            default:
-                return firstname.substring(0, 1) + "." + name;
-        }
-    }
-
-    private static List<String> readNames(final String name) throws IOException {
-        List<String> names = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(CallUtils.class.getResourceAsStream(name)))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                names.add(line);
-            }
-        }
-        return names;
-    }
 
     public void processData() throws Exception {
         String slackContentFromFile = FileUtils.readFromFile("/" + inputFile);
-        newNames = readNames("/names.txt");
-        newFirstName = readNames("/first-names.txt");
+        newLastNames = FileUtils.readNames("/last-names.txt");
+        newFirstNames = FileUtils.readNames("/first-names.txt");
 
         // we call the shuffeling twice.
         FileUtils.writeToFile(replaceName(replaceName(slackContentFromFile)), outputFile);
@@ -78,7 +47,7 @@ public class SlackDataHarmonizer {
     private String replaceName(final String inputJson) throws Exception {
         SlackResponse response = mapper.readValue(inputJson, SlackResponse.class);
 
-        Map<String, String> nameList = new HashMap<>();
+        Map<String, String> lastNameList = new HashMap<>();
         Map<String, String> firstNameList = new HashMap<>();
 
         for (SlackMember member : response.getMembers()) {
@@ -107,40 +76,40 @@ public class SlackDataHarmonizer {
             }
 
             // Generate new Name out of Name List
-            String replaceName = createNewName(member, nameList);
+            String replaceLastName = createNewLastName(member, lastNameList);
 
             // Generate new Firstname out of Firstname List
             String replaceFirstName = createNewFristName(member, firstNameList);
 
             // Replace the name in the member object
-            replaceNames(member, replaceName, replaceFirstName);
+            replaceNames(member, replaceLastName, replaceFirstName);
         }
         return mapper.writeValueAsString(response);
     }
 
-    private String createNewName(final SlackMember member, Map<String, String> nameList) {
+    private String createNewLastName(final SlackMember member, Map<String, String> lastNameList) {
         // Replace Lastname with Random Lastname
-        String replaceName;
+        String replaceLastName;
 
-        String inputName = member.getProfile().getLastName();
+        String inputLastName = member.getProfile().getLastName();
 
-        if (inputName == null) {
+        if (inputLastName == null) {
             if ((member.getProfile().getRealName().contains(" ") || member.getProfile().getRealName().contains("."))) {
-                inputName = member.getProfile().getRealName().split("\\.| ")[0];
+                inputLastName = member.getProfile().getRealName().split("\\.| ")[0];
             } else {
-                inputName = "noName";
+                inputLastName = "noName";
                 LOGGER.warn("Unable to extract a Name out of '{}'", member.getProfile().getRealName());
             }
         }
 
-        if (!nameList.containsKey(inputName)) {
-            replaceName = newNames.get(Math.abs(inputName.hashCode() % newNames.size()));
-            nameList.put(inputName, replaceName);
+        if (!lastNameList.containsKey(inputLastName)) {
+            replaceLastName = newLastNames.get(Math.abs(inputLastName.hashCode() % newLastNames.size()));
+            lastNameList.put(inputLastName, replaceLastName);
         } else {
-            replaceName = nameList.get(inputName);
+            replaceLastName = lastNameList.get(inputLastName);
         }
 
-        return replaceName;
+        return replaceLastName;
     }
 
     private String createNewFristName(final SlackMember member, Map<String, String> firstNameList) {
@@ -158,7 +127,7 @@ public class SlackDataHarmonizer {
         }
 
         if (!firstNameList.containsKey(inputFirstName)) {
-            replaceFirstName = newFirstName.get(Math.abs(inputFirstName.hashCode() % newFirstName.size()));
+            replaceFirstName = newFirstNames.get(Math.abs(inputFirstName.hashCode() % newFirstNames.size()));
             firstNameList.put(inputFirstName, replaceFirstName);
         } else {
             replaceFirstName = firstNameList.get(inputFirstName);
@@ -167,23 +136,23 @@ public class SlackDataHarmonizer {
         return replaceFirstName;
     }
 
-    private void replaceNames(final SlackMember member, final String replaceName, final String replaceFirstName) {
+    private void replaceNames(final SlackMember member, final String replaceLastName, final String replaceFirstName) {
 
-        member.setName(generateRandomName(replaceFirstName, replaceName)); // UPN bei SSO
+        member.setName(FileUtils.generateRandomName(replaceFirstName, replaceLastName)); // UPN bei SSO
 
-        member.setRealName(replaceFirstName + " " + replaceName);
-        member.getProfile().setRealName(replaceFirstName + " " + replaceName);
-        member.getProfile().setRealNameNormalized(replaceFirstName + " " + replaceName);
+        member.setRealName(replaceFirstName + " " + replaceLastName);
+        member.getProfile().setRealName(replaceFirstName + " " + replaceLastName);
+        member.getProfile().setRealNameNormalized(replaceFirstName + " " + replaceLastName);
 
-        member.getProfile().setDisplayName(replaceFirstName + " " + replaceName);
-        member.getProfile().setDisplayNameNormalized(replaceFirstName + " " + replaceName);
+        member.getProfile().setDisplayName(replaceFirstName + " " + replaceLastName);
+        member.getProfile().setDisplayNameNormalized(replaceFirstName + " " + replaceLastName);
 
         member.getProfile().setFirstName(replaceFirstName);
-        member.getProfile().setLastName(replaceName);
+        member.getProfile().setLastName(replaceLastName);
 
         // fake the Email address with <newfirstname>.<newlastname>@<old-host>
         if (member.getProfile().getEmail() != null) {
-            member.getProfile().setEmail(replaceFirstName + "." + replaceName + "@" + member.getProfile().getEmail().split("@")[1]);
+            member.getProfile().setEmail(replaceFirstName + "." + replaceLastName + "@" + member.getProfile().getEmail().split("@")[1]);
         }
     }
 
