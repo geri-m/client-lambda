@@ -9,6 +9,7 @@ import at.madlmayr.slack.SlackCall;
 import at.madlmayr.tools.ArtifactoryListElementWithUser;
 import at.madlmayr.tools.FileUtils;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.logging.log4j.LogManager;
@@ -92,8 +93,9 @@ public class LambdaTest {
 
 
         JSONArray listElements = call.processCall(artifactory.getUrl(), artifactory.getBearer());
-        ArtifactoryListElement[] userArray = objectMapper.readValue(listElements.toString(), ArtifactoryListElement[].class);
-        LOGGER.info("Amount of Users: {} ", userArray.length);
+        List<ArtifactoryListElement> userArray = objectMapper.readValue(listElements.toString(), new TypeReference<List<ArtifactoryListElement>>() {
+        });
+        LOGGER.info("Amount of Users: {} ", userArray.size());
 
         // We do the sync call for several reasons
         // 1) Xray works out of the box
@@ -102,17 +104,17 @@ public class LambdaTest {
 
         List<ArtifactoryListElementWithUser> fullUserList = new ArrayList<>();
 
-        for (Object singleListElement : listElements) {
-            JSONArray singleElementARray = new JSONArray();
-            singleElementARray.put(singleListElement);
-            JSONArray detailUsers = call.doClientCallsSync(singleElementARray, artifactory.getBearer());
+        for (ArtifactoryListElement singleListElement : userArray) {
+            List<ArtifactoryListElement> tempList = new ArrayList<>();
+            tempList.add(singleListElement);
 
-            ArtifactoryListElement[] listElement = objectMapper.readValue(singleElementARray.toString(), ArtifactoryListElement[].class);
-            ArtifactoryUser[] userElement = objectMapper.readValue(detailUsers.toString(), ArtifactoryUser[].class);
+            JSONArray detailUsers = call.doClientCallsSync(tempList, artifactory.getBearer());
+            List<ArtifactoryUser> userElement = objectMapper.readValue(detailUsers.toString(), new TypeReference<List<ArtifactoryUser>>() {
+            });
 
             ArtifactoryListElementWithUser fullElement = new ArtifactoryListElementWithUser();
-            fullElement.setListElement(listElement[0]);
-            fullElement.setUser(userElement[0]);
+            fullElement.setListElement(singleListElement);
+            fullElement.setUser(userElement.get(0));
             fullUserList.add(fullElement);
         }
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -156,9 +158,10 @@ public class LambdaTest {
         assertThat(jira != null);
         JiraV2Call call = new JiraV2Call();
         JSONArray listElements = call.processCall(jira.getUrl(), jira.getBearer());
-        JiraSearchResultElement[] userList = objectMapper.readValue(listElements.toString(), JiraSearchResultElement[].class);
+        List<JiraSearchResultElement> userList = objectMapper.readValue(listElements.toString(), new TypeReference<List<JiraSearchResultElement>>() {
+        });
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        LOGGER.info("Amount of Users: {} ", userList.length);
+        LOGGER.info("Amount of Users: {} ", userList.size());
         FileUtils.writeToFile(objectMapper.writeValueAsString(userList), "jira_01.raw");
     }
 
