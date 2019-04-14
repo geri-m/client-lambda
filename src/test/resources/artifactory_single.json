@@ -1,0 +1,24 @@
+[
+  {
+    "user": {
+      "name": "Natividad",
+      "email": "Natividad.Astto@example.com",
+      "admin": false,
+      "profileUpdatable": false,
+      "internalPasswordDisabled": false,
+      "groups": [
+        "readers"
+      ],
+      "lastLoggedIn": null,
+      "lastLoggedInMillis": 0,
+      "offlineMode": false,
+      "disableUIAccess": true,
+      "realm": "internal"
+    },
+    "listElement": {
+      "uri": "http://localhost/gma/api/security/users/Natividad",
+      "realm": "internal",
+      "name": "Natividad"
+    }
+  }
+]

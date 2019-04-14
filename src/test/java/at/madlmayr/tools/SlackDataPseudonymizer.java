@@ -30,7 +30,7 @@ public class SlackDataPseudonymizer {
     }
 
     public static void main(final String[] args) throws Exception {
-        SlackDataPseudonymizer harmonizer = new SlackDataPseudonymizer("slackdata_01.raw", "slackdata_01.json");
+        SlackDataPseudonymizer harmonizer = new SlackDataPseudonymizer("slack_01.raw", "slack_01.json");
         harmonizer.processData();
     }
 

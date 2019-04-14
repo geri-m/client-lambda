@@ -60,10 +60,11 @@ public class SlackCallTest {
     }
 
 
-    public static SlackResponse initWiremock(int wiremockPort, ObjectMapper mapper) throws Exception {
-        String response = FileUtils.readFromFile("/slackdata_01.json");
+    public static SlackResponse initWiremock(String fileName) throws Exception {
+        ObjectMapper localMapper = new ObjectMapper();
+        String response = FileUtils.readFromFile(fileName);
 
-        SlackResponse responseFromFile = mapper.readValue(response, SlackResponse.class);
+        SlackResponse responseFromFile = localMapper.readValue(response, SlackResponse.class);
 
         // WireMock.reset();
         stubFor(get(urlEqualTo("/api/users.list/"))
@@ -81,7 +82,7 @@ public class SlackCallTest {
         WireMock.reset();
 
         Set<String> memberIds = new HashSet<>();
-        for (SlackMember m : initWiremock(wireMockServer.port(), mapper).getMembers()) {
+        for (SlackMember m : initWiremock("/slack_01.json").getMembers()) {
             memberIds.add(m.getId());
         }
 

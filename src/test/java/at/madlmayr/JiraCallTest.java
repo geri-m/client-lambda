@@ -5,6 +5,7 @@ import at.madlmayr.jira.JiraV2Call;
 import at.madlmayr.tools.FileUtils;
 import at.madlmayr.tools.LocalDynamoDbServer;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -59,11 +60,12 @@ public class JiraCallTest {
     }
 
 
-    public static JiraSearchResultElement[] initWiremock(int wiremockPort, ObjectMapper mapper) throws Exception {
-        String response = FileUtils.readFromFile("/jira_01.json");
+    public static List<JiraSearchResultElement> initWiremock(String filename) throws Exception {
+        String response = FileUtils.readFromFile(filename);
+        ObjectMapper localMapper = new ObjectMapper();
 
-
-        JiraSearchResultElement[] responseFromFile = mapper.readValue(response, JiraSearchResultElement[].class);
+        List<JiraSearchResultElement> responseFromFile = localMapper.readValue(response, new TypeReference<List<JiraSearchResultElement>>() {
+        });
         Map<String, List<JiraSearchResultElement>> result = search("", responseFromFile, 1);
 
         for (Map.Entry<String, List<JiraSearchResultElement>> entry : result.entrySet()) {
@@ -71,14 +73,14 @@ public class JiraCallTest {
                     .willReturn(aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json; charset=utf-8")
-                            .withBody(mapper.writeValueAsString(entry.getValue()))));
+                            .withBody(localMapper.writeValueAsString(entry.getValue()))));
 
         }
 
         return responseFromFile;
     }
 
-    private static Map<String, List<JiraSearchResultElement>> search(final String prefix, JiraSearchResultElement[] userList, int deep) {
+    private static Map<String, List<JiraSearchResultElement>> search(final String prefix, List<JiraSearchResultElement> userList, int deep) {
         Map<String, List<JiraSearchResultElement>> result = new HashMap<>();
         for (char searchChar : SEARCH_CHARS) {
             List<JiraSearchResultElement> tempResult = recursiveSearch(prefix + searchChar, userList);
@@ -92,7 +94,7 @@ public class JiraCallTest {
         return result;
     }
 
-    private static List<JiraSearchResultElement> recursiveSearch(final String prefix, JiraSearchResultElement[] userList) {
+    private static List<JiraSearchResultElement> recursiveSearch(final String prefix, List<JiraSearchResultElement> userList) {
         int counter = 0;
         List<JiraSearchResultElement> list = new ArrayList<>();
         for (JiraSearchResultElement jiraUser : userList) {
@@ -113,7 +115,7 @@ public class JiraCallTest {
 
         Set<String> memberIds = new HashSet<>();
 
-        for (JiraSearchResultElement m : initWiremock(wireMockServer.port(), mapper)) {
+        for (JiraSearchResultElement m : initWiremock("/jira_01.json")) {
             memberIds.add(m.getKey());
         }
 

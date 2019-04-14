@@ -1,0 +1,19 @@
+[
+  {
+    "companyToolTimestamp": null,
+    "self": "https://jira.sim-technik.de/rest/api/2/user?username=dion.riehl",
+    "key": "dion.riehl",
+    "name": "dion.riehl",
+    "emailAddress": "dion.riehl@prosiebensat1.com",
+    "avatarUrls": {
+      "48x48": "https://jira.sim-technik.de/secure/useravatar?avatarId=10292",
+      "24x24": "https://jira.sim-technik.de/secure/useravatar?size=small&avatarId=10292",
+      "16x16": "https://jira.sim-technik.de/secure/useravatar?size=xsmall&avatarId=10292",
+      "32x32": "https://jira.sim-technik.de/secure/useravatar?size=medium&avatarId=10292"
+    },
+    "displayName": "Dion Riehl",
+    "active": true,
+    "timeZone": "Europe/Berlin",
+    "locale": "en_US"
+  }
+]

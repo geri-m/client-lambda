@@ -40,9 +40,9 @@ public class ReadConfigTest {
         localDynamoDbServer.createConfigTable();
         localDynamoDbServer.createAccountTable();
         insertData();
-        JiraCallTest.initWiremock(wireMockServer.port(), mapper);
-        ArtifactoryCallTest.initWiremock(wireMockServer.port(), mapper);
-        SlackCallTest.initWiremock(wireMockServer.port(), mapper);
+        JiraCallTest.initWiremock("/jira_single.json");
+        ArtifactoryCallTest.initWiremock("/artifactory_single.json", wireMockServer.port());
+        SlackCallTest.initWiremock("/slack_single.json");
     }
 
     private static void insertData() {

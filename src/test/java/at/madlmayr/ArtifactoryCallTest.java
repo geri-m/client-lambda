@@ -7,6 +7,7 @@ import at.madlmayr.tools.ArtifactoryListElementWithUser;
 import at.madlmayr.tools.FileUtils;
 import at.madlmayr.tools.LocalDynamoDbServer;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -63,14 +64,14 @@ public class ArtifactoryCallTest {
     }
 
 
-    public static ArtifactoryListElementWithUser[] initWiremock(int wiremockPort, ObjectMapper mapper) throws Exception {
-        String response = FileUtils.readFromFile("/artifactory_01.json");
+    public static List<ArtifactoryListElementWithUser> initWiremock(String filename, int wiremockPort) throws Exception {
+        String response = FileUtils.readFromFile(filename);
+        ObjectMapper localMapper = new ObjectMapper();
 
         List<ArtifactoryListElement> list = new ArrayList<>();
-        ArtifactoryListElementWithUser[] responseFromFile = mapper.readValue(response, ArtifactoryListElementWithUser[].class);
+        List<ArtifactoryListElementWithUser> responseFromFile = localMapper.readValue(response, new TypeReference<List<ArtifactoryListElementWithUser>>() {
+        });
         for (ArtifactoryListElementWithUser user : responseFromFile) {
-
-
             URL originalUrl = new URL(user.getListElement().getUri());
             URL newUrl = new URL(originalUrl.getProtocol(), originalUrl.getHost(), wiremockPort, originalUrl.getFile());
             user.getListElement().setUri(newUrl.toString());
@@ -80,7 +81,7 @@ public class ArtifactoryCallTest {
                     .willReturn(aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json; charset=utf-8")
-                            .withBody(mapper.writeValueAsString(user.getUser()))));
+                            .withBody(localMapper.writeValueAsString(user.getUser()))));
 
             list.add(user.getListElement());
         }
@@ -90,7 +91,7 @@ public class ArtifactoryCallTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json; charset=utf-8")
-                        .withBody(mapper.writeValueAsString(list))));
+                        .withBody(localMapper.writeValueAsString(list))));
 
         return responseFromFile;
     }
@@ -100,7 +101,7 @@ public class ArtifactoryCallTest {
         WireMock.reset();
 
         Set<String> memberIds = new HashSet<>();
-        for (ArtifactoryListElementWithUser user : initWiremock(wireMockServer.port(), mapper)) {
+        for (ArtifactoryListElementWithUser user : initWiremock("/artifactory_01.json", wireMockServer.port())) {
             memberIds.add(user.getUser().getName());
         }
 
