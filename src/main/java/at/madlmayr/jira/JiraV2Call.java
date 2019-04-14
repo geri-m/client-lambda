@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -22,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JiraV2Call implements RequestStreamHandler, ToolCall {
@@ -57,13 +59,15 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
             JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
 
-            JiraSearchResultElement[] userArrayDetails = objectMapper.readValue(users.toString(), JiraSearchResultElement[].class);
-            LOGGER.info("Amount of Users: {} ", userArrayDetails.length);
+            List<JiraSearchResultElement> userArrayDetails = objectMapper.readValue(users.toString(), new TypeReference<List<JiraSearchResultElement>>() {
+            });
+            LOGGER.info("Amount of Users: {} ", userArrayDetails.size());
 
             for (JiraSearchResultElement user : userArrayDetails) {
                 user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
-                db.writeJiraUser(user);
             }
+
+            db.writeJiraMembersBatch(userArrayDetails);
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());

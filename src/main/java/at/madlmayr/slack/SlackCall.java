@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 public class SlackCall implements RequestStreamHandler, ToolCall {
 
@@ -45,13 +47,15 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
 
             JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
-            SlackMember[] r = objectMapper.readValue(users.toString(), SlackMember[].class);
+            List<SlackMember> userList = objectMapper.readValue(users.toString(), new TypeReference<List<SlackMember>>() {
+            });
 
-            for (SlackMember member : r) {
+            for (SlackMember member : userList) {
                 member.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
                 member.setId(member.getId());
-                db.writeSlackMember(member);
             }
+
+            db.writeSlackMembersBatch(userList);
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());

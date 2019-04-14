@@ -18,6 +18,7 @@ import com.amazonaws.xray.handlers.TracingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DynamoFactory {
@@ -51,16 +52,16 @@ public class DynamoFactory {
             return mapper;
         }
 
-        public void writeSlackMember(final SlackMember member) {
-            mapper.save(member);
+        public void writeSlackMembersBatch(final List<SlackMember> members) {
+            mapper.batchWrite(members, new ArrayList<>());
         }
 
-        public void writeArtifactoryUser(final ArtifactoryUser member) {
-            mapper.save(member);
+        public void writeArtifactoryMembersBatch(final List<ArtifactoryUser> members) {
+            mapper.batchWrite(members, new ArrayList<>());
         }
 
-        public void writeJiraUser(final JiraSearchResultElement member) {
-            mapper.save(member);
+        public void writeJiraMembersBatch(final List<JiraSearchResultElement> members) {
+            mapper.batchWrite(members, new ArrayList<>());
         }
 
         public void writeCallResult(final ToolCallResult result) {

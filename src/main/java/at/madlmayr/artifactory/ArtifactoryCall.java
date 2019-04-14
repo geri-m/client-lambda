@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
@@ -68,14 +70,15 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             // 2) Not much mor expensive than Sync all (yes, 100 % is something, but its cents)
             // 3) less effort for testing.
             JSONArray detailUsers = doClientCallsSync(listElements, toolCallRequest.getBearer());
-            ArtifactoryUser[] userArrayDetails = objectMapper.readValue(detailUsers.toString(), ArtifactoryUser[].class);
-            LOGGER.info("Amount of Users: {} ", userArrayDetails.length);
+            List<ArtifactoryUser> userArrayDetails = objectMapper.readValue(detailUsers.toString(), new TypeReference<List<ArtifactoryUser>>() {
+            });
+            LOGGER.info("Amount of Users: {} ", userArrayDetails.size());
 
             for (ArtifactoryUser user : userArrayDetails) {
                 user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
-                db.writeArtifactoryUser(user);
             }
 
+            db.writeArtifactoryMembersBatch(userArrayDetails);
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length(), toolCallRequest.getTimestamp());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());
