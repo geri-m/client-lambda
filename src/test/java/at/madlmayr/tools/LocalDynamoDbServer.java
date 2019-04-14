@@ -6,7 +6,6 @@ import at.madlmayr.ToolCallRequest;
 import at.madlmayr.artifactory.ArtifactoryUser;
 import at.madlmayr.jira.JiraSearchResultElement;
 import at.madlmayr.slack.SlackMember;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.local.main.ServerRunner;
@@ -64,7 +63,7 @@ public class LocalDynamoDbServer {
     /**
      * If it's not already running, starts the server, then returns a client regardless.
      */
-    public AmazonDynamoDB start() {
+    public void start() {
         if (!running) {
             try {
                 System.setProperty("sqlite4java.library.path", "native-libs");
@@ -77,7 +76,6 @@ public class LocalDynamoDbServer {
                 throw new RuntimeException(e);
             }
         }
-        return db.getClient();
     }
 
     /**
@@ -111,7 +109,7 @@ public class LocalDynamoDbServer {
                 .withKeySchema(new KeySchemaElement(Account.COLUMN_COMPANY_TOOL, KeyType.HASH), new KeySchemaElement(Account.COLUMN_ID, KeyType.RANGE))
                 .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
                 .withTableName(Account.TABLE_NAME);
-        createTable(request);
+        db.createTable(request);
     }
 
 
@@ -124,62 +122,51 @@ public class LocalDynamoDbServer {
                 .withKeySchema(new KeySchemaElement(ToolCallRequest.COLUMN_COMPANY, KeyType.HASH), new KeySchemaElement(ToolCallRequest.COLUMN_TOOL, KeyType.RANGE))
                 .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
                 .withTableName(ToolCallRequest.TABLE_NAME);
-        createTable(request);
+        db.createTable(request);
     }
 
     public void insertConfig(final List<ToolCallRequest> calls) {
-        AmazonDynamoDB ddb = db.getClient();
-        DynamoDBMapper mapper = new DynamoDBMapper(ddb);
-
+        DynamoDBMapper mapper = db.getMapper();
         for (ToolCallRequest call : calls) {
             mapper.save(call);
         }
     }
 
-    private void createTable(CreateTableRequest request) {
-        final AmazonDynamoDB ddb = db.getClient();
-        CreateTableResult result = ddb.createTable(request);
-        LOGGER.info("Table '{}' created", result.getTableDescription().getTableName());
-    }
+
 
     public List<SlackMember> getSlackMemberListByCompanyToolTimestamp(final String companyToolTimestamp) {
-        final AmazonDynamoDB ddb = db.getClient();
-        DynamoDBMapper dbMapper = new DynamoDBMapper(ddb);
+        DynamoDBMapper mapper = db.getMapper();
         SlackMember query = new SlackMember();
         query.setCompanyToolTimestamp(companyToolTimestamp);
         DynamoDBQueryExpression<SlackMember> queryExpression = new DynamoDBQueryExpression<SlackMember>()
                 .withHashKeyValues(query);
 
-        return dbMapper.query(SlackMember.class, queryExpression);
+        return mapper.query(SlackMember.class, queryExpression);
     }
 
     public List<ArtifactoryUser> getArtifactoryUserListByCompanyToolTimestamp(final String companyToolTimestamp) {
-        final AmazonDynamoDB ddb = db.getClient();
-        DynamoDBMapper dbMapper = new DynamoDBMapper(ddb);
+        DynamoDBMapper mapper = db.getMapper();
         ArtifactoryUser query = new ArtifactoryUser();
         query.setCompanyToolTimestamp(companyToolTimestamp);
         DynamoDBQueryExpression<ArtifactoryUser> queryExpression = new DynamoDBQueryExpression<ArtifactoryUser>()
                 .withHashKeyValues(query);
 
-        return dbMapper.query(ArtifactoryUser.class, queryExpression);
+        return mapper.query(ArtifactoryUser.class, queryExpression);
     }
 
 
     public List<JiraSearchResultElement> getJiraUserListByCompanyToolTimestamp(final String companyToolTimestamp) {
-        final AmazonDynamoDB ddb = db.getClient();
-        DynamoDBMapper dbMapper = new DynamoDBMapper(ddb);
+        DynamoDBMapper mapper = db.getMapper();
         JiraSearchResultElement query = new JiraSearchResultElement();
         query.setCompanyToolTimestamp(companyToolTimestamp);
         DynamoDBQueryExpression<JiraSearchResultElement> queryExpression = new DynamoDBQueryExpression<JiraSearchResultElement>()
                 .withHashKeyValues(query);
 
-        return dbMapper.query(JiraSearchResultElement.class, queryExpression);
+        return mapper.query(JiraSearchResultElement.class, queryExpression);
     }
 
     public List<ToolCallRequest> getToolCallRequests(final String companyTool) {
-        final AmazonDynamoDB ddb = db.getClient();
-        DynamoDBMapper mapper = new DynamoDBMapper(ddb);
-
+        DynamoDBMapper mapper = db.getMapper();
         ToolCallRequest query = new ToolCallRequest();
         query.setCompany(companyTool);
 
@@ -191,15 +178,17 @@ public class LocalDynamoDbServer {
 
 
     public void deleteAccountTable() {
-        final AmazonDynamoDB ddb = db.getClient();
-        DeleteTableResult result = ddb.deleteTable(Account.TABLE_NAME);
+        DeleteTableRequest r = new DeleteTableRequest();
+        r.setTableName(Account.TABLE_NAME);
+        DeleteTableResult result = db.deleteTable(r);
         LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
     }
 
 
     public void deleteConfigTable() {
-        final AmazonDynamoDB ddb = db.getClient();
-        DeleteTableResult result = ddb.deleteTable(ToolCallRequest.TABLE_NAME);
+        DeleteTableRequest r = new DeleteTableRequest();
+        r.setTableName(ToolCallRequest.TABLE_NAME);
+        DeleteTableResult result = db.deleteTable(r);
         LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
     }
 

@@ -9,6 +9,10 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
+import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
+import com.amazonaws.services.dynamodbv2.model.DeleteTableRequest;
+import com.amazonaws.services.dynamodbv2.model.DeleteTableResult;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.handlers.TracingHandler;
 import org.apache.logging.log4j.LogManager;
@@ -29,48 +33,42 @@ public class DynamoFactory {
     public static class DynamoAbstraction {
 
         private static final Logger LOGGER = LogManager.getLogger(DynamoFactory.class);
-        private int port = 0;
+        private final AmazonDynamoDB db;
+        private final DynamoDBMapper mapper;
+
 
         private DynamoAbstraction() {
-
+            db = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
+            mapper = new DynamoDBMapper(db);
         }
 
         public DynamoAbstraction(int port) {
-            this.port = port;
+            db = AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:" + port, Regions.EU_CENTRAL_1.getName())).build();
+            mapper = new DynamoDBMapper(db);
         }
 
-        public AmazonDynamoDB getClient() {
-            // this is not so cool, as there is an "if" in each getClient call..
-            if (port != 0) {
-                return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:" + port, Regions.EU_CENTRAL_1.getName())).build();
-            } else {
-                return AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
-            }
+        public DynamoDBMapper getMapper() {
+            return mapper;
         }
 
         public void writeSlackMember(final SlackMember member) {
-            DynamoDBMapper mapper = new DynamoDBMapper(getClient());
             mapper.save(member);
         }
 
         public void writeArtifactoryUser(final ArtifactoryUser member) {
-            DynamoDBMapper mapper = new DynamoDBMapper(getClient());
             mapper.save(member);
         }
 
         public void writeJiraUser(final JiraSearchResultElement member) {
-            DynamoDBMapper mapper = new DynamoDBMapper(getClient());
             mapper.save(member);
         }
 
         public void writeCallResult(final ToolCallResult result) {
-            DynamoDBMapper mapper = new DynamoDBMapper(getClient());
             mapper.save(result);
         }
 
         public List<ToolCallRequest> getAllToolCallRequest() {
 
-            DynamoDBMapper mapper = new DynamoDBMapper(getClient());
             List<ToolCallRequest> r = mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
 
             // Get all Element from the Table
@@ -82,5 +80,15 @@ public class DynamoFactory {
             */
             return r;
         }
+
+
+        public CreateTableResult createTable(CreateTableRequest request) {
+            return db.createTable(request);
+        }
+
+        public DeleteTableResult deleteTable(DeleteTableRequest request) {
+            return db.deleteTable(request);
+        }
+
     }
 }
