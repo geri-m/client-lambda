@@ -29,12 +29,12 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
 
     public SlackCall() {
         db = new DynamoFactory().create();
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
     }
 
     public SlackCall(int port) {
         db = new DynamoFactory().create(port);
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
     }
 
 

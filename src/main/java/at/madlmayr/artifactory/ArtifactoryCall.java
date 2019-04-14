@@ -40,13 +40,14 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
     public ArtifactoryCall() {
         db = new DynamoFactory().create();
         // We use XRay, hence the {@link HttpClients.createDefault();} is not used
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
+
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
     }
 
     public ArtifactoryCall(int port) {
         db = new DynamoFactory().create(port);
         // We use XRay, hence the {@link HttpClients.createDefault();} is not used
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
     }
 
     @Override

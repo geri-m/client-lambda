@@ -40,12 +40,12 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
 
     public JiraV2Call() {
         db = new DynamoFactory().create();
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
     }
 
     public JiraV2Call(int port) {
         db = new DynamoFactory().create(port);
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).build();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
     }
 
     @Override
