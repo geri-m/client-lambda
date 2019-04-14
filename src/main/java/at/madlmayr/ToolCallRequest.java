@@ -82,6 +82,10 @@ public class ToolCallRequest implements Serializable {
         this.timestamp = timestamp;
     }
 
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     @DynamoDBHashKey(attributeName = ToolCallRequest.COLUMN_COMPANY)
     public String getCompany() {
         return company;

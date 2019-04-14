@@ -33,7 +33,7 @@ public class ToolCallRequest2DynamoDbTest {
 
     @AfterAll
     public static void afterAll() {
-        localDynamoDbServer.deleteTable();
+        localDynamoDbServer.deleteConfigTable();
         localDynamoDbServer.stop();
     }
 

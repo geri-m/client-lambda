@@ -22,7 +22,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -60,19 +62,17 @@ public class ArtifactoryCallTest {
         wireMockServer.stop();
     }
 
-    @Test
-    public void userListTest() throws Exception {
-        WireMock.reset();
+
+    public static ArtifactoryListElementWithUser[] initWiremock(int wiremockPort, ObjectMapper mapper) throws Exception {
         String response = FileUtils.readFromFile("/artifactory_01.json");
 
-        List<String> memberIds = new ArrayList<>();
         List<ArtifactoryListElement> list = new ArrayList<>();
         ArtifactoryListElementWithUser[] responseFromFile = mapper.readValue(response, ArtifactoryListElementWithUser[].class);
         for (ArtifactoryListElementWithUser user : responseFromFile) {
-            memberIds.add(user.getUser().getName());
+
 
             URL originalUrl = new URL(user.getListElement().getUri());
-            URL newUrl = new URL(originalUrl.getProtocol(), originalUrl.getHost(), wireMockServer.port(), originalUrl.getFile());
+            URL newUrl = new URL(originalUrl.getProtocol(), originalUrl.getHost(), wiremockPort, originalUrl.getFile());
             user.getListElement().setUri(newUrl.toString());
 
             // put each user into wiremock
@@ -92,6 +92,17 @@ public class ArtifactoryCallTest {
                         .withHeader("Content-Type", "application/json; charset=utf-8")
                         .withBody(mapper.writeValueAsString(list))));
 
+        return responseFromFile;
+    }
+
+    @Test
+    public void userListTest() throws Exception {
+        WireMock.reset();
+
+        Set<String> memberIds = new HashSet<>();
+        for (ArtifactoryListElementWithUser user : initWiremock(wireMockServer.port(), mapper)) {
+            memberIds.add(user.getUser().getName());
+        }
 
         ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.ARTIFACTORY.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L);
         RequestStreamHandler call = new ArtifactoryCall(localDynamoDbServer.getPort());

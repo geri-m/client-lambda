@@ -197,7 +197,7 @@ public class LocalDynamoDbServer {
     }
 
 
-    public void deleteTable() {
+    public void deleteConfigTable() {
         final AmazonDynamoDB ddb = db.getClient();
         DeleteTableResult result = ddb.deleteTable(ToolCallRequest.TABLE_NAME);
         LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());

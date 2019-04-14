@@ -1,5 +1,6 @@
 package at.madlmayr;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
@@ -14,5 +15,13 @@ public class Utils {
 
     public static String standardTimeFormat(final long time) {
         return simpleDateFormat.format(time);
+    }
+
+    public static long parseStandardTime(final String timestamp) {
+        try {
+            return simpleDateFormat.parse(timestamp).getTime();
+        } catch (ParseException e) {
+            throw new ToolCallException(e);
+        }
     }
 }

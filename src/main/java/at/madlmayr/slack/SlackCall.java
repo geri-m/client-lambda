@@ -53,7 +53,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
                 db.writeSlackMember(member);
             }
 
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length());
+            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());
 
         } catch (IOException e) {

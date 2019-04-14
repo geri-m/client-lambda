@@ -58,12 +58,11 @@ public class JiraCallTest {
         wireMockServer.stop();
     }
 
-    @Test
-    public void userListTest() throws Exception {
-        WireMock.reset();
+
+    public static JiraSearchResultElement[] initWiremock(int wiremockPort, ObjectMapper mapper) throws Exception {
         String response = FileUtils.readFromFile("/jira_01.json");
 
-        Set<String> memberIds = new HashSet<>();
+
         JiraSearchResultElement[] responseFromFile = mapper.readValue(response, JiraSearchResultElement[].class);
         Map<String, List<JiraSearchResultElement>> result = search("", responseFromFile, 1);
 
@@ -76,7 +75,45 @@ public class JiraCallTest {
 
         }
 
-        for (JiraSearchResultElement m : responseFromFile) {
+        return responseFromFile;
+    }
+
+    private static Map<String, List<JiraSearchResultElement>> search(final String prefix, JiraSearchResultElement[] userList, int deep) {
+        Map<String, List<JiraSearchResultElement>> result = new HashMap<>();
+        for (char searchChar : SEARCH_CHARS) {
+            List<JiraSearchResultElement> tempResult = recursiveSearch(prefix + searchChar, userList);
+            result.put(prefix + searchChar, tempResult);
+            if (tempResult.size() == 1000 && deep < MAX_RECURSION_DEPTH) {
+                Map<String, List<JiraSearchResultElement>> resultFromRecursion = search(prefix + searchChar, userList, deep + 1);
+                result.putAll(resultFromRecursion);
+            }
+
+        }
+        return result;
+    }
+
+    private static List<JiraSearchResultElement> recursiveSearch(final String prefix, JiraSearchResultElement[] userList) {
+        int counter = 0;
+        List<JiraSearchResultElement> list = new ArrayList<>();
+        for (JiraSearchResultElement jiraUser : userList) {
+            if (jiraUser.searchSearchString(prefix)) {
+                list.add(jiraUser);
+                counter++;
+                // if we have 1000 Elements in the match, we stop.
+                if (counter == MAX_RESULT_COUNT_GET_PARAMETER)
+                    break;
+            }
+        }
+        return list;
+    }
+
+    @Test
+    public void userListTest() throws Exception {
+        WireMock.reset();
+
+        Set<String> memberIds = new HashSet<>();
+
+        for (JiraSearchResultElement m : initWiremock(wireMockServer.port(), mapper)) {
             memberIds.add(m.getKey());
         }
 
@@ -99,35 +136,5 @@ public class JiraCallTest {
         // make sure, each and every key was found (and remove from the temporary list
         assertThat(memberIds.size()).isEqualTo(0);
         assertThat(itemList.size()).isEqualTo(4197);
-    }
-
-    private Map<String, List<JiraSearchResultElement>> search(final String prefix, JiraSearchResultElement[] userList, int deep) {
-
-        Map<String, List<JiraSearchResultElement>> result = new HashMap<>();
-        for (char searchChar : SEARCH_CHARS) {
-            List<JiraSearchResultElement> tempResult = recursiveSearch(prefix + searchChar, userList);
-            result.put(prefix + searchChar, tempResult);
-            if (tempResult.size() == 1000 && deep < MAX_RECURSION_DEPTH) {
-                Map<String, List<JiraSearchResultElement>> resultFromRecursion = search(prefix + searchChar, userList, deep + 1);
-                result.putAll(resultFromRecursion);
-            }
-
-        }
-        return result;
-    }
-
-    private List<JiraSearchResultElement> recursiveSearch(final String prefix, JiraSearchResultElement[] userList) {
-        int counter = 0;
-        List<JiraSearchResultElement> list = new ArrayList<>();
-        for (JiraSearchResultElement jiraUser : userList) {
-            if (jiraUser.searchSearchString(prefix)) {
-                list.add(jiraUser);
-                counter++;
-                // if we have 1000 Elements in the match, we stop.
-                if (counter == MAX_RESULT_COUNT_GET_PARAMETER)
-                    break;
-            }
-        }
-        return list;
     }
 }

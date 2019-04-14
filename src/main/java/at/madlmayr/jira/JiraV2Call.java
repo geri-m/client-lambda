@@ -65,7 +65,7 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
                 db.writeJiraUser(user);
             }
 
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length());
+            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());
         } catch (IOException e) {
             LOGGER.error(e.getMessage());

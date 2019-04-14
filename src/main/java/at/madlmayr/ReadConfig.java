@@ -1,11 +1,6 @@
 package at.madlmayr;
 
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ScanRequest;
-import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.lambda.AWSLambdaAsync;
 import com.amazonaws.services.lambda.AWSLambdaAsyncClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
@@ -25,7 +20,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -35,34 +29,28 @@ public class ReadConfig implements RequestStreamHandler {
     // Initialize the Log4j logger.
     private static final Logger LOGGER = LogManager.getLogger(ReadConfig.class);
 
-    private final AmazonDynamoDB dynamo;
+    private final DynamoFactory.DynamoAbstraction db;
     private final AWSLambdaAsync lambda;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ReadConfig() {
-        dynamo = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
+        db = new DynamoFactory().create();
         lambda = AWSLambdaAsyncClientBuilder.standard().withRegion(Regions.EU_CENTRAL_1).withRequestHandlers(new TracingHandler(AWSXRay.getGlobalRecorder())).build();
+    }
+
+    public ReadConfig(int port, final AWSLambdaAsync lambdaAsync) {
+        db = new DynamoFactory().create(port);
+        lambda = lambdaAsync;
     }
 
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
         Subsegment seg = AWSXRay.beginSubsegment("Read Config");
 
-        // Get all Element from the Table
-        ScanRequest scanRequest = new ScanRequest()
-                .withTableName(ToolCallRequest.TABLE_NAME);
-
-        ScanResult result = dynamo.scan(scanRequest);
-        LOGGER.info("Amount of Config found: {}", result.getItems().size());
-        seg.putMetadata("Amount of Configs", result.getItems().size());
-
-        long timestampOfBatch = System.currentTimeMillis();
         List<Future<InvokeResult>> futures = new ArrayList<>();
-
-        for (Map<String, AttributeValue> returnedItems : result.getItems()) {
-            if (returnedItems != null) {
+        for (ToolCallRequest toolCallRequest : db.getAllToolCallRequest()) {
                 try {
-                    ToolCallRequest toolCallRequest = new ToolCallRequest(returnedItems, timestampOfBatch);
+                    toolCallRequest.setTimestamp(System.currentTimeMillis());
                     LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getName());
                     InvokeRequest req = new InvokeRequest()
                             .withFunctionName(ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getFunctionName())
@@ -70,10 +58,8 @@ public class ReadConfig implements RequestStreamHandler {
                     futures.add(lambda.invokeAsync(req));
                 } catch (Exception e) {
                     LOGGER.error(e);
+                    AWSXRay.getCurrentSegment().addException(e);
                 }
-            } else {
-                LOGGER.info("No item found in Config Table");
-            }
         }
 
         // 'remove()' of the List causes ConcurrentModificationException
@@ -87,8 +73,10 @@ public class ReadConfig implements RequestStreamHandler {
                     try {
                         ToolCallResult resultFromCall = objectMapper.readValue(new String(localFuture.get().getPayload().array(), StandardCharsets.UTF_8), ToolCallResult.class);
                         LOGGER.info("Response from Method '{}', # Users: '{}'", resultFromCall.getTool(), resultFromCall.getAmountOfUsers());
+                        //db.writeCallResult(resultFromCall);
                     } catch (final IOException | InterruptedException | ExecutionException e) {
                         LOGGER.error(e.getMessage());
+                        AWSXRay.getCurrentSegment().addException(e);
                     }
 
                     // finished Features go into a separate list.

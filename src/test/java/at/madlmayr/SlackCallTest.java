@@ -19,8 +19,9 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -58,16 +59,11 @@ public class SlackCallTest {
         wireMockServer.stop();
     }
 
-    @Test
-    public void userListTest() throws Exception {
-        WireMock.reset();
+
+    public static SlackResponse initWiremock(int wiremockPort, ObjectMapper mapper) throws Exception {
         String response = FileUtils.readFromFile("/slackdata_01.json");
 
-        List<String> memberIds = new ArrayList<>();
         SlackResponse responseFromFile = mapper.readValue(response, SlackResponse.class);
-        for (SlackMember m : responseFromFile.getMembers()) {
-            memberIds.add(m.getId());
-        }
 
         // WireMock.reset();
         stubFor(get(urlEqualTo("/api/users.list/"))
@@ -75,6 +71,19 @@ public class SlackCallTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json; charset=utf-8")
                         .withBody(response)));
+
+        return responseFromFile;
+    }
+
+
+    @Test
+    public void userListTest() throws Exception {
+        WireMock.reset();
+
+        Set<String> memberIds = new HashSet<>();
+        for (SlackMember m : initWiremock(wireMockServer.port(), mapper).getMembers()) {
+            memberIds.add(m.getId());
+        }
 
         ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.SLACK.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L);
         RequestStreamHandler call = new SlackCall(localDynamoDbServer.getPort());

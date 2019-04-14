@@ -77,7 +77,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             }
 
 
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length());
+            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length(), toolCallRequest.getTimestamp());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
