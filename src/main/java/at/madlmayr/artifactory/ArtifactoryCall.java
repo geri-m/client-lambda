@@ -62,14 +62,15 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
 
             JSONArray listElements = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
-            ArtifactoryListElement[] userArray = objectMapper.readValue(listElements.toString(), ArtifactoryListElement[].class);
-            LOGGER.info("Amount of Users: {} ", userArray.length);
+            List<ArtifactoryListElement> userArray = objectMapper.readValue(listElements.toString(), new TypeReference<List<ArtifactoryListElement>>() {
+            });
+            LOGGER.info("Amount of Users: {} ", userArray.size());
 
             // We do the sync call for several reasons
             // 1) Xray works out of the box
             // 2) Not much mor expensive than Sync all (yes, 100 % is something, but its cents)
             // 3) less effort for testing.
-            JSONArray detailUsers = doClientCallsSync(listElements, toolCallRequest.getBearer());
+            JSONArray detailUsers = doClientCallsSync(userArray, toolCallRequest.getBearer());
             List<ArtifactoryUser> userArrayDetails = objectMapper.readValue(detailUsers.toString(), new TypeReference<List<ArtifactoryUser>>() {
             });
             LOGGER.info("Amount of Users: {} ", userArrayDetails.size());
@@ -109,10 +110,10 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
         }
     }
 
-    public JSONArray doClientCallsSync(final JSONArray userList, final String bearer) {
+    public JSONArray doClientCallsSync(final List<ArtifactoryListElement> userList, final String bearer) {
         JSONArray userDetailList = new JSONArray();
-        for (Object jsonUserObject : userList) {
-            String uri = ((JSONObject) jsonUserObject).get("uri").toString();
+        for (ArtifactoryListElement user : userList) {
+            String uri = user.getUri();
             HttpGet requestForUser = new HttpGet(uri);
             requestForUser.setHeader("X-JFrog-Art-Api", bearer);
             try (CloseableHttpResponse responseForUser = httpClient.execute(requestForUser)) {
