@@ -66,8 +66,9 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             for (JiraSearchResultElement user : userArrayDetails) {
                 user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
             }
-
+            LOGGER.info("Start writing to db");
             db.writeJiraMembersBatch(userArrayDetails);
+            LOGGER.info("End writing to db");
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());

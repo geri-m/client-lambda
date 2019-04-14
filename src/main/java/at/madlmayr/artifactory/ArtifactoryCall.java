@@ -73,13 +73,14 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             JSONArray detailUsers = doClientCallsSync(userArray, toolCallRequest.getBearer());
             List<ArtifactoryUser> userArrayDetails = objectMapper.readValue(detailUsers.toString(), new TypeReference<List<ArtifactoryUser>>() {
             });
-            LOGGER.info("Amount of Users: {} ", userArrayDetails.size());
+            LOGGER.info("Amount of Detailed Users: {} ", userArrayDetails.size());
 
             for (ArtifactoryUser user : userArrayDetails) {
                 user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
             }
-
+            LOGGER.info("Start writing to db");
             db.writeArtifactoryMembersBatch(userArrayDetails);
+            LOGGER.info("End writing to db");
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length(), toolCallRequest.getTimestamp());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());

@@ -49,13 +49,15 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
             List<SlackMember> userList = objectMapper.readValue(users.toString(), new TypeReference<List<SlackMember>>() {
             });
-
+            LOGGER.info("Amount of Users: {} ", userList.size())
+            ;
             for (SlackMember member : userList) {
                 member.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
                 member.setId(member.getId());
             }
-
+            LOGGER.info("Start writing to db");
             db.writeSlackMembersBatch(userList);
+            LOGGER.info("End writing to db");
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp());
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());
