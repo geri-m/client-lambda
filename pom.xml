@@ -164,6 +164,14 @@
     <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>
+
+            <!-- Static Code Analysis https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+Maven -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.6.0.1398</version>
+            </plugin>
+
             <!-- Shading as we require it for lambda -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

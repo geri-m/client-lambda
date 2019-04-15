@@ -4,21 +4,12 @@ import at.madlmayr.*;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.proxies.apache.http.HttpClientBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
-import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
-import org.apache.http.nio.reactor.ConnectingIOReactor;
-import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
@@ -129,60 +119,5 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             }
         }
         return userDetailList;
-    }
-
-    private JSONArray doClientCallsAsync(final JSONArray userList, final String bearer) throws IOReactorException, ToolCallException {
-        Subsegment userSubSegment = AWSXRay.beginSubsegment("## Fetch Users");
-        ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
-        PoolingNHttpClientConnectionManager cm =
-                new PoolingNHttpClientConnectionManager(ioReactor);
-
-        try (CloseableHttpAsyncClient httpAsyncClient = HttpAsyncClients.custom().setConnectionManager(cm).build()) {
-            httpAsyncClient.start();
-            final CountDownLatch latchForUserCalls = new CountDownLatch(userList.length());
-
-            // Response Element
-            JSONArray userDetailList = new JSONArray();
-
-            for (int i = 0; i < userList.length(); i++) {
-                String uri = new JSONObject(userList.get(i).toString()).get("uri").toString();
-
-                HttpGet requestForUser = new HttpGet(uri);
-                requestForUser.setHeader("X-JFrog-Art-Api", bearer);
-                httpAsyncClient.execute(requestForUser, new FutureCallback<HttpResponse>() {
-
-                    public void completed(final HttpResponse response) {
-                        try {
-                            String jsonStringForUser = EntityUtils.toString(response.getEntity());
-                            userDetailList.put(new JSONObject(jsonStringForUser));
-                        } catch (IOException e) {
-                            throw new ToolCallException(e);
-                        } finally {
-                            latchForUserCalls.countDown();
-                        }
-                    }
-
-                    public void failed(final Exception ex) {
-                        latchForUserCalls.countDown();
-                        LOGGER.error(requestForUser.getRequestLine() + "->" + ex);
-                    }
-
-                    public void cancelled() {
-                        latchForUserCalls.countDown();
-                        LOGGER.error(requestForUser.getRequestLine() + " cancelled");
-                    }
-                });
-            }
-            // Wait till all calls come back.
-            latchForUserCalls.await();
-            userSubSegment.putMetadata("Amount of Users", userList.length());
-            return userDetailList;
-        } catch (IOException | InterruptedException e) {
-            userSubSegment.addException(e);
-            throw new ToolCallException(e);
-        } finally {
-            AWSXRay.endSubsegment();
-        }
-
     }
 }
