@@ -86,7 +86,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             outputStream.write(objectMapper.writeValueAsString(result).getBytes());
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            AWSXRay.getCurrentSegment().addException(e);
+            AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
             throw new ToolCallException(e);
         }
     }

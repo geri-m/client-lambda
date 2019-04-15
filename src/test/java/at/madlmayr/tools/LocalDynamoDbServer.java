@@ -3,11 +3,13 @@ package at.madlmayr.tools;
 import at.madlmayr.Account;
 import at.madlmayr.DynamoFactory;
 import at.madlmayr.ToolCallRequest;
+import at.madlmayr.ToolCallResult;
 import at.madlmayr.artifactory.ArtifactoryUser;
 import at.madlmayr.jira.JiraSearchResultElement;
 import at.madlmayr.slack.SlackMember;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.local.main.ServerRunner;
 import com.amazonaws.services.dynamodbv2.local.server.DynamoDBProxyServer;
 import com.amazonaws.services.dynamodbv2.model.*;
@@ -113,6 +115,18 @@ public class LocalDynamoDbServer {
     }
 
 
+    public void createCallResultTable() {
+        CreateTableRequest request = new CreateTableRequest()
+                .withAttributeDefinitions(new AttributeDefinition(
+                        ToolCallResult.COLUMN_COMPANY_TOOL, ScalarAttributeType.S))
+                .withAttributeDefinitions(new AttributeDefinition(
+                        ToolCallResult.TIME_STAMP, ScalarAttributeType.S))
+                .withKeySchema(new KeySchemaElement(ToolCallResult.COLUMN_COMPANY_TOOL, KeyType.HASH), new KeySchemaElement(ToolCallResult.TIME_STAMP, KeyType.RANGE))
+                .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
+                .withTableName(ToolCallResult.TABLE_NAME);
+        db.createTable(request);
+    }
+
     public void createConfigTable() {
         CreateTableRequest request = new CreateTableRequest()
                 .withAttributeDefinitions(new AttributeDefinition(
@@ -176,6 +190,10 @@ public class LocalDynamoDbServer {
         return mapper.query(ToolCallRequest.class, queryExpression);
     }
 
+    public List<ToolCallResult> getAllToolCallResult() {
+        return db.getMapper().scan(ToolCallResult.class, new DynamoDBScanExpression());
+    }
+
 
     public void deleteAccountTable() {
         DeleteTableRequest r = new DeleteTableRequest();
@@ -188,6 +206,13 @@ public class LocalDynamoDbServer {
     public void deleteConfigTable() {
         DeleteTableRequest r = new DeleteTableRequest();
         r.setTableName(ToolCallRequest.TABLE_NAME);
+        DeleteTableResult result = db.deleteTable(r);
+        LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
+    }
+
+    public void deleteCallResultTable() {
+        DeleteTableRequest r = new DeleteTableRequest();
+        r.setTableName(ToolCallResult.TABLE_NAME);
         DeleteTableResult result = db.deleteTable(r);
         LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
     }

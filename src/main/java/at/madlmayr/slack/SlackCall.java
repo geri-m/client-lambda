@@ -49,8 +49,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
             List<SlackMember> userList = objectMapper.readValue(users.toString(), new TypeReference<List<SlackMember>>() {
             });
-            LOGGER.info("Amount of Users: {} ", userList.size())
-            ;
+            LOGGER.info("Amount of Users: {} ", userList.size());
             for (SlackMember member : userList) {
                 member.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
                 member.setId(member.getId());
@@ -64,7 +63,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
 
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            AWSXRay.getCurrentSegment().addException(e);
+            AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
             throw new ToolCallException(e);
         }
     }

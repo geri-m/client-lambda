@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class ReadConfigTest {
@@ -37,6 +38,7 @@ public class ReadConfigTest {
         LOGGER.debug("DynamoDB: {}", localDynamoDbServer.getPort());
         localDynamoDbServer.createConfigTable();
         localDynamoDbServer.createAccountTable();
+        localDynamoDbServer.createCallResultTable();
         insertData();
         JiraCallTest.initWiremock("/jira_single.json");
         ArtifactoryCallTest.initWiremock("/artifactory_single.json", wireMockServer.port());
@@ -54,6 +56,7 @@ public class ReadConfigTest {
 
     @AfterAll
     public static void afterAll() {
+        localDynamoDbServer.deleteCallResultTable();
         localDynamoDbServer.deleteConfigTable();
         localDynamoDbServer.deleteAccountTable();
         localDynamoDbServer.stop();
@@ -64,5 +67,14 @@ public class ReadConfigTest {
     public void userListTest() throws Exception {
         RequestStreamHandler call = new ReadConfig(localDynamoDbServer.getPort(), new AWSLambdaAsyncMock(localDynamoDbServer.getPort()));
         call.handleRequest(null, null, null);
+        List<ToolCallResult> res = localDynamoDbServer.getAllToolCallResult();
+
+        for (ToolCallResult result : res) {
+            LOGGER.info("Result: {}", result.getTool());
+        }
+
+        // we fire 3 Call, as we expect 3 results in the table.
+        assertThat(res.size()).isEqualTo(3);
+
     }
 }

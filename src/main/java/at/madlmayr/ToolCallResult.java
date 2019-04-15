@@ -14,9 +14,9 @@ public class ToolCallResult implements Serializable {
     public static final String COLUMN_COMPANY = "company";
     public static final String COLUMN_TOOL = "tool";
     public static final String TABLE_NAME = "CallResults";
-    private static final String COLUMN_COMPANY_TOOL = "companyTool";
+    public static final String COLUMN_COMPANY_TOOL = "companyTool";
     private static final String COLUMN_AMOUNT_OF_USER = "amountOfUsers";
-    private static final String TIME_STAMP = "timestamp";
+    public static final String TIME_STAMP = "timestamp";
 
     @JsonProperty(COLUMN_COMPANY)
     private String company;
@@ -54,9 +54,25 @@ public class ToolCallResult implements Serializable {
         return amountOfUsers;
     }
 
-    @DynamoDBRangeKey(attributeName = ToolCallResult.TIME_STAMP)
+    public void setAmountOfUsers(int amountOfUsers) {
+        this.amountOfUsers = amountOfUsers;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
     public long getTimeStamp() {
         return timeStamp;
+    }
+
+    @DynamoDBRangeKey(attributeName = ToolCallResult.TIME_STAMP)
+    public String getTimeStampformated() {
+        return Utils.standardTimeFormat(timeStamp);
+    }
+
+    public void setTimeStampformated(final String input) {
+        timeStamp = Utils.parseStandardTime(input);
     }
 
     @DynamoDBHashKey(attributeName = ToolCallResult.COLUMN_COMPANY_TOOL)

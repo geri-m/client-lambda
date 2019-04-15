@@ -8,7 +8,6 @@ import com.amazonaws.services.lambda.model.InvokeResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
-import com.amazonaws.xray.entities.Subsegment;
 import com.amazonaws.xray.handlers.TracingHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -45,8 +44,6 @@ public class ReadConfig implements RequestStreamHandler {
 
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
-        Subsegment seg = AWSXRay.beginSubsegment("Read Config");
-
         List<Future<InvokeResult>> futures = new ArrayList<>();
         for (ToolCallRequest toolCallRequest : db.getAllToolCallRequest()) {
                 try {
@@ -58,7 +55,7 @@ public class ReadConfig implements RequestStreamHandler {
                     futures.add(lambda.invokeAsync(req));
                 } catch (Exception e) {
                     LOGGER.error(e);
-                    //  AWSXRay.getCurrentSegment().addException(e);
+                    AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
                 }
         }
 
@@ -67,30 +64,20 @@ public class ReadConfig implements RequestStreamHandler {
 
         // loop over the futures as long as input list is not the same size as finished list.
         while (futuresFinished.size() != futures.size()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new ToolCallException(e);
-            }
-            LOGGER.info("Finished Size: {}, Future Size: {}", futuresFinished.size(), futures.size());
-
             for (Future<InvokeResult> localFuture : futures) {
                 // futures which are done, but not yet in the finished list.
                 if (localFuture.isDone() && !futuresFinished.contains(localFuture)) {
-                    LOGGER.info("Finished: {}", localFuture.hashCode());
                     try {
                         ToolCallResult resultFromCall = objectMapper.readValue(new String(localFuture.get().getPayload().array(), StandardCharsets.UTF_8), ToolCallResult.class);
                         LOGGER.info("Response from Method '{}', # Users: '{}'", resultFromCall.getTool(), resultFromCall.getAmountOfUsers());
-                        //db.writeCallResult(resultFromCall);
+                        db.writeCallResult(resultFromCall);
                     } catch (final IOException | InterruptedException | ExecutionException e) {
                         LOGGER.error(e.getMessage());
-                        // AWSXRay.getCurrentSegment().addException(e);
+                        AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
                     }
 
                     // finished Features go into a separate list.
                     futuresFinished.add(localFuture);
-                } else {
-                    LOGGER.info("NOT Finished: {}", localFuture.hashCode());
                 }
             }
         }
