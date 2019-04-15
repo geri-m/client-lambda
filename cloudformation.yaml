@@ -10,7 +10,7 @@ Resources:
       Runtime: java8
       Description: "Client API Lambda"
       MemorySize: 256
-      Timeout: 180
+      Timeout: 600 # 10 (!) Minutes Timeout for Testing Purpose.
       Role: !GetAtt LambdaExecutionRole.Arn
       FunctionName: ReadConfig
       Tracing: Active

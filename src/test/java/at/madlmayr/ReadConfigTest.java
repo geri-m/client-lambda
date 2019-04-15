@@ -3,7 +3,6 @@ package at.madlmayr;
 import at.madlmayr.tools.AWSLambdaAsyncMock;
 import at.madlmayr.tools.LocalDynamoDbServer;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.apache.logging.log4j.LogManager;
@@ -21,7 +20,6 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 public class ReadConfigTest {
 
     private static final Logger LOGGER = LogManager.getLogger(LambdaTest.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
     private static final String FAKE_COMPANY_1 = "gma";
     private static LocalDynamoDbServer localDynamoDbServer;
     private static WireMockServer wireMockServer;

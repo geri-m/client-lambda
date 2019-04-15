@@ -69,17 +69,7 @@ public class DynamoFactory {
         }
 
         public List<ToolCallRequest> getAllToolCallRequest() {
-
-            List<ToolCallRequest> r = mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
-
-            // Get all Element from the Table
-            /*
-            ScanRequest scanRequest = new ScanRequest()
-                    .withTableName(ToolCallRequest.TABLE_NAME);
-
-            ScanResult result = dynamo.scan(scanRequest);
-            */
-            return r;
+            return mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
         }
 
 
