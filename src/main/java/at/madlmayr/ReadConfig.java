@@ -58,7 +58,7 @@ public class ReadConfig implements RequestStreamHandler {
                     futures.add(lambda.invokeAsync(req));
                 } catch (Exception e) {
                     LOGGER.error(e);
-                    AWSXRay.getCurrentSegment().addException(e);
+                    //  AWSXRay.getCurrentSegment().addException(e);
                 }
         }
 
@@ -67,25 +67,32 @@ public class ReadConfig implements RequestStreamHandler {
 
         // loop over the futures as long as input list is not the same size as finished list.
         while (futuresFinished.size() != futures.size()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new ToolCallException(e);
+            }
+            LOGGER.info("Finished Size: {}, Future Size: {}", futuresFinished.size(), futures.size());
+
             for (Future<InvokeResult> localFuture : futures) {
                 // futures which are done, but not yet in the finished list.
                 if (localFuture.isDone() && !futuresFinished.contains(localFuture)) {
+                    LOGGER.info("Finished: {}", localFuture.hashCode());
                     try {
                         ToolCallResult resultFromCall = objectMapper.readValue(new String(localFuture.get().getPayload().array(), StandardCharsets.UTF_8), ToolCallResult.class);
                         LOGGER.info("Response from Method '{}', # Users: '{}'", resultFromCall.getTool(), resultFromCall.getAmountOfUsers());
                         //db.writeCallResult(resultFromCall);
                     } catch (final IOException | InterruptedException | ExecutionException e) {
                         LOGGER.error(e.getMessage());
-                        AWSXRay.getCurrentSegment().addException(e);
+                        // AWSXRay.getCurrentSegment().addException(e);
                     }
 
                     // finished Features go into a separate list.
                     futuresFinished.add(localFuture);
+                } else {
+                    LOGGER.info("NOT Finished: {}", localFuture.hashCode());
                 }
             }
         }
-        AWSXRay.endSubsegment();
     }
-
-
 }
