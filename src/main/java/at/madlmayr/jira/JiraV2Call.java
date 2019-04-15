@@ -87,7 +87,7 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             try {
                 userArray.put(new JSONObject(objectMapper.writeValueAsString(entry.getValue())));
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
         }
         return userArray;
@@ -115,9 +115,6 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
                 String jsonString = EntityUtils.toString(response.getEntity());
                 if ((response.getStatusLine().getStatusCode() / 100) == 2) {
                     JSONArray users = new JSONArray(jsonString);
-
-                    JiraSearchResultElement[] userList = objectMapper.readValue(users.toString(), JiraSearchResultElement[].class);
-
                     // run a recursion, if the amount of result exceeds the max results
                     // Issue: the search also goes thru the email, so if the string matches the email, you will get all users.
                     if (users.length() == MAX_RESULT_COUNT_GET_PARAMETER) {

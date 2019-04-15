@@ -77,7 +77,7 @@ public class ToolCallResult implements Serializable {
 
     @DynamoDBHashKey(attributeName = ToolCallResult.COLUMN_COMPANY_TOOL)
     public String getKey() {
-        return getCompany() + "#" + getTool() + "#" + Utils.standardTimeFormat(getTimeStamp());
+        return getCompany() + "#" + getTool();
     }
 
     public void setKey(final String key) {
@@ -88,12 +88,11 @@ public class ToolCallResult implements Serializable {
             throw new ToolCallException(String.format("Key '%s 'does not contain '#' symbol for split.", key));
 
         String[] segments = key.split("#");
-        if (segments.length != 3 || segments[0] == null || segments[1] == null || segments[2] == null) {
+        if (segments.length != 2 || segments[0] == null || segments[1] == null) {
             throw new ToolCallException(String.format("Invalid Key '%s'.", key));
         } else {
             company = segments[0];
             tool = segments[1];
-            timeStamp = Utils.parseStandardTime(segments[2]);
         }
     }
 
