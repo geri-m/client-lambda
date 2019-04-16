@@ -68,24 +68,32 @@ public class ReadConfig implements RequestStreamHandler {
                 // futures which are done, but not yet in the finished list.
                 if (localFuture.isDone() && !futuresFinished.contains(localFuture)) {
                     LOGGER.debug("New Future is done ...");
-                    try {
-                        ToolCallResult resultFromCall = objectMapper.readValue(new String(localFuture.get().getPayload().array(), StandardCharsets.UTF_8), ToolCallResult.class);
-                        LOGGER.info("Response from Method '{}', # Users: '{}'", resultFromCall.getTool(), resultFromCall.getAmountOfUsers());
-                        db.writeCallResult(resultFromCall);
-                    } catch (final IOException | ExecutionException e) {
-                        LOGGER.error(e.getMessage());
-                        AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
-                    } catch (InterruptedException e) {
-                        LOGGER.error(e.getMessage());
-                        AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
-                        // Restore interrupted state...
-                        Thread.currentThread().interrupt();
-                    }
-
                     // finished Features go into a separate list.
                     futuresFinished.add(localFuture);
                 }
+                try {
+                    Thread.sleep(25);
+                } catch (InterruptedException e) {
+                    throw new ToolCallException(e);
+                }
             }
         }
+
+        for (Future<InvokeResult> future : futuresFinished) {
+            try {
+                ToolCallResult resultFromCall = objectMapper.readValue(new String(future.get().getPayload().array(), StandardCharsets.UTF_8), ToolCallResult.class);
+                LOGGER.info("Response from Method '{}', # Users: '{}'", resultFromCall.getTool(), resultFromCall.getAmountOfUsers());
+                db.writeCallResult(resultFromCall);
+            } catch (final IOException | ExecutionException e) {
+                LOGGER.error(e.getMessage());
+                AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
+            } catch (InterruptedException e) {
+                LOGGER.error(e.getMessage());
+                AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
+                // Restore interrupted state...
+                Thread.currentThread().interrupt();
+            }
+        }
+
     }
 }
