@@ -86,10 +86,10 @@ public class ReadConfig implements RequestStreamHandler {
                 db.writeCallResult(resultFromCall);
             } catch (final IOException | ExecutionException e) {
                 LOGGER.error(e.getMessage());
-                AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
+                e.printStackTrace();
             } catch (InterruptedException e) {
                 LOGGER.error(e.getMessage());
-                AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
+                e.printStackTrace();
                 // Restore interrupted state...
                 Thread.currentThread().interrupt();
             }
