@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// S2386: SEARCH_CHARS is used in tests and can be private.
+// S2647: Basic Auth is the way we currently authenticate against Jira; can change that for now.
+@java.lang.SuppressWarnings({"squid:S2386", "squid:S2647"})
 public class JiraV2Call implements RequestStreamHandler, ToolCall {
 
     // JIRA v7.4.3 - https://docs.atlassian.com/software/jira/docs/api/REST/7.4.3/
