@@ -68,9 +68,9 @@ public class ReadConfigTest {
         RequestStreamHandler call = new ReadConfig(localDynamoDbServer.getPort(), new AWSLambdaAsyncMock(localDynamoDbServer.getPort()));
         call.handleRequest(null, null, null);
 
-        //while ((localDynamoDbServer.getAllToolCallResult().size() != 3)) {
-        //   LOGGER.info("Okay");
-        //}
+        while ((localDynamoDbServer.getAllToolCallResult(FAKE_COMPANY_1, 1L).size() != 3)) {
+            LOGGER.info("Okay");
+        }
 
 
     }

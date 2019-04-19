@@ -8,6 +8,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
 import com.amazonaws.services.dynamodbv2.model.DeleteTableRequest;
@@ -64,12 +65,11 @@ public class DynamoFactory {
         }
 
         public void writeCallResult(final ToolCallResult result) {
-            //mapper.save(result);
+            mapper.save(result);
         }
 
         public List<ToolCallRequest> getAllToolCallRequest() {
-            // return mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
-            return null;
+            return mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
         }
 
 

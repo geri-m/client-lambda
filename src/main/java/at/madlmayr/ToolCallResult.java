@@ -4,40 +4,33 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
 @DynamoDBTable(tableName = ToolCallResult.TABLE_NAME)
 public class ToolCallResult implements Serializable {
 
-    public static final String COLUMN_COMPANY = "company";
     public static final String COLUMN_TOOL = "tool";
     public static final String TABLE_NAME = "CallResults";
-    public static final String COLUMN_COMPANY_TOOL = "companyTool";
-    private static final String COLUMN_AMOUNT_OF_USER = "amountOfUsers";
+    public static final String COLUMN_COMPANY_TIMESTAMP = "companyTimestamp";
     public static final String TIME_STAMP = "timestamp";
 
-    @JsonProperty(COLUMN_COMPANY)
     private String company;
 
-    @JsonProperty(COLUMN_TOOL)
     private String tool;
 
-    @JsonProperty(COLUMN_AMOUNT_OF_USER)
     private int amountOfUsers;
 
-    @JsonProperty(TIME_STAMP)
-    private long timeStamp;
+    private long timestamp;
 
     public ToolCallResult() {
     }
 
-    public ToolCallResult(String company, String tool, int amountOfUsers, long timeStamp) {
+    public ToolCallResult(String company, String tool, int amountOfUsers, long timestamp) {
         this.company = company;
         this.tool = tool;
         this.amountOfUsers = amountOfUsers;
-        this.timeStamp = timeStamp;
+        this.timestamp = timestamp;
     }
 
     @DynamoDBIgnore
@@ -45,7 +38,7 @@ public class ToolCallResult implements Serializable {
         return company;
     }
 
-    @DynamoDBIgnore
+    @DynamoDBRangeKey(attributeName = ToolCallResult.COLUMN_TOOL)
     public String getTool() {
         return tool;
     }
@@ -58,26 +51,25 @@ public class ToolCallResult implements Serializable {
         this.amountOfUsers = amountOfUsers;
     }
 
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public long getTimeStamp() {
-        return timeStamp;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
-    @DynamoDBRangeKey(attributeName = ToolCallResult.TIME_STAMP)
-    public String getTimeStampformated() {
-        return Utils.standardTimeFormat(timeStamp);
+    public String getTimestampFormatted() {
+        return Utils.standardTimeFormat(timestamp);
     }
 
-    public void setTimeStampformated(final String input) {
-        timeStamp = Utils.parseStandardTime(input);
+    public void setTimestampFormatted(final String input) {
+        timestamp = Utils.parseStandardTime(input);
     }
 
-    @DynamoDBHashKey(attributeName = ToolCallResult.COLUMN_COMPANY_TOOL)
+    @DynamoDBHashKey(attributeName = ToolCallResult.COLUMN_COMPANY_TIMESTAMP)
     public String getKey() {
-        return getCompany() + "#" + getTool();
+        return getCompany() + "#" + getTimestampFormatted();
     }
 
     public void setKey(final String key) {
@@ -91,8 +83,8 @@ public class ToolCallResult implements Serializable {
         if (segments.length != 2 || segments[0] == null || segments[1] == null) {
             throw new ToolCallException(String.format("Invalid Key '%s'.", key));
         } else {
-            company = segments[0];
-            tool = segments[1];
+            setCompany(segments[0]);
+            setTimestampFormatted(segments[1]);
         }
     }
 

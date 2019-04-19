@@ -115,10 +115,10 @@ public class LocalDynamoDbServer {
     public void createCallResultTable() {
         CreateTableRequest request = new CreateTableRequest()
                 .withAttributeDefinitions(new AttributeDefinition(
-                        ToolCallResult.COLUMN_COMPANY_TOOL, ScalarAttributeType.S))
+                        ToolCallResult.COLUMN_COMPANY_TIMESTAMP, ScalarAttributeType.S))
                 .withAttributeDefinitions(new AttributeDefinition(
-                        ToolCallResult.TIME_STAMP, ScalarAttributeType.S))
-                .withKeySchema(new KeySchemaElement(ToolCallResult.COLUMN_COMPANY_TOOL, KeyType.HASH), new KeySchemaElement(ToolCallResult.TIME_STAMP, KeyType.RANGE))
+                        ToolCallResult.COLUMN_TOOL, ScalarAttributeType.S))
+                .withKeySchema(new KeySchemaElement(ToolCallResult.COLUMN_COMPANY_TIMESTAMP, KeyType.HASH), new KeySchemaElement(ToolCallResult.COLUMN_TOOL, KeyType.RANGE))
                 .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
                 .withTableName(ToolCallResult.TABLE_NAME);
         db.createTable(request);
@@ -192,14 +192,25 @@ public class LocalDynamoDbServer {
         DynamoDBMapper mapper = db.getMapper();
         ToolCallResult query = new ToolCallResult();
         query.setCompany(company);
-        query.setTimeStamp(batchTimeStamp);
+        query.setTimestamp(batchTimeStamp);
         query.setTool(tool.getName());
-
         DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
                 .withHashKeyValues(query);
 
         return mapper.query(ToolCallResult.class, queryExpression);
     }
+
+    public List<ToolCallResult> getAllToolCallResult(final String company, final long batchTimeStamp) {
+        DynamoDBMapper mapper = db.getMapper();
+        ToolCallResult query = new ToolCallResult();
+        query.setCompany(company);
+        query.setTimestamp(batchTimeStamp);
+        DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
+                .withHashKeyValues(query);
+
+        return mapper.query(ToolCallResult.class, queryExpression);
+    }
+
 
     public List<ToolCallResult> getAllToolCallResult() {
         DynamoDBMapper mapper = db.getMapper();

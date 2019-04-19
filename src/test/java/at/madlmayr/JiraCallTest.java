@@ -127,9 +127,9 @@ public class JiraCallTest {
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
 
-        //List<ToolCallResult> resultList = localDynamoDbServer.getAllToolCallResult("gma", ToolEnum.JIRA, 1L);
-        //assertThat(resultList.size()).isEqualTo(1);
-        //assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(4197);
+        List<ToolCallResult> resultList = localDynamoDbServer.getAllToolCallResult("gma", ToolEnum.JIRA, 1L);
+        assertThat(resultList.size()).isEqualTo(1);
+        assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(4197);
 
 
         List<JiraSearchResultElement> itemList = localDynamoDbServer.getJiraUserListByCompanyToolTimestamp("gma#" + ToolEnum.JIRA.getName() + "#" + Utils.standardTimeFormat(1L));
