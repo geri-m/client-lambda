@@ -6,6 +6,7 @@ import at.madlmayr.jira.JiraSearchResultElement;
 import at.madlmayr.slack.SlackMember;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.local.main.ServerRunner;
 import com.amazonaws.services.dynamodbv2.local.server.DynamoDBProxyServer;
 import com.amazonaws.services.dynamodbv2.model.*;
@@ -198,6 +199,12 @@ public class LocalDynamoDbServer {
                 .withHashKeyValues(query);
 
         return mapper.query(ToolCallResult.class, queryExpression);
+    }
+
+    public List<ToolCallResult> getAllToolCallResult() {
+        DynamoDBMapper mapper = db.getMapper();
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+        return mapper.scan(ToolCallResult.class, scanExpression);
     }
 
 
