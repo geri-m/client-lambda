@@ -50,11 +50,13 @@ public class JiraCallTest {
         LOGGER.debug("Wiremock: {}", wireMockServer.port());
         LOGGER.debug("DynamoDB: {}", localDynamoDbServer.getPort());
         localDynamoDbServer.createAccountTable();
+        localDynamoDbServer.createCallResultTable();
     }
 
     @AfterAll
     public static void afterAll() {
         localDynamoDbServer.deleteAccountTable();
+        localDynamoDbServer.deleteCallResultTable();
         localDynamoDbServer.stop();
         wireMockServer.stop();
     }
@@ -119,14 +121,16 @@ public class JiraCallTest {
             memberIds.add(m.getKey());
         }
 
-        ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.JIRA.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/rest/api/2/user/search"}, 1L);
+        ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.JIRA.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/rest/api/2/user/search"}, 1L, 1);
         RequestStreamHandler call = new JiraV2Call(localDynamoDbServer.getPort());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
 
-        ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
-        assertThat(resultFromCall.getAmountOfUsers()).isEqualTo(4197);
+        List<ToolCallResult> resultList = localDynamoDbServer.getAllToolCallResult("gma", ToolEnum.JIRA, 1L);
+        assertThat(resultList.size()).isEqualTo(1);
+        assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(4197);
+
 
         List<JiraSearchResultElement> itemList = localDynamoDbServer.getJiraUserListByCompanyToolTimestamp("gma#" + ToolEnum.JIRA.getName() + "#" + Utils.standardTimeFormat(1L));
 

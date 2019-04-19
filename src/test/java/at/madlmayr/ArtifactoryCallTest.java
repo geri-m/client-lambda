@@ -54,11 +54,13 @@ public class ArtifactoryCallTest {
         LOGGER.debug("Wiremock: {}", wireMockServer.port());
         LOGGER.debug("DynamoDB: {}", localDynamoDbServer.getPort());
         localDynamoDbServer.createAccountTable();
+        localDynamoDbServer.createCallResultTable();
     }
 
     @AfterAll
     public static void afterAll() {
         localDynamoDbServer.deleteAccountTable();
+        localDynamoDbServer.deleteCallResultTable();
         localDynamoDbServer.stop();
         wireMockServer.stop();
     }
@@ -105,14 +107,15 @@ public class ArtifactoryCallTest {
             memberIds.add(user.getUser().getName());
         }
 
-        ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.ARTIFACTORY.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L);
+        ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.ARTIFACTORY.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L, 1);
         RequestStreamHandler call = new ArtifactoryCall(localDynamoDbServer.getPort());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
 
-        ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
-        assertThat(resultFromCall.getAmountOfUsers()).isEqualTo(103);
+        List<ToolCallResult> resultList = localDynamoDbServer.getAllToolCallResult("gma", ToolEnum.ARTIFACTORY, 1L);
+        assertThat(resultList.size()).isEqualTo(1);
+        assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(103);
 
         List<ArtifactoryUser> artifactoryUserList = localDynamoDbServer.getArtifactoryUserListByCompanyToolTimestamp("gma#" + ToolEnum.ARTIFACTORY.getName() + "#" + Utils.standardTimeFormat(1L));
 

@@ -1,15 +1,11 @@
 package at.madlmayr.tools;
 
-import at.madlmayr.Account;
-import at.madlmayr.DynamoFactory;
-import at.madlmayr.ToolCallRequest;
-import at.madlmayr.ToolCallResult;
+import at.madlmayr.*;
 import at.madlmayr.artifactory.ArtifactoryUser;
 import at.madlmayr.jira.JiraSearchResultElement;
 import at.madlmayr.slack.SlackMember;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.local.main.ServerRunner;
 import com.amazonaws.services.dynamodbv2.local.server.DynamoDBProxyServer;
 import com.amazonaws.services.dynamodbv2.model.*;
@@ -190,8 +186,18 @@ public class LocalDynamoDbServer {
         return mapper.query(ToolCallRequest.class, queryExpression);
     }
 
-    public List<ToolCallResult> getAllToolCallResult() {
-        return db.getMapper().scan(ToolCallResult.class, new DynamoDBScanExpression());
+
+    public List<ToolCallResult> getAllToolCallResult(final String company, final ToolEnum tool, final long batchTimeStamp) {
+        DynamoDBMapper mapper = db.getMapper();
+        ToolCallResult query = new ToolCallResult();
+        query.setCompany(company);
+        query.setTimeStamp(batchTimeStamp);
+        query.setTool(tool.getName());
+
+        DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
+                .withHashKeyValues(query);
+
+        return mapper.query(ToolCallResult.class, queryExpression);
     }
 
 

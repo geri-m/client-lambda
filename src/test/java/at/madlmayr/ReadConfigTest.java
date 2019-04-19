@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class ReadConfigTest {
@@ -47,9 +46,9 @@ public class ReadConfigTest {
 
     private static void insertData() {
         List<ToolCallRequest> callList = new ArrayList<>();
-        callList.add(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.SLACK.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L));
-        callList.add(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.ARTIFACTORY.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L));
-        callList.add(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.JIRA.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/rest/api/2/user/search"}, 1L));
+        callList.add(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.SLACK.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L, 1));
+        callList.add(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.ARTIFACTORY.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L, 1));
+        callList.add(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.JIRA.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/rest/api/2/user/search"}, 1L, 1));
         localDynamoDbServer.insertConfig(callList);
     }
 
@@ -67,14 +66,6 @@ public class ReadConfigTest {
     public void userListTest() throws Exception {
         RequestStreamHandler call = new ReadConfig(localDynamoDbServer.getPort(), new AWSLambdaAsyncMock(localDynamoDbServer.getPort()));
         call.handleRequest(null, null, null);
-        List<ToolCallResult> res = localDynamoDbServer.getAllToolCallResult();
-
-        for (ToolCallResult result : res) {
-            LOGGER.info("Result: {}", result.getTool());
-        }
-
-        // we fire 3 Call, as we expect 3 results in the table.
-        assertThat(res.size()).isEqualTo(3);
 
     }
 }

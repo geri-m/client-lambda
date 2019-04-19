@@ -59,8 +59,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             LOGGER.info("End writing to db");
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp());
-            outputStream.write(objectMapper.writeValueAsString(result).getBytes());
-
+            db.writeCallResult(result);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);

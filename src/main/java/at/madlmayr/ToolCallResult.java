@@ -96,4 +96,11 @@ public class ToolCallResult implements Serializable {
         }
     }
 
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public void setTool(String tool) {
+        this.tool = tool;
+    }
 }

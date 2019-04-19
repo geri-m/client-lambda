@@ -23,7 +23,7 @@ public class ToolCallRequestTest {
         dataFromDynamo.put("url", new AttributeValue("https://www.madlmayr.at"));
         dataFromDynamo.put("tool", new AttributeValue("slack"));
 
-        ToolCallRequest config = new ToolCallRequest(dataFromDynamo, 1234);
+        ToolCallRequest config = new ToolCallRequest(dataFromDynamo, 1234, 1);
 
         assertThat(config.getBearer().equals("some bearer"));
         assertThat(config.getUrl().equals("https://www.madlmayr.at"));
@@ -57,7 +57,7 @@ public class ToolCallRequestTest {
         dataFromDynamo.put("tool", new AttributeValue("slack"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
-                        () -> new ToolCallRequest(dataFromDynamo, 1234),
+                        () -> new ToolCallRequest(dataFromDynamo, 1234, 1),
                         "Company not present in Record");
 
         assertTrue(thrown.getMessage().contains("Company not present in Record"));
@@ -71,7 +71,7 @@ public class ToolCallRequestTest {
         dataFromDynamo.put("tool", new AttributeValue("slack"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
-                        () -> new ToolCallRequest(dataFromDynamo, 1234),
+                        () -> new ToolCallRequest(dataFromDynamo, 1234, 1),
                         "Bearer not present in Record");
 
         assertTrue(thrown.getMessage().contains("Bearer not present in Record"));
@@ -85,7 +85,7 @@ public class ToolCallRequestTest {
         dataFromDynamo.put("tool", new AttributeValue("slack"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
-                        () -> new ToolCallRequest(dataFromDynamo, 1234),
+                        () -> new ToolCallRequest(dataFromDynamo, 1234, 1),
                         "URL not present in Record");
 
         assertTrue(thrown.getMessage().contains("URL not present in Record"));
@@ -99,7 +99,7 @@ public class ToolCallRequestTest {
         dataFromDynamo.put("url", new AttributeValue("https://www.madlmayr.at"));
         ToolCallException thrown =
                 assertThrows(ToolCallException.class,
-                        () -> new ToolCallRequest(dataFromDynamo, 1234),
+                        () -> new ToolCallRequest(dataFromDynamo, 1234, 1),
                         "Tool not present in Record");
 
         assertTrue(thrown.getMessage().contains("Tool not present in Record"));

@@ -50,11 +50,13 @@ public class SlackCallTest {
         LOGGER.debug("Wiremock: {}", wireMockServer.port());
         LOGGER.debug("DynamoDB: {}", localDynamoDbServer.getPort());
         localDynamoDbServer.createAccountTable();
+        localDynamoDbServer.createCallResultTable();
     }
 
     @AfterAll
     public static void afterAll() {
         localDynamoDbServer.deleteAccountTable();
+        localDynamoDbServer.deleteCallResultTable();
         localDynamoDbServer.stop();
         wireMockServer.stop();
     }
@@ -86,14 +88,15 @@ public class SlackCallTest {
             memberIds.add(m.getId());
         }
 
-        ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.SLACK.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L);
+        ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.SLACK.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L, 1);
         RequestStreamHandler call = new SlackCall(localDynamoDbServer.getPort());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
 
-        ToolCallResult resultFromCall = mapper.readValue(outputStream.toString(), ToolCallResult.class);
-        assertThat(resultFromCall.getAmountOfUsers()).isEqualTo(163);
+        List<ToolCallResult> resultList = localDynamoDbServer.getAllToolCallResult("gma", ToolEnum.SLACK, 1L);
+        assertThat(resultList.size()).isEqualTo(1);
+        assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(163);
 
         List<SlackMember> itemList = localDynamoDbServer.getSlackMemberListByCompanyToolTimestamp("gma#" + ToolEnum.SLACK.getName() + "#" + Utils.standardTimeFormat(1L));
 

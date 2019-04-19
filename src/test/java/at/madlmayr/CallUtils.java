@@ -24,7 +24,8 @@ public class CallUtils {
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(COMMA_DELIMITER);
                 if (values.length == 4) {
-                    ToolCallRequest config = new ToolCallRequest(values, new Date().getTime());
+                    // TODO We read the CVS File and assume that there are 4 Lines.
+                    ToolCallRequest config = new ToolCallRequest(values, new Date().getTime(), 4);
                     records.add(config);
                 } else {
                     throw new IOException(String.format("Line '%s' does not have four elements", line));
