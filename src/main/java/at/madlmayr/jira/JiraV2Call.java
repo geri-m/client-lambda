@@ -81,7 +81,6 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             } else {
                 LOGGER.info("Still waiting for other Jobs");
             }
-            outputStream.write(objectMapper.writeValueAsString(result).getBytes());
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);

@@ -25,8 +25,6 @@ public class ToolCallResult implements Serializable {
 
     private int numberOfToolsPerCompany;
 
-    private int numberOfToolsPerCompanyProcessed;
-
     public ToolCallResult() {
     }
 
@@ -38,22 +36,12 @@ public class ToolCallResult implements Serializable {
         this.numberOfToolsPerCompany = numberOfToolsPerCompany;
     }
 
-    @DynamoDBIgnore
     public int getNumberOfToolsPerCompany() {
         return numberOfToolsPerCompany;
     }
 
     public void setNumberOfToolsPerCompany(int numberOfToolsPerCompany) {
         this.numberOfToolsPerCompany = numberOfToolsPerCompany;
-    }
-
-    @DynamoDBIgnore
-    public int getNumberOfToolsPerCompanyProcessed() {
-        return numberOfToolsPerCompanyProcessed;
-    }
-
-    public void setNumberOfToolsPerCompanyProcessed(int numberOfToolsPerCompanyProcessed) {
-        this.numberOfToolsPerCompanyProcessed = numberOfToolsPerCompanyProcessed;
     }
 
     @DynamoDBIgnore
