@@ -4,7 +4,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.AWSLambdaAsync;
 import com.amazonaws.services.lambda.AWSLambdaAsyncClientBuilder;
 import com.amazonaws.services.lambda.model.InvokeRequest;
-import com.amazonaws.services.lambda.model.InvokeResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.xray.AWSXRay;
@@ -15,9 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Future;
 
 
 public class ReadConfig implements RequestStreamHandler {
@@ -41,7 +38,6 @@ public class ReadConfig implements RequestStreamHandler {
 
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
-        List<Future<InvokeResult>> futures = new ArrayList<>();
         long batchTimeStamp = System.currentTimeMillis();
         List<ToolCallRequest> requests = db.getAllToolCallRequest();
         for (ToolCallRequest toolCallRequest : requests) {
@@ -53,7 +49,7 @@ public class ReadConfig implements RequestStreamHandler {
                     InvokeRequest req = new InvokeRequest()
                             .withFunctionName(ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getFunctionName())
                             .withPayload(objectMapper.writeValueAsString(toolCallRequest));
-                    futures.add(lambda.invokeAsync(req));
+                    lambda.invokeAsync(req);
                 } catch (Exception e) {
                     LOGGER.error(e);
                     AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
