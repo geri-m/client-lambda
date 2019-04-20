@@ -201,14 +201,7 @@ public class LocalDynamoDbServer {
     }
 
     public List<ToolCallResult> getAllToolCallResult(final String company, final long batchTimeStamp) {
-        DynamoDBMapper mapper = db.getMapper();
-        ToolCallResult query = new ToolCallResult();
-        query.setCompany(company);
-        query.setTimestamp(batchTimeStamp);
-        DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
-                .withHashKeyValues(query);
-
-        return mapper.query(ToolCallResult.class, queryExpression);
+        return db.getAllToolCallResult(company, batchTimeStamp);
     }
 
 

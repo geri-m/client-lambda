@@ -49,6 +49,7 @@ public class ReadConfig implements RequestStreamHandler {
                     InvokeRequest req = new InvokeRequest()
                             .withFunctionName(ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getFunctionName())
                             .withPayload(objectMapper.writeValueAsString(toolCallRequest));
+                    // Fire and Forget
                     lambda.invokeAsync(req);
                 } catch (Exception e) {
                     LOGGER.error(e);

@@ -75,6 +75,13 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp());
             db.writeCallResult(result);
+
+            if (db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size() == toolCallRequest.getBatchSize()) {
+                LOGGER.info("All calls done");
+            } else {
+                LOGGER.info("Still waiting for other Jobs");
+            }
+
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);

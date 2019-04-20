@@ -72,8 +72,18 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             db.writeArtifactoryMembersBatch(userArrayDetails);
             LOGGER.info("End writing to db");
 
+
+            // Synchronizing the different Lambda Jobs
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length(), toolCallRequest.getTimestamp());
             db.writeCallResult(result);
+
+
+            if (db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size() == toolCallRequest.getBatchSize()) {
+                LOGGER.info("All calls done");
+            } else {
+                LOGGER.info("Still waiting for other Jobs");
+            }
+
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);

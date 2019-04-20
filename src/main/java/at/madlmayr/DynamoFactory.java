@@ -8,6 +8,8 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
@@ -72,6 +74,22 @@ public class DynamoFactory {
             return mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
         }
 
+        public List<ToolCallResult> getAllToolCallResult(final String company, final long batchTimeStamp) {
+            DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder()
+                    .withConsistentReads(DynamoDBMapperConfig.ConsistentReads.CONSISTENT)
+                    .withPaginationLoadingStrategy(DynamoDBMapperConfig.PaginationLoadingStrategy.EAGER_LOADING)
+                    .build();
+
+            // we create a dedicated mapper, as we need consistent reads.
+            DynamoDBMapper mapper = new DynamoDBMapper(db, mapperConfig);
+            ToolCallResult query = new ToolCallResult();
+            query.setCompany(company);
+            query.setTimestamp(batchTimeStamp);
+            DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
+                    .withHashKeyValues(query);
+
+            return mapper.query(ToolCallResult.class, queryExpression);
+        }
 
         public CreateTableResult createTable(CreateTableRequest request) {
             return db.createTable(request);
