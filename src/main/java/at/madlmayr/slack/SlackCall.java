@@ -58,15 +58,16 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             db.writeSlackMembersBatch(userList);
             LOGGER.info("End writing to db");
 
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp());
+            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
             db.writeCallResult(result);
 
-            if (db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size() == toolCallRequest.getBatchSize()) {
+            if (db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size() == toolCallRequest.getNumberOfToolsPerCompany()) {
                 LOGGER.info("All calls done");
             } else {
                 LOGGER.info("Still waiting for other Jobs");
             }
 
+            outputStream.write(objectMapper.writeValueAsString(result).getBytes());
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);

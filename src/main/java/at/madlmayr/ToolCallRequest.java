@@ -2,7 +2,6 @@ package at.madlmayr;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -16,34 +15,25 @@ public class ToolCallRequest implements Serializable {
     public static final String COLUMN_TOOL = "tool";
     private static final String COLUMN_BEARER = "bearer";
     private static final String COLUMN_URL = "url";
-    private static final String TIME_STAMP = "timestamp";
-    public static final String COLUMN_BATCH_SIZE = "batchSize";
-
     private static final int AMOUNT_OF_PARAMETER = 4;
 
-    @JsonProperty(COLUMN_COMPANY)
     private String company;
 
-    @JsonProperty(COLUMN_BATCH_SIZE)
-    private int batchSize;
+    private int numberOfToolsPerCompany;
 
-    @JsonProperty(COLUMN_TOOL)
     private String tool;
 
-    @JsonProperty(COLUMN_BEARER)
     private String bearer;
 
-    @JsonProperty(COLUMN_URL)
     private String url;
 
-    @JsonProperty(TIME_STAMP)
     private long timestamp;
 
     // Required for Jackson to create an Object.
     public ToolCallRequest() {
     }
 
-    public ToolCallRequest(final String[] values, final long timestamp, final int batchSize) throws ToolCallException {
+    public ToolCallRequest(final String[] values, final long timestamp, final int numberOfToolsPerCompany) throws ToolCallException {
         if (values.length != AMOUNT_OF_PARAMETER) {
             throw new IllegalArgumentException(String.format("Incorrect Length of Parameter to create ToolCallRequest. Required %s, given '%s'", AMOUNT_OF_PARAMETER, values.length));
         }
@@ -53,12 +43,12 @@ public class ToolCallRequest implements Serializable {
         dataFromDynamo.put(COLUMN_TOOL, new AttributeValue(values[1].trim()));
         dataFromDynamo.put(COLUMN_BEARER, new AttributeValue(values[2].trim()));
         dataFromDynamo.put(COLUMN_URL, new AttributeValue(values[3].trim()));
-        assignLocalVales(dataFromDynamo, timestamp, batchSize);
+        assignLocalVales(dataFromDynamo, timestamp, numberOfToolsPerCompany);
     }
 
 
-    public ToolCallRequest(Map<String, AttributeValue> dataFromDynamo, final long timestamp, final int batchSize) throws ToolCallException {
-        assignLocalVales(dataFromDynamo, timestamp, batchSize);
+    public ToolCallRequest(Map<String, AttributeValue> dataFromDynamo, final long timestamp, final int numberOfToolsPerCompany) throws ToolCallException {
+        assignLocalVales(dataFromDynamo, timestamp, numberOfToolsPerCompany);
     }
 
     private void assignLocalVales(Map<String, AttributeValue> dataFromDynamo, final long timestamp, final int batchSize) {
@@ -83,7 +73,7 @@ public class ToolCallRequest implements Serializable {
         this.company = dataFromDynamo.get(COLUMN_COMPANY).getS();
         this.tool = dataFromDynamo.get(COLUMN_TOOL).getS();
         this.timestamp = timestamp;
-        this.batchSize = batchSize;
+        this.numberOfToolsPerCompany = batchSize;
     }
 
     public void setTimestamp(long timestamp) {
@@ -105,12 +95,12 @@ public class ToolCallRequest implements Serializable {
     }
 
     @DynamoDBIgnore
-    public int getBatchSize() {
-        return batchSize;
+    public int getNumberOfToolsPerCompany() {
+        return numberOfToolsPerCompany;
     }
 
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
+    public void setNumberOfToolsPerCompany(int numberOfToolsPerCompany) {
+        this.numberOfToolsPerCompany = numberOfToolsPerCompany;
     }
 
     public void setUrl(String url) {

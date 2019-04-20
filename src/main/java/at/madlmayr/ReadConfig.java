@@ -44,7 +44,7 @@ public class ReadConfig implements RequestStreamHandler {
                 try {
                     // a batch has size and amount of elements in the batch
                     toolCallRequest.setTimestamp(batchTimeStamp);
-                    toolCallRequest.setBatchSize(requests.size());
+                    toolCallRequest.setNumberOfToolsPerCompany(requests.size());
                     LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getName());
                     InvokeRequest req = new InvokeRequest()
                             .withFunctionName(ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getFunctionName())

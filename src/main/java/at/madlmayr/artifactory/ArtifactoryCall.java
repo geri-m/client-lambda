@@ -74,15 +74,18 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
 
             // Synchronizing the different Lambda Jobs
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length(), toolCallRequest.getTimestamp());
+            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
             db.writeCallResult(result);
 
 
-            if (db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size() == toolCallRequest.getBatchSize()) {
+            int amountOfCallsFinished = db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size();
+            if (amountOfCallsFinished == toolCallRequest.getNumberOfToolsPerCompany()) {
                 LOGGER.info("All calls done");
             } else {
                 LOGGER.info("Still waiting for other Jobs");
             }
+            result.setNumberOfToolsPerCompanyProcessed(amountOfCallsFinished);
+            outputStream.write(objectMapper.writeValueAsString(result).getBytes());
 
         } catch (IOException e) {
             LOGGER.error(e.getMessage());

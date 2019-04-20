@@ -23,14 +23,37 @@ public class ToolCallResult implements Serializable {
 
     private long timestamp;
 
+    private int numberOfToolsPerCompany;
+
+    private int numberOfToolsPerCompanyProcessed;
+
     public ToolCallResult() {
     }
 
-    public ToolCallResult(String company, String tool, int amountOfUsers, long timestamp) {
+    public ToolCallResult(String company, String tool, int amountOfUsers, long timestamp, int numberOfToolsPerCompany) {
         this.company = company;
         this.tool = tool;
         this.amountOfUsers = amountOfUsers;
         this.timestamp = timestamp;
+        this.numberOfToolsPerCompany = numberOfToolsPerCompany;
+    }
+
+    @DynamoDBIgnore
+    public int getNumberOfToolsPerCompany() {
+        return numberOfToolsPerCompany;
+    }
+
+    public void setNumberOfToolsPerCompany(int numberOfToolsPerCompany) {
+        this.numberOfToolsPerCompany = numberOfToolsPerCompany;
+    }
+
+    @DynamoDBIgnore
+    public int getNumberOfToolsPerCompanyProcessed() {
+        return numberOfToolsPerCompanyProcessed;
+    }
+
+    public void setNumberOfToolsPerCompanyProcessed(int numberOfToolsPerCompanyProcessed) {
+        this.numberOfToolsPerCompanyProcessed = numberOfToolsPerCompanyProcessed;
     }
 
     @DynamoDBIgnore
