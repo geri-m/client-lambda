@@ -60,6 +60,11 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
             db.writeCallResult(result);
+            LOGGER.info("current result {}", result.getKey());
+
+            // also write the same element with Timestamp 0 into the DB, to indicate, this is the latest one.
+            result.setTimestamp(0L);
+            db.writeCallResult(result);
 
             if (db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size() == toolCallRequest.getNumberOfToolsPerCompany()) {
                 LOGGER.info("All calls done");

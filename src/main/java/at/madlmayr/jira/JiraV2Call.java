@@ -73,7 +73,13 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             db.writeJiraMembersBatch(userArrayDetails);
             LOGGER.info("End writing to db");
 
+            // Synchronizing the different Lambda Jobs
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
+            db.writeCallResult(result);
+            LOGGER.info("current result {}", result.getKey());
+
+            // also write the same element with Timestamp 0 into the DB, to indicate, this is the latest one.
+            result.setTimestamp(0L);
             db.writeCallResult(result);
 
             if (db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size() == toolCallRequest.getNumberOfToolsPerCompany()) {

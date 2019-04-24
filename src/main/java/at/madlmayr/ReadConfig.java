@@ -38,6 +38,8 @@ public class ReadConfig implements RequestStreamHandler {
 
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
+
+        // this timestamp identifies all calls of company that go together
         long batchTimeStamp = System.currentTimeMillis();
         List<ToolCallRequest> requests = db.getAllToolCallRequest();
         for (ToolCallRequest toolCallRequest : requests) {

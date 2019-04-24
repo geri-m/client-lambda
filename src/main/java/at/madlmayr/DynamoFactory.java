@@ -74,6 +74,17 @@ public class DynamoFactory {
             return mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
         }
 
+        public ToolCallResult getLatestCallResultFor(final String company) {
+            ToolCallResult query = new ToolCallResult();
+            query.setCompany(company);
+            query.setTimestamp(0L);
+            DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
+                    .withHashKeyValues(query);
+
+            return mapper.query(ToolCallResult.class, queryExpression).get(0);
+        }
+
+
         public List<ToolCallResult> getAllToolCallResult(final String company, final long batchTimeStamp) {
             DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder()
                     .withConsistentReads(DynamoDBMapperConfig.ConsistentReads.CONSISTENT)
