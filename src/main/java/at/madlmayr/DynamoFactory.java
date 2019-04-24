@@ -10,7 +10,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
 import com.amazonaws.services.dynamodbv2.model.DeleteTableRequest;
@@ -71,7 +70,8 @@ public class DynamoFactory {
         }
 
         public List<ToolCallRequest> getAllToolCallRequest() {
-            return mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
+            return new ArrayList<>();
+            // return mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
         }
 
         public ToolCallResult getLatestCallResultFor(final String company) {
@@ -81,7 +81,8 @@ public class DynamoFactory {
             DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
                     .withHashKeyValues(query);
 
-            return mapper.query(ToolCallResult.class, queryExpression).get(0);
+            return null;
+            // return mapper.query(ToolCallResult.class, queryExpression).get(0);
         }
 
 
@@ -99,7 +100,8 @@ public class DynamoFactory {
             DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
                     .withHashKeyValues(query);
 
-            return mapper.query(ToolCallResult.class, queryExpression);
+            return new ArrayList<>();
+            // return mapper.query(ToolCallResult.class, queryExpression);
         }
 
         public CreateTableResult createTable(CreateTableRequest request) {
