@@ -17,7 +17,7 @@ public class ToolCallResult implements Serializable {
 
     public static final String TABLE_NAME = "Results";
     public static final String COLUMN_COMPANY_TOOL = "companyTool";
-    public static final String COLUMN_TIMESTAMP = "timestamp";
+    public static final String COLUMN_TIMESTAMP = "ts";
 
     private String company;
 

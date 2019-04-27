@@ -99,7 +99,7 @@ public class SlackCallTest {
         assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(163);
         assertThat(resultList.get(1).getAmountOfUsers()).isEqualTo(163);
 
-        List<ToolCallResult> resultListLatest = localDynamoDbServer.getLatestToolCallResult("gma", ToolEnum.SLACK, 1L);
+        List<ToolCallResult> resultListLatest = localDynamoDbServer.getLatestToolCallResult("gma", ToolEnum.SLACK);
         assertThat(resultListLatest.size()).isEqualTo(1);
         assertThat(resultListLatest.get(0).getAmountOfUsers()).isEqualTo(163);
         assertThat(resultListLatest.get(0).getTimestampFormatted()).isEqualTo("1970-01-01T00:00:00.000Z");

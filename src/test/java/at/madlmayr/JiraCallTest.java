@@ -132,7 +132,7 @@ public class JiraCallTest {
         assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(4197);
         assertThat(resultList.get(1).getAmountOfUsers()).isEqualTo(4197);
 
-        List<ToolCallResult> resultListLatest = localDynamoDbServer.getLatestToolCallResult("gma", ToolEnum.JIRA, 1L);
+        List<ToolCallResult> resultListLatest = localDynamoDbServer.getLatestToolCallResult("gma", ToolEnum.JIRA);
         assertThat(resultListLatest.size()).isEqualTo(1);
         assertThat(resultListLatest.get(0).getAmountOfUsers()).isEqualTo(4197);
         assertThat(resultListLatest.get(0).getTimestampFormatted()).isEqualTo("1970-01-01T00:00:00.000Z");

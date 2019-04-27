@@ -15,9 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Starts up a DynamoDB server using the command line launcher and returns an AmazonDynamoDB client that
@@ -202,19 +200,20 @@ public class LocalDynamoDbServer {
         return mapper.query(ToolCallResult.class, queryExpression);
     }
 
-    public List<ToolCallResult> getLatestToolCallResult(final String company, final ToolEnum tool, final long batchTimeStamp) {
+    public List<ToolCallResult> getLatestToolCallResult(final String company, final ToolEnum tool) {
         DynamoDBMapper mapper = db.getMapper();
         ToolCallResult query = new ToolCallResult();
         query.setCompany(company);
-        query.setTimestamp(batchTimeStamp);
         query.setTool(tool.getName());
 
-        Map<String, AttributeValue> eav = new HashMap<>();
-        eav.put(":timestamp", new AttributeValue().withN("1970-01-01T00:00:00.000Z"));
-
-
         DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
-                .withHashKeyValues(query).withFilterExpression("timestamp = :timestamp").withExpressionAttributeValues(eav);
+                .withHashKeyValues(query).withRangeKeyCondition("ts", new Condition()
+                        .withComparisonOperator(ComparisonOperator.EQ)
+                        .withAttributeValueList(
+                                new AttributeValue().withS(
+                                        "1970-01-01T00:00:00.000Z")
+                        )
+                );
 
         return mapper.query(ToolCallResult.class, queryExpression);
     }

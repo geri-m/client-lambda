@@ -118,7 +118,7 @@ public class ArtifactoryCallTest {
         assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(103);
         assertThat(resultList.get(1).getAmountOfUsers()).isEqualTo(103);
 
-        List<ToolCallResult> resultListLatest = localDynamoDbServer.getLatestToolCallResult("gma", ToolEnum.ARTIFACTORY, 1L);
+        List<ToolCallResult> resultListLatest = localDynamoDbServer.getLatestToolCallResult("gma", ToolEnum.ARTIFACTORY);
         assertThat(resultListLatest.size()).isEqualTo(1);
         assertThat(resultListLatest.get(0).getAmountOfUsers()).isEqualTo(103);
         assertThat(resultListLatest.get(0).getTimestampFormatted()).isEqualTo("1970-01-01T00:00:00.000Z");
