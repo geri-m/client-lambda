@@ -55,11 +55,11 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
 
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
-        ToolCallRequest toolCallRequest;
+        ToolCallConfig toolCallRequest;
         try {
             // Handling De-Serialization myself
             // https://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-req-resp.html
-            toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
+            toolCallRequest = objectMapper.readValue(inputStream, ToolCallConfig.class);
             JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
 
             List<JiraSearchResultElement> userArrayDetails = objectMapper.readValue(users.toString(), new TypeReference<List<JiraSearchResultElement>>() {

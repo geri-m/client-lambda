@@ -107,15 +107,21 @@ public class ArtifactoryCallTest {
             memberIds.add(user.getUser().getName());
         }
 
-        ToolCallRequest slack = new ToolCallRequest(new String[]{"gma", ToolEnum.ARTIFACTORY.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L, 1);
+        ToolCallConfig slack = new ToolCallConfig(new String[]{"gma", ToolEnum.ARTIFACTORY.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L, 1);
         RequestStreamHandler call = new ArtifactoryCall(localDynamoDbServer.getPort());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
 
         List<ToolCallResult> resultList = localDynamoDbServer.getAllToolCallResult("gma", ToolEnum.ARTIFACTORY, 1L);
-        assertThat(resultList.size()).isEqualTo(1);
+        assertThat(resultList.size()).isEqualTo(2);
         assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(103);
+        assertThat(resultList.get(1).getAmountOfUsers()).isEqualTo(103);
+
+        List<ToolCallResult> resultListLatest = localDynamoDbServer.getLatestToolCallResult("gma", ToolEnum.ARTIFACTORY, 1L);
+        assertThat(resultListLatest.size()).isEqualTo(1);
+        assertThat(resultListLatest.get(0).getAmountOfUsers()).isEqualTo(103);
+        assertThat(resultListLatest.get(0).getTimestampFormatted()).isEqualTo("1970-01-01T00:00:00.000Z");
 
         List<ArtifactoryUser> artifactoryUserList = localDynamoDbServer.getArtifactoryUserListByCompanyToolTimestamp("gma#" + ToolEnum.ARTIFACTORY.getName() + "#1970-01-01T00:00:00.001Z");
 

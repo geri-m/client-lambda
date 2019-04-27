@@ -1,6 +1,9 @@
 package at.madlmayr;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joda.time.DateTime;
@@ -12,8 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@DynamoDBTable(tableName = ToolCallRequest.TABLE_NAME)
-public class ToolCallRequest implements Serializable {
+@DynamoDBTable(tableName = ToolCallConfig.TABLE_NAME)
+public class ToolCallConfig implements Serializable {
     public static final String TABLE_NAME = "Config";
     public static final String COLUMN_COMPANY = "company";
     public static final String COLUMN_TOOL = "tool";
@@ -34,12 +37,12 @@ public class ToolCallRequest implements Serializable {
     private long timestamp;
 
     // Required for Jackson to create an Object.
-    public ToolCallRequest() {
+    public ToolCallConfig() {
     }
 
-    public ToolCallRequest(final String[] values, final long timestamp, final int numberOfToolsPerCompany) throws ToolCallException {
+    public ToolCallConfig(final String[] values, final long timestamp, final int numberOfToolsPerCompany) throws ToolCallException {
         if (values.length != AMOUNT_OF_PARAMETER) {
-            throw new IllegalArgumentException(String.format("Incorrect Length of Parameter to create ToolCallRequest. Required %s, given '%s'", AMOUNT_OF_PARAMETER, values.length));
+            throw new IllegalArgumentException(String.format("Incorrect Length of Parameter to create ToolCallConfig. Required %s, given '%s'", AMOUNT_OF_PARAMETER, values.length));
         }
 
         Map<String, AttributeValue> dataFromDynamo = new HashMap<>();
@@ -51,7 +54,7 @@ public class ToolCallRequest implements Serializable {
     }
 
 
-    public ToolCallRequest(Map<String, AttributeValue> dataFromDynamo, final long timestamp, final int numberOfToolsPerCompany) throws ToolCallException {
+    public ToolCallConfig(Map<String, AttributeValue> dataFromDynamo, final long timestamp, final int numberOfToolsPerCompany) throws ToolCallException {
         assignLocalVales(dataFromDynamo, timestamp, numberOfToolsPerCompany);
     }
 
@@ -93,7 +96,6 @@ public class ToolCallRequest implements Serializable {
         this.company = company;
     }
 
-    @DynamoDBAttribute
     public String getUrl() {
         return url;
     }
@@ -111,7 +113,6 @@ public class ToolCallRequest implements Serializable {
         this.url = url;
     }
 
-    @DynamoDBAttribute(attributeName = ToolCallRequest.COLUMN_BEARER)
     public String getBearer() {
         return bearer;
     }
@@ -120,7 +121,7 @@ public class ToolCallRequest implements Serializable {
         this.bearer = bearer;
     }
 
-    @DynamoDBRangeKey(attributeName = ToolCallRequest.COLUMN_TOOL)
+    @DynamoDBRangeKey(attributeName = ToolCallConfig.COLUMN_TOOL)
     public String getTool() {
         return tool;
     }

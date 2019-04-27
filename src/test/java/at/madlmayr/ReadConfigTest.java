@@ -46,10 +46,10 @@ public class ReadConfigTest {
     }
 
     private static void insertData() {
-        List<ToolCallRequest> callList = new ArrayList<>();
-        callList.add(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.SLACK.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L, 1));
-        callList.add(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.ARTIFACTORY.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L, 1));
-        callList.add(new ToolCallRequest(new String[]{FAKE_COMPANY_1, ToolEnum.JIRA.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/rest/api/2/user/search"}, 1L, 1));
+        List<ToolCallConfig> callList = new ArrayList<>();
+        callList.add(new ToolCallConfig(new String[]{FAKE_COMPANY_1, ToolEnum.SLACK.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L, 1));
+        callList.add(new ToolCallConfig(new String[]{FAKE_COMPANY_1, ToolEnum.ARTIFACTORY.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L, 1));
+        callList.add(new ToolCallConfig(new String[]{FAKE_COMPANY_1, ToolEnum.JIRA.getName(), "somekey", "http://localhost:" + wireMockServer.port() + "/rest/api/2/user/search"}, 1L, 1));
         localDynamoDbServer.insertConfig(callList);
     }
 

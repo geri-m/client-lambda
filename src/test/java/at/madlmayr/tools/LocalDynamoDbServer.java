@@ -15,7 +15,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Starts up a DynamoDB server using the command line launcher and returns an AmazonDynamoDB client that
@@ -115,10 +117,10 @@ public class LocalDynamoDbServer {
     public void createCallResultTable() {
         CreateTableRequest request = new CreateTableRequest()
                 .withAttributeDefinitions(new AttributeDefinition(
-                        ToolCallResult.COLUMN_COMPANY_TIMESTAMP, ScalarAttributeType.S))
+                        ToolCallResult.COLUMN_COMPANY_TOOL, ScalarAttributeType.S))
                 .withAttributeDefinitions(new AttributeDefinition(
-                        ToolCallResult.COLUMN_TOOL, ScalarAttributeType.S))
-                .withKeySchema(new KeySchemaElement(ToolCallResult.COLUMN_COMPANY_TIMESTAMP, KeyType.HASH), new KeySchemaElement(ToolCallResult.COLUMN_TOOL, KeyType.RANGE))
+                        ToolCallResult.COLUMN_TIMESTAMP, ScalarAttributeType.S))
+                .withKeySchema(new KeySchemaElement(ToolCallResult.COLUMN_COMPANY_TOOL, KeyType.HASH), new KeySchemaElement(ToolCallResult.COLUMN_TIMESTAMP, KeyType.RANGE))
                 .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
                 .withTableName(ToolCallResult.TABLE_NAME);
         db.createTable(request);
@@ -127,18 +129,18 @@ public class LocalDynamoDbServer {
     public void createConfigTable() {
         CreateTableRequest request = new CreateTableRequest()
                 .withAttributeDefinitions(new AttributeDefinition(
-                        ToolCallRequest.COLUMN_COMPANY, ScalarAttributeType.S))
+                        ToolCallConfig.COLUMN_COMPANY, ScalarAttributeType.S))
                 .withAttributeDefinitions(new AttributeDefinition(
-                        ToolCallRequest.COLUMN_TOOL, ScalarAttributeType.S))
-                .withKeySchema(new KeySchemaElement(ToolCallRequest.COLUMN_COMPANY, KeyType.HASH), new KeySchemaElement(ToolCallRequest.COLUMN_TOOL, KeyType.RANGE))
+                        ToolCallConfig.COLUMN_TOOL, ScalarAttributeType.S))
+                .withKeySchema(new KeySchemaElement(ToolCallConfig.COLUMN_COMPANY, KeyType.HASH), new KeySchemaElement(ToolCallConfig.COLUMN_TOOL, KeyType.RANGE))
                 .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
-                .withTableName(ToolCallRequest.TABLE_NAME);
+                .withTableName(ToolCallConfig.TABLE_NAME);
         db.createTable(request);
     }
 
-    public void insertConfig(final List<ToolCallRequest> calls) {
+    public void insertConfig(final List<ToolCallConfig> calls) {
         DynamoDBMapper mapper = db.getMapper();
-        for (ToolCallRequest call : calls) {
+        for (ToolCallConfig call : calls) {
             mapper.save(call);
         }
     }
@@ -176,15 +178,15 @@ public class LocalDynamoDbServer {
         return mapper.query(JiraSearchResultElement.class, queryExpression);
     }
 
-    public List<ToolCallRequest> getToolCallRequests(final String companyTool) {
+    public List<ToolCallConfig> getToolCallRequests(final String companyTool) {
         DynamoDBMapper mapper = db.getMapper();
-        ToolCallRequest query = new ToolCallRequest();
+        ToolCallConfig query = new ToolCallConfig();
         query.setCompany(companyTool);
 
-        DynamoDBQueryExpression<ToolCallRequest> queryExpression = new DynamoDBQueryExpression<ToolCallRequest>()
+        DynamoDBQueryExpression<ToolCallConfig> queryExpression = new DynamoDBQueryExpression<ToolCallConfig>()
                 .withHashKeyValues(query);
 
-        return mapper.query(ToolCallRequest.class, queryExpression);
+        return mapper.query(ToolCallConfig.class, queryExpression);
     }
 
 
@@ -196,6 +198,23 @@ public class LocalDynamoDbServer {
         query.setTool(tool.getName());
         DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
                 .withHashKeyValues(query);
+
+        return mapper.query(ToolCallResult.class, queryExpression);
+    }
+
+    public List<ToolCallResult> getLatestToolCallResult(final String company, final ToolEnum tool, final long batchTimeStamp) {
+        DynamoDBMapper mapper = db.getMapper();
+        ToolCallResult query = new ToolCallResult();
+        query.setCompany(company);
+        query.setTimestamp(batchTimeStamp);
+        query.setTool(tool.getName());
+
+        Map<String, AttributeValue> eav = new HashMap<>();
+        eav.put(":timestamp", new AttributeValue().withN("1970-01-01T00:00:00.000Z"));
+
+
+        DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
+                .withHashKeyValues(query).withFilterExpression("timestamp = :timestamp").withExpressionAttributeValues(eav);
 
         return mapper.query(ToolCallResult.class, queryExpression);
     }
@@ -222,7 +241,7 @@ public class LocalDynamoDbServer {
 
     public void deleteConfigTable() {
         DeleteTableRequest r = new DeleteTableRequest();
-        r.setTableName(ToolCallRequest.TABLE_NAME);
+        r.setTableName(ToolCallConfig.TABLE_NAME);
         DeleteTableResult result = db.deleteTable(r);
         LOGGER.info("Table '{}' deleted", result.getTableDescription().getTableName());
     }

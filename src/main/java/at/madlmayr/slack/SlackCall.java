@@ -42,9 +42,9 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
 
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
-        ToolCallRequest toolCallRequest;
+        ToolCallConfig toolCallRequest;
         try {
-            toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
+            toolCallRequest = objectMapper.readValue(inputStream, ToolCallConfig.class);
 
             JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
             List<SlackMember> userList = objectMapper.readValue(users.toString(), new TypeReference<List<SlackMember>>() {
@@ -61,6 +61,10 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
             db.writeCallResult(result);
             LOGGER.info("current result {}, Users: {}", result.getKey(), result.getAmountOfUsers());
+
+            // also write the same element with Timestamp 0 into the DB, to indicate, this is the latest one.
+            result.setTimestamp(0L);
+            db.writeCallResult(result);
 
             List<ToolCallResult> unfinishedCalls = db.getAllToolCallResultUnfinished(toolCallRequest.getCompany(), toolCallRequest.getTimestamp());
             if (unfinishedCalls.isEmpty()) {

@@ -40,8 +40,8 @@ public class ReadConfig implements RequestStreamHandler {
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) {
         // this timestamp identifies all calls of company that go together
         long batchTimeStamp = System.currentTimeMillis();
-        List<ToolCallRequest> requests = db.getAllToolCallRequest();
-        for (ToolCallRequest toolCallRequest : requests) {
+        List<ToolCallConfig> requests = db.getAllToolCallRequest();
+        for (ToolCallConfig toolCallRequest : requests) {
                 try {
                     // a batch has size and amount of elements in the batch
                     toolCallRequest.setTimestamp(batchTimeStamp);

@@ -14,8 +14,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.handlers.TracingHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +32,6 @@ public class DynamoFactory {
 
     public static class DynamoAbstraction {
 
-        private static final Logger LOGGER = LogManager.getLogger(DynamoFactory.class);
         private final AmazonDynamoDB db;
         private final DynamoDBMapper mapper;
 
@@ -69,8 +66,8 @@ public class DynamoFactory {
             mapper.save(result);
         }
 
-        public List<ToolCallRequest> getAllToolCallRequest() {
-            return mapper.scan(ToolCallRequest.class, new DynamoDBScanExpression());
+        public List<ToolCallConfig> getAllToolCallRequest() {
+            return mapper.scan(ToolCallConfig.class, new DynamoDBScanExpression());
         }
 
         public ToolCallResult getLatestCallResultFor(final String company) {

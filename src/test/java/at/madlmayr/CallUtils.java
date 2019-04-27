@@ -17,15 +17,15 @@ public class CallUtils {
     private final static String COMMA_DELIMITER = ",";
     private static final Logger LOGGER = LogManager.getLogger(CallUtils.class);
 
-    public static List<ToolCallRequest> readToolConfigFromCVSFile() throws IOException {
-        List<ToolCallRequest> records = new ArrayList<>();
+    public static List<ToolCallConfig> readToolConfigFromCVSFile() throws IOException {
+        List<ToolCallConfig> records = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(CallUtils.class.getResourceAsStream("/" + CREDENTIAL_FILE)))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(COMMA_DELIMITER);
                 if (values.length == 4) {
                     // TODO We read the CVS File and assume that there are 4 Lines.
-                    ToolCallRequest config = new ToolCallRequest(values, new Date().getTime(), 4);
+                    ToolCallConfig config = new ToolCallConfig(values, new Date().getTime(), 4);
                     records.add(config);
                 } else {
                     throw new IOException(String.format("Line '%s' does not have four elements", line));

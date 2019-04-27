@@ -41,9 +41,9 @@ public class LambdaTest {
 
     @Test
     public void testSlackCall() throws IOException {
-        List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
-        ToolCallRequest slack = null;
-        for (ToolCallRequest config : configList) {
+        List<ToolCallConfig> configList = CallUtils.readToolConfigFromCVSFile();
+        ToolCallConfig slack = null;
+        for (ToolCallConfig config : configList) {
             if (config.getTool().equals(ToolEnum.SLACK.getName())) {
                 slack = config;
                 break;
@@ -61,9 +61,9 @@ public class LambdaTest {
 
     @Test
     public void testArtifactoryCall() throws IOException {
-        List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
-        ToolCallRequest artifactory = null;
-        for (ToolCallRequest config : configList) {
+        List<ToolCallConfig> configList = CallUtils.readToolConfigFromCVSFile();
+        ToolCallConfig artifactory = null;
+        for (ToolCallConfig config : configList) {
             if (config.getTool().equals(ToolEnum.ARTIFACTORY.getName())) {
                 artifactory = config;
                 break;
@@ -80,9 +80,9 @@ public class LambdaTest {
 
     @Test
     public void testArtifactoryTestDataCall() throws IOException {
-        List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
-        ToolCallRequest artifactory = null;
-        for (ToolCallRequest config : configList) {
+        List<ToolCallConfig> configList = CallUtils.readToolConfigFromCVSFile();
+        ToolCallConfig artifactory = null;
+        for (ToolCallConfig config : configList) {
             if (config.getTool().equals(ToolEnum.ARTIFACTORY.getName())) {
                 artifactory = config;
                 break;
@@ -128,9 +128,9 @@ public class LambdaTest {
 
     @Test
     public void testJiraCall() throws IOException {
-        List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
-        ToolCallRequest jira = null;
-        for (ToolCallRequest config : configList) {
+        List<ToolCallConfig> configList = CallUtils.readToolConfigFromCVSFile();
+        ToolCallConfig jira = null;
+        for (ToolCallConfig config : configList) {
             if (config.getTool().equals(ToolEnum.JIRA.getName())) {
                 jira = config;
                 break;
@@ -147,9 +147,9 @@ public class LambdaTest {
 
     @Test
     public void testJiraTestDataCall() throws Exception {
-        List<ToolCallRequest> configList = CallUtils.readToolConfigFromCVSFile();
-        ToolCallRequest jira = null;
-        for (ToolCallRequest config : configList) {
+        List<ToolCallConfig> configList = CallUtils.readToolConfigFromCVSFile();
+        ToolCallConfig jira = null;
+        for (ToolCallConfig config : configList) {
             if (config.getTool().equals(ToolEnum.JIRA.getName())) {
                 jira = config;
                 break;

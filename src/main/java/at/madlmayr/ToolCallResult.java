@@ -4,20 +4,20 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.Serializable;
 
-@DynamoDBTable(tableName = ToolCallResult.TABLE_NAME)
+import static at.madlmayr.ToolCallResult.TABLE_NAME;
+
+@DynamoDBTable(tableName = TABLE_NAME)
 public class ToolCallResult implements Serializable {
 
-    public static final String COLUMN_TOOL = "tool";
-    public static final String TABLE_NAME = "CallResults";
-    public static final String COLUMN_COMPANY_TIMESTAMP = "companyTimestamp";
-    public static final String TIME_STAMP = "timestamp";
+    public static final String TABLE_NAME = "Results";
+    public static final String COLUMN_COMPANY_TOOL = "companyTool";
+    public static final String COLUMN_TIMESTAMP = "timestamp";
 
     private String company;
 
@@ -48,12 +48,10 @@ public class ToolCallResult implements Serializable {
         this.numberOfToolsPerCompany = numberOfToolsPerCompany;
     }
 
-    @DynamoDBIgnore
     public String getCompany() {
         return company;
     }
 
-    @DynamoDBRangeKey(attributeName = ToolCallResult.COLUMN_TOOL)
     public String getTool() {
         return tool;
     }
@@ -66,6 +64,7 @@ public class ToolCallResult implements Serializable {
         this.amountOfUsers = amountOfUsers;
     }
 
+    @DynamoDBIgnore
     public long getTimestamp() {
         return timestamp;
     }
@@ -74,7 +73,7 @@ public class ToolCallResult implements Serializable {
         this.timestamp = timestamp;
     }
 
-    @JsonIgnore
+    @DynamoDBRangeKey(attributeName = ToolCallResult.COLUMN_TIMESTAMP)
     public String getTimestampFormatted() {
         return ISODateTimeFormat.dateTime().print(new DateTime(timestamp, DateTimeZone.UTC));
     }
@@ -83,9 +82,9 @@ public class ToolCallResult implements Serializable {
         timestamp = ISODateTimeFormat.dateTime().parseDateTime(input).getMillis();
     }
 
-    @DynamoDBHashKey(attributeName = ToolCallResult.COLUMN_COMPANY_TIMESTAMP)
+    @DynamoDBHashKey(attributeName = ToolCallResult.COLUMN_COMPANY_TOOL)
     public String getKey() {
-        return getCompany() + "#" + getTimestampFormatted();
+        return getCompany() + "#" + getTool();
     }
 
     public void setKey(final String key) {
@@ -100,7 +99,7 @@ public class ToolCallResult implements Serializable {
             throw new ToolCallException(String.format("Invalid Key '%s'.", key));
         } else {
             setCompany(segments[0]);
-            setTimestampFormatted(segments[1]);
+            setTool(segments[1]);
         }
     }
 
