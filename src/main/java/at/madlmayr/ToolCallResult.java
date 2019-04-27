@@ -4,6 +4,10 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.Serializable;
 
@@ -70,12 +74,13 @@ public class ToolCallResult implements Serializable {
         this.timestamp = timestamp;
     }
 
+    @JsonIgnore
     public String getTimestampFormatted() {
-        return Utils.standardTimeFormat(timestamp);
+        return ISODateTimeFormat.dateTime().print(new DateTime(timestamp, DateTimeZone.UTC));
     }
 
     public void setTimestampFormatted(final String input) {
-        timestamp = Utils.parseStandardTime(input);
+        timestamp = ISODateTimeFormat.dateTime().parseDateTime(input).getMillis();
     }
 
     @DynamoDBHashKey(attributeName = ToolCallResult.COLUMN_COMPANY_TIMESTAMP)

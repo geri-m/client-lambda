@@ -98,7 +98,7 @@ public class SlackCallTest {
         assertThat(resultList.size()).isEqualTo(1);
         assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(163);
 
-        List<SlackMember> itemList = localDynamoDbServer.getSlackMemberListByCompanyToolTimestamp("gma#" + ToolEnum.SLACK.getName() + "#" + Utils.standardTimeFormat(1L));
+        List<SlackMember> itemList = localDynamoDbServer.getSlackMemberListByCompanyToolTimestamp("gma#" + ToolEnum.SLACK.getName() + "#1970-01-01T00:00:00.001Z");
 
         for (SlackMember m : itemList) {
             assertThat(memberIds.contains(m.getId()));

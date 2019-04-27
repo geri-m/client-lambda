@@ -132,7 +132,7 @@ public class JiraCallTest {
         assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(4197);
 
 
-        List<JiraSearchResultElement> itemList = localDynamoDbServer.getJiraUserListByCompanyToolTimestamp("gma#" + ToolEnum.JIRA.getName() + "#" + Utils.standardTimeFormat(1L));
+        List<JiraSearchResultElement> itemList = localDynamoDbServer.getJiraUserListByCompanyToolTimestamp("gma#" + ToolEnum.JIRA.getName() + "#1970-01-01T00:00:00.001Z");
 
         for (JiraSearchResultElement m : itemList) {
             assertThat(memberIds.contains(m.getKey()));

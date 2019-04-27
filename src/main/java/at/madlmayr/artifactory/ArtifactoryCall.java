@@ -66,7 +66,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             LOGGER.info("Amount of Detailed Users: {} ", userArrayDetails.size());
 
             for (ArtifactoryUser user : userArrayDetails) {
-                user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
+                user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + toolCallRequest.getTimestampFormatted());
             }
             LOGGER.info("Start writing to db");
             db.writeArtifactoryMembersBatch(userArrayDetails);

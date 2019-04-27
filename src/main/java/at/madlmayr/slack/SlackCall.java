@@ -51,7 +51,7 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
             });
             LOGGER.info("Amount of Users: {} ", userList.size());
             for (SlackMember member : userList) {
-                member.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
+                member.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + toolCallRequest.getTimestampFormatted());
                 member.setId(member.getId());
             }
             LOGGER.info("Start writing to db");

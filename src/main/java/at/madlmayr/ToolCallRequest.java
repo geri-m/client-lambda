@@ -2,6 +2,10 @@ package at.madlmayr;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -80,7 +84,7 @@ public class ToolCallRequest implements Serializable {
         this.timestamp = timestamp;
     }
 
-    @DynamoDBHashKey(attributeName = ToolCallRequest.COLUMN_COMPANY)
+    @DynamoDBHashKey
     public String getCompany() {
         return company;
     }
@@ -89,7 +93,7 @@ public class ToolCallRequest implements Serializable {
         this.company = company;
     }
 
-    @DynamoDBAttribute(attributeName = ToolCallRequest.COLUMN_URL)
+    @DynamoDBAttribute
     public String getUrl() {
         return url;
     }
@@ -132,5 +136,11 @@ public class ToolCallRequest implements Serializable {
     @DynamoDBIgnore
     public long getTimestamp() {
         return timestamp;
+    }
+
+    @DynamoDBIgnore
+    @JsonIgnore
+    public String getTimestampFormatted() {
+        return ISODateTimeFormat.dateTime().print(new DateTime(timestamp, DateTimeZone.UTC));
     }
 }

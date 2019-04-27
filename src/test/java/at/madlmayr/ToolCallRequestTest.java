@@ -111,7 +111,7 @@ public class ToolCallRequestTest {
 
     @Test
     public void testJodaIsoDateParsing() {
-        long input = System.currentTimeMillis();
+        long input = 1; //System.currentTimeMillis();
 
         DateTime jodaTime = new DateTime(input,
                 DateTimeZone.UTC);

@@ -117,7 +117,7 @@ public class ArtifactoryCallTest {
         assertThat(resultList.size()).isEqualTo(1);
         assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(103);
 
-        List<ArtifactoryUser> artifactoryUserList = localDynamoDbServer.getArtifactoryUserListByCompanyToolTimestamp("gma#" + ToolEnum.ARTIFACTORY.getName() + "#" + Utils.standardTimeFormat(1L));
+        List<ArtifactoryUser> artifactoryUserList = localDynamoDbServer.getArtifactoryUserListByCompanyToolTimestamp("gma#" + ToolEnum.ARTIFACTORY.getName() + "#1970-01-01T00:00:00.001Z");
 
         for (ArtifactoryUser artifactoryUser : artifactoryUserList) {
             assertThat(memberIds.contains(artifactoryUser.getName()));

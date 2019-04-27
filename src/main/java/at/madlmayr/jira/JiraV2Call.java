@@ -67,7 +67,7 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             LOGGER.info("Amount of Users: {} ", userArrayDetails.size());
 
             for (JiraSearchResultElement user : userArrayDetails) {
-                user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + Utils.standardTimeFormat(toolCallRequest.getTimestamp()));
+                user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + toolCallRequest.getTimestampFormatted());
             }
             LOGGER.info("Start writing to db");
             db.writeJiraMembersBatch(userArrayDetails);
