@@ -131,21 +131,7 @@ Resources:
           KeyType: "RANGE"
       BillingMode: PAY_PER_REQUEST
       TableName: "Accounts"
-  DynamoDBCallTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: "company"
-          AttributeType: "S"
-        - AttributeName: "timestamp"
-          AttributeType: "S"
-      KeySchema:
-        - AttributeName: "company"
-          KeyType: "HASH"
-        - AttributeName: "timestamp"
-          KeyType: "RANGE"
-      BillingMode: PAY_PER_REQUEST
-      TableName: "Calls"
+
 Outputs:
   TableName:
     Value: !Ref 'DynamoDBConfigTable'
