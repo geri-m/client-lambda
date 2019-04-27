@@ -131,6 +131,21 @@ Resources:
           KeyType: "RANGE"
       BillingMode: PAY_PER_REQUEST
       TableName: "Accounts"
+  DynamoDBResultTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "companyTool"
+          AttributeType: "S"
+        - AttributeName: "ts"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "companyTool"
+          KeyType: "HASH"
+        - AttributeName: "ts"
+          KeyType: "RANGE"
+      BillingMode: PAY_PER_REQUEST
+      TableName: "Results"
 Outputs:
   TableName:
     Value: !Ref 'DynamoDBConfigTable'
