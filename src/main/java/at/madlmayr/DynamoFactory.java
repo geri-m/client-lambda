@@ -11,17 +11,16 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
-import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
-import com.amazonaws.services.dynamodbv2.model.DeleteTableRequest;
-import com.amazonaws.services.dynamodbv2.model.DeleteTableResult;
+import com.amazonaws.services.dynamodbv2.model.*;
 import com.amazonaws.xray.AWSXRay;
 import com.amazonaws.xray.handlers.TracingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DynamoFactory {
 
@@ -100,9 +99,31 @@ public class DynamoFactory {
             DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
                     .withHashKeyValues(query);
 
-            return new ArrayList<>();
-            // return mapper.query(ToolCallResult.class, queryExpression);
+            return mapper.query(ToolCallResult.class, queryExpression);
         }
+
+        public List<ToolCallResult> getAllToolCallResultUnfinished(final String company, final long batchTimeStamp) {
+            DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder()
+                    .withConsistentReads(DynamoDBMapperConfig.ConsistentReads.CONSISTENT)
+                    .withPaginationLoadingStrategy(DynamoDBMapperConfig.PaginationLoadingStrategy.EAGER_LOADING)
+                    .build();
+
+            // we create a dedicated mapper, as we need consistent reads.
+            DynamoDBMapper mapper = new DynamoDBMapper(db, mapperConfig);
+            ToolCallResult query = new ToolCallResult();
+            query.setCompany(company);
+            query.setTimestamp(batchTimeStamp);
+            // query.setAmountOfUsers(-1);
+
+            Map<String, AttributeValue> eav = new HashMap<>();
+            eav.put(":negativeUsers", new AttributeValue().withN("-1"));
+
+            DynamoDBQueryExpression<ToolCallResult> queryExpression = new DynamoDBQueryExpression<ToolCallResult>()
+                    .withHashKeyValues(query).withFilterExpression("amountOfUsers = :negativeUsers").withExpressionAttributeValues(eav).withConsistentRead(true);
+
+            return mapper.query(ToolCallResult.class, queryExpression);
+        }
+
 
         public CreateTableResult createTable(CreateTableRequest request) {
             return db.createTable(request);

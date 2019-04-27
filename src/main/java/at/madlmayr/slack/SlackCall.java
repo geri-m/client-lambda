@@ -60,16 +60,16 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
 
             ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
             db.writeCallResult(result);
-            LOGGER.info("current result {}", result.getKey());
+            LOGGER.info("current result {}, Users: {}", result.getKey(), result.getAmountOfUsers());
 
-            // also write the same element with Timestamp 0 into the DB, to indicate, this is the latest one.
-            result.setTimestamp(0L);
-            db.writeCallResult(result);
-
-            if (db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size() == toolCallRequest.getNumberOfToolsPerCompany()) {
+            List<ToolCallResult> unfinishedCalls = db.getAllToolCallResultUnfinished(toolCallRequest.getCompany(), toolCallRequest.getTimestamp());
+            if (unfinishedCalls.isEmpty()) {
                 LOGGER.info("All calls done");
             } else {
-                LOGGER.info("Still waiting for other Jobs");
+                LOGGER.info("Still waiting for other calls: {}", unfinishedCalls.size());
+                for (ToolCallResult unfinishedJob : unfinishedCalls) {
+                    LOGGER.info("calls '{}' still running", unfinishedJob.getTool());
+                }
             }
         } catch (IOException e) {
             LOGGER.error(e.getMessage());

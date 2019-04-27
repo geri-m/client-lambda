@@ -47,9 +47,14 @@ public class ReadConfig implements RequestStreamHandler {
                     toolCallRequest.setTimestamp(batchTimeStamp);
                     toolCallRequest.setNumberOfToolsPerCompany(requests.size());
                     LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getName());
+
+                    // writing empty record to database of Call Results; User Count it -1
+                    db.writeCallResult(new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), -1, toolCallRequest.getTimestamp(), requests.size()));
+
                     InvokeRequest req = new InvokeRequest()
                             .withFunctionName(ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getFunctionName())
                             .withPayload(objectMapper.writeValueAsString(toolCallRequest));
+
                     // Fire and Forget
                     lambda.invokeAsync(req);
                 } catch (Exception e) {

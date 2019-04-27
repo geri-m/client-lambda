@@ -51,8 +51,8 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             // https://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-req-resp.html
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallRequest.class);
 
-            JSONArray listElements = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
-            List<ArtifactoryListElement> userArray = objectMapper.readValue(listElements.toString(), new TypeReference<List<ArtifactoryListElement>>() {
+            JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
+            List<ArtifactoryListElement> userArray = objectMapper.readValue(users.toString(), new TypeReference<List<ArtifactoryListElement>>() {
             });
             LOGGER.info("Amount of Users: {} ", userArray.size());
 
@@ -73,19 +73,22 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             LOGGER.info("End writing to db");
 
             // Synchronizing the different Lambda Jobs
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), listElements.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
+            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
             db.writeCallResult(result);
-            LOGGER.info("current result {}", result.getKey());
+            LOGGER.info("current result {}, Users: {}", result.getKey(), result.getAmountOfUsers());
 
             // also write the same element with Timestamp 0 into the DB, to indicate, this is the latest one.
             result.setTimestamp(0L);
             db.writeCallResult(result);
 
-            int amountOfCallsFinished = db.getAllToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTimestamp()).size();
-            if (amountOfCallsFinished == toolCallRequest.getNumberOfToolsPerCompany()) {
+            List<ToolCallResult> unfinishedCalls = db.getAllToolCallResultUnfinished(toolCallRequest.getCompany(), toolCallRequest.getTimestamp());
+            if (unfinishedCalls.isEmpty()) {
                 LOGGER.info("All calls done");
             } else {
-                LOGGER.info("Still waiting for other Jobs");
+                LOGGER.info("Still waiting for other calls: {}", unfinishedCalls.size());
+                for (ToolCallResult unfinishedJob : unfinishedCalls) {
+                    LOGGER.info("calls '{}' still running", unfinishedJob.getTool());
+                }
             }
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
