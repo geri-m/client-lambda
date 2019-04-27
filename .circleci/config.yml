@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # Build Image Version is pinned in order to have Java 8
-      - image: softinstigate/maven-aws:v1.12.1
+      - image: softinstigate/maven-aws:v1.5.0
 
     working_directory: ~/repo
 
