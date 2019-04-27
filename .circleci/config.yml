@@ -6,8 +6,8 @@ version: 2
 jobs:
   build:
     docker:
-    # specify the version you desire here
-    - image: softinstigate/maven-aws:latest
+      # Build Image Version is pinned in order to have Java 8
+      - image: softinstigate/maven-aws:v1.12.1
 
     working_directory: ~/repo
 
@@ -25,8 +25,13 @@ jobs:
         # fallback to using the latest cache if no exact match is found
         - v1-dependencies-
 
-    # Make sure we have all dependencies
-    - run: mvn dependency:go-offline
+    - run:
+        name: Check Java and Maven Version
+        command: mvn -version
+
+    - run:
+        name: Make sure we have all dependencies
+        command: mvn dependency:go-offline
 
     - save_cache:
         paths:
@@ -48,7 +53,6 @@ jobs:
     - run: export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
     - run: export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
     - run: echo 'export AWS_DEFAULT_REGION="eu-central-1"' >> $BASH_ENV
-
 
     - run:
         name: "Create Bucket if not exist"
