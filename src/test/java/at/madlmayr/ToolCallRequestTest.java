@@ -3,6 +3,10 @@ package at.madlmayr;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -105,5 +109,18 @@ public class ToolCallRequestTest {
         assertTrue(thrown.getMessage().contains("Tool not present in Record"));
     }
 
+    @Test
+    public void testJodaIsoDateParsing() {
+        long input = System.currentTimeMillis();
+
+        DateTime jodaTime = new DateTime(input,
+                DateTimeZone.UTC);
+        DateTimeFormatter parser1 = ISODateTimeFormat.dateTime();
+
+        System.out.println("Input: " + input);
+        System.out.println("jodaTime: " + parser1.print(jodaTime));
+        System.out.println("parsed: " + parser1.parseDateTime(parser1.print(jodaTime)).getMillis());
+        assertThat(input).isEqualTo(parser1.parseDateTime(parser1.print(jodaTime)).getMillis());
+    }
 
 }

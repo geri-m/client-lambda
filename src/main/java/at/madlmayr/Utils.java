@@ -1,27 +1,23 @@
 package at.madlmayr;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 public class Utils {
 
-    private final static String PATTERN = "yyyy-MM-dd_HH:mm:ss.SSS";
-    private final static String TIME_ZONE = "Europe/Vienna";
+    // DynamoDb wants ISO/UTC: https://docs.aws.amazon.com/de_de/amazondynamodb/latest/developerguide/DynamoDBMapper.DataTypes.html
+    // https://en.wikipedia.org/wiki/ISO_8601
 
     public static String standardTimeFormat(final long time) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
-        return simpleDateFormat.format(time);
+        DateTime jodaTime = new DateTime(time, DateTimeZone.UTC);
+        DateTimeFormatter parser1 = ISODateTimeFormat.dateTime();
+        return parser1.print(jodaTime);
     }
 
     public static long parseStandardTime(final String timestamp) {
-        try {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN);
-            simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
-            return simpleDateFormat.parse(timestamp).getTime();
-        } catch (ParseException e) {
-            throw new ToolCallException(e);
-        }
+        DateTimeFormatter parser1 = ISODateTimeFormat.dateTime();
+        return parser1.parseDateTime(timestamp).getMillis();
     }
 }
