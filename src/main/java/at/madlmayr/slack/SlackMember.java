@@ -11,38 +11,34 @@ import java.io.Serializable;
 import java.net.URL;
 
 @DynamoDBTable(tableName = Account.TABLE_NAME)
-public class SlackMember implements Serializable {
+public class SlackMember implements Serializable, Account {
 
     private String companyToolTimestamp;
 
-    @DynamoDBHashKey(attributeName = Account.COLUMN_COMPANY_TOOL)
+    public SlackMember() {
+
+    }
+
+    @DynamoDBHashKey(attributeName = COLUMN_COMPANY_TOOL)
+    @Override
     public String getCompanyToolTimestamp() {
         return companyToolTimestamp;
     }
 
-    public void setCompanyToolTimestamp(String companyToolTimestamp) {
-        this.companyToolTimestamp = companyToolTimestamp;
-    }
-
-    @JsonProperty("id")
     private String id;
 
     @JsonProperty("team_id")
     private String teamId;
 
-    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("deleted")
     private boolean deleted;
 
-    @JsonProperty("color")
     private String color;
 
     @JsonProperty("real_name")
     private String realName;
 
-    @JsonProperty("tz")
     private String tz;
 
     @JsonProperty("tz_label")
@@ -72,16 +68,16 @@ public class SlackMember implements Serializable {
     @JsonProperty("is_app_user")
     private boolean appUser;
 
-    @JsonProperty("updated")
     private long updated;
 
-    @JsonProperty("profile")
     private SlackProfile profile;
 
-    public SlackMember() {
+    @Override
+    public void setCompanyToolTimestamp(String companyToolTimestamp) {
+        this.companyToolTimestamp = companyToolTimestamp;
     }
 
-    @DynamoDBRangeKey(attributeName = Account.COLUMN_ID)
+    @DynamoDBRangeKey(attributeName = COLUMN_ID)
     public String getId() {
         return id;
     }
@@ -98,6 +94,7 @@ public class SlackMember implements Serializable {
         this.teamId = teamId;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -226,16 +223,23 @@ public class SlackMember implements Serializable {
         this.profile = profile;
     }
 
+    @Override
+    public String getEmail() {
+        return profile.getEmail();
+    }
+
+    public void setEmail(final String email) {
+        profile.setEmail(email);
+    }
+
+
     @DynamoDBDocument
     public static class SlackProfile implements Serializable {
 
-        @JsonProperty("title")
         private String title;
 
-        @JsonProperty("phone")
         private String phone;
 
-        @JsonProperty("skype")
         private String skype;
 
         @JsonProperty("real_name")

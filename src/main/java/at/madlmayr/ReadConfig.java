@@ -48,7 +48,7 @@ public class ReadConfig implements RequestStreamHandler {
                     toolCallRequest.setNumberOfToolsPerCompany(requests.size());
                     LOGGER.info("Tool: '{}'", ToolEnum.valueOf(toolCallRequest.getTool().toUpperCase()).getName());
 
-                    // writing empty record to database of Call Results; User Count it -1
+                    // writing empty record to database of WriteAccountsToDb Results; User Count it -1
                     db.writeCallResult(new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), -1, toolCallRequest.getTimestamp(), requests.size()));
 
                     InvokeRequest req = new InvokeRequest()

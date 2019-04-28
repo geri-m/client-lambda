@@ -1,17 +1,9 @@
 package at.madlmayr;
 
-import org.apache.http.client.config.RequestConfig;
+import java.util.List;
 
-public class Call {
+public interface Call<T extends Account> {
 
-    private static int TIMEOUT_IN_MS = 5000;
-
-    public static RequestConfig getRequestConfig() {
-        RequestConfig.Builder requestBuilder = RequestConfig.custom();
-        requestBuilder.setConnectTimeout(TIMEOUT_IN_MS);
-        requestBuilder.setConnectionRequestTimeout(TIMEOUT_IN_MS);
-        requestBuilder.setSocketTimeout(TIMEOUT_IN_MS);
-        return requestBuilder.build();
-    }
+    void writeStuffToDatabase(final List<T> userList, final ToolCallConfig toolCallRequest);
 
 }

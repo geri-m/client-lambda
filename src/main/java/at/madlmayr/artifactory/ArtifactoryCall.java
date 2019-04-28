@@ -24,22 +24,21 @@ import java.util.List;
 public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
 
     private final static Logger LOGGER = LogManager.getLogger(ArtifactoryCall.class);
-    private final DynamoFactory.DynamoAbstraction db;
+    private final Call<ArtifactoryUser> call;
     private final CloseableHttpClient httpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     public ArtifactoryCall() {
-        db = new DynamoFactory().create();
+        call = new WriteAccountsToDb<>();
         // We use XRay, hence the {@link HttpClients.createDefault();} is not used
-
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(WriteAccountsToDb.getRequestConfig()).build();
     }
 
     public ArtifactoryCall(int port) {
-        db = new DynamoFactory().create(port);
+        call = new WriteAccountsToDb<>(port);
         // We use XRay, hence the {@link HttpClients.createDefault();} is not used
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(WriteAccountsToDb.getRequestConfig()).build();
     }
 
     @Override
@@ -61,35 +60,9 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
             // 2) Not much mor expensive than Sync all (yes, 100 % is something, but its cents)
             // 3) less effort for testing.
             JSONArray detailUsers = doClientCallsSync(userArray, toolCallRequest.getBearer());
-            List<ArtifactoryUser> userArrayDetails = objectMapper.readValue(detailUsers.toString(), new TypeReference<List<ArtifactoryUser>>() {
+            List<ArtifactoryUser> userList = objectMapper.readValue(detailUsers.toString(), new TypeReference<List<ArtifactoryUser>>() {
             });
-            LOGGER.info("Amount of Detailed Users: {} ", userArrayDetails.size());
-
-            for (ArtifactoryUser user : userArrayDetails) {
-                user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + toolCallRequest.getTimestampFormatted());
-            }
-            LOGGER.info("Start writing to db");
-            db.writeArtifactoryMembersBatch(userArrayDetails);
-            LOGGER.info("End writing to db");
-
-            // Synchronizing the different Lambda Jobs
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
-            db.writeCallResult(result);
-            LOGGER.info("current result {}, Users: {}", result.getKey(), result.getAmountOfUsers());
-
-            // also write the same element with Timestamp 0 into the DB, to indicate, this is the latest one.
-            result.setTimestamp(0L);
-            db.writeCallResult(result);
-
-            List<ToolCallResult> unfinishedCalls = db.getAllToolCallResultUnfinished(toolCallRequest.getCompany(), toolCallRequest.getTimestamp());
-            if (unfinishedCalls.isEmpty()) {
-                LOGGER.info("All calls done");
-            } else {
-                LOGGER.info("Still waiting for other calls: {}", unfinishedCalls.size());
-                for (ToolCallResult unfinishedJob : unfinishedCalls) {
-                    LOGGER.info("calls '{}' still running", unfinishedJob.getTool());
-                }
-            }
+            call.writeStuffToDatabase(userList, toolCallRequest);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
@@ -107,10 +80,10 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             String jsonString = EntityUtils.toString(response.getEntity());
             if ((response.getStatusLine().getStatusCode() / 100) == 2) {
-                LOGGER.info("HTTP Call to '{}' was successful (fetching list of Users)", url);
+                LOGGER.info("HTTP WriteAccountsToDb to '{}' was successful (fetching list of Users)", url);
                 return new JSONArray(jsonString);
             } else {
-                throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
+                throw new ToolCallException(String.format("WriteAccountsToDb to '%s' was not successful. Ended with response: '%s'", url, jsonString));
             }
         } catch (IOException ioe) {
             throw new ToolCallException(ioe);
@@ -128,7 +101,7 @@ public class ArtifactoryCall implements RequestStreamHandler, ToolCall {
                     String jsonStringForUser = EntityUtils.toString(responseForUser.getEntity());
                     userDetailList.put(new JSONObject(jsonStringForUser));
                 } else {
-                    LOGGER.error("Failed to to Detailed User Call using URL '{}'", uri);
+                    LOGGER.error("Failed to to Detailed User WriteAccountsToDb using URL '{}'", uri);
                 }
             } catch (IOException e) {
                 LOGGER.error(e.getLocalizedMessage());

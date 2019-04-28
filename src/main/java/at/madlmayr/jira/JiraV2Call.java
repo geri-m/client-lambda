@@ -39,18 +39,18 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
     public static final char[] SEARCH_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
     private static final Logger LOGGER = LogManager.getLogger(JiraV2Call.class);
-    private final DynamoFactory.DynamoAbstraction db;
+    private final Call<JiraSearchResultElement> call;
     private final CloseableHttpClient httpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public JiraV2Call() {
-        db = new DynamoFactory().create();
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
+        call = new WriteAccountsToDb<>();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(WriteAccountsToDb.getRequestConfig()).build();
     }
 
     public JiraV2Call(int port) {
-        db = new DynamoFactory().create(port);
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
+        call = new WriteAccountsToDb<>(port);
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(WriteAccountsToDb.getRequestConfig()).build();
     }
 
     @Override
@@ -61,36 +61,9 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
             // https://docs.aws.amazon.com/lambda/latest/dg/java-programming-model-req-resp.html
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallConfig.class);
             JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
-
-            List<JiraSearchResultElement> userArrayDetails = objectMapper.readValue(users.toString(), new TypeReference<List<JiraSearchResultElement>>() {
+            List<JiraSearchResultElement> userList = objectMapper.readValue(users.toString(), new TypeReference<List<JiraSearchResultElement>>() {
             });
-            LOGGER.info("Amount of Users: {} ", userArrayDetails.size());
-
-            for (JiraSearchResultElement user : userArrayDetails) {
-                user.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + toolCallRequest.getTimestampFormatted());
-            }
-            LOGGER.info("Start writing to db");
-            db.writeJiraMembersBatch(userArrayDetails);
-            LOGGER.info("End writing to db");
-
-            // Synchronizing the different Lambda Jobs
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
-            db.writeCallResult(result);
-            LOGGER.info("current result {}, Users: {}", result.getKey(), result.getAmountOfUsers());
-
-            // also write the same element with Timestamp 0 into the DB, to indicate, this is the latest one.
-            result.setTimestamp(0L);
-            db.writeCallResult(result);
-
-            List<ToolCallResult> unfinishedCalls = db.getAllToolCallResultUnfinished(toolCallRequest.getCompany(), toolCallRequest.getTimestamp());
-            if (unfinishedCalls.isEmpty()) {
-                LOGGER.info("All calls done");
-            } else {
-                LOGGER.info("Still waiting for other calls: {}", unfinishedCalls.size());
-                for (ToolCallResult unfinishedJob : unfinishedCalls) {
-                    LOGGER.info("calls '{}' still running", unfinishedJob.getTool());
-                }
-            }
+            call.writeStuffToDatabase(userList, toolCallRequest);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
@@ -150,7 +123,7 @@ public class JiraV2Call implements RequestStreamHandler, ToolCall {
                         }
                     }
                 } else {
-                    throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
+                    throw new ToolCallException(String.format("WriteAccountsToDb to '%s' was not successful. Ended with response: '%s'", url, jsonString));
                 }
             } catch (IOException ioe) {
                 throw new ToolCallException(ioe);

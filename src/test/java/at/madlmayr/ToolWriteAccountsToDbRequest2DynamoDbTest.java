@@ -14,9 +14,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ToolCallRequest2DynamoDbTest {
+public class ToolWriteAccountsToDbRequest2DynamoDbTest {
 
-    private static final Logger LOGGER = LogManager.getLogger(ToolCallRequest2DynamoDbTest.class);
+    private static final Logger LOGGER = LogManager.getLogger(ToolWriteAccountsToDbRequest2DynamoDbTest.class);
     private static LocalDynamoDbServer localDynamoDbServer;
     private static final String FAKE_COMPANY_1 = "gma";
     private static final String FAKE_COMPANY_2 = "another";

@@ -84,18 +84,18 @@ public class JiraDataPseudonymizer {
             member.setDisplayName(replaceFirstName + " " + replaceLastName);
 
 
-            if (member.getEmailAddress() != null && member.getEmailAddress().contains("@")) {
+            if (member.getEmail() != null && member.getEmail().contains("@")) {
 
                 String email;
-                if (member.getEmailAddress().split("@").length == 1) {
-                    LOGGER.info("Email {}", member.getEmailAddress());
+                if (member.getEmail().split("@").length == 1) {
+                    LOGGER.info("Email {}", member.getEmail());
                     email = (replaceFirstName + "." + replaceLastName).toLowerCase() + "@demo.info";
                 } else {
-                    email = (replaceFirstName + "." + replaceLastName).toLowerCase() + "@" + member.getEmailAddress().split("@")[1];
+                    email = (replaceFirstName + "." + replaceLastName).toLowerCase() + "@" + member.getEmail().split("@")[1];
                 }
-                member.setEmailAddress(email);
+                member.setEmail(email);
             } else {
-                LOGGER.warn("No Email given: {}", member.getEmailAddress());
+                LOGGER.warn("No Email given: {}", member.getEmail());
             }
 
         }

@@ -1,8 +1,5 @@
 package at.madlmayr;
 
-import at.madlmayr.artifactory.ArtifactoryUser;
-import at.madlmayr.jira.JiraSearchResultElement;
-import at.madlmayr.slack.SlackMember;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -50,15 +47,7 @@ public class DynamoFactory {
             return mapper;
         }
 
-        public void writeSlackMembersBatch(final List<SlackMember> members) {
-            mapper.batchWrite(members, new ArrayList<>());
-        }
-
-        public void writeArtifactoryMembersBatch(final List<ArtifactoryUser> members) {
-            mapper.batchWrite(members, new ArrayList<>());
-        }
-
-        public void writeJiraMembersBatch(final List<JiraSearchResultElement> members) {
+        public void writeMembersBatch(final List members) {
             mapper.batchWrite(members, new ArrayList<>());
         }
 

@@ -1,11 +1,13 @@
 package at.madlmayr;
 
-import at.madlmayr.slack.SlackCall;
-import at.madlmayr.slack.SlackMember;
-import at.madlmayr.slack.SlackResponse;
+import at.madlmayr.artifactory.ArtifactoryCall;
+import at.madlmayr.artifactory.ArtifactoryListElement;
+import at.madlmayr.artifactory.ArtifactoryUser;
+import at.madlmayr.tools.ArtifactoryListElementWithUser;
 import at.madlmayr.tools.FileUtils;
 import at.madlmayr.tools.LocalDynamoDbServer;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -19,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +31,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SlackCallTest {
+public class ArtifactoryWriteAccountsToDbTest {
 
     // @Rule
     // public static WireMockRule wireMockServer = new WireMockRule(wireMockConfig().dynamicPort().dynamicHttpsPort());
@@ -62,56 +66,73 @@ public class SlackCallTest {
     }
 
 
-    public static SlackResponse initWiremock(String fileName) throws Exception {
+    public static List<ArtifactoryListElementWithUser> initWiremock(String filename, int wiremockPort) throws Exception {
+        String response = FileUtils.readFromFile(filename);
         ObjectMapper localMapper = new ObjectMapper();
-        String response = FileUtils.readFromFile(fileName);
 
-        SlackResponse responseFromFile = localMapper.readValue(response, SlackResponse.class);
+        List<ArtifactoryListElement> list = new ArrayList<>();
+        List<ArtifactoryListElementWithUser> responseFromFile = localMapper.readValue(response, new TypeReference<List<ArtifactoryListElementWithUser>>() {
+        });
+        for (ArtifactoryListElementWithUser user : responseFromFile) {
+            URL originalUrl = new URL(user.getListElement().getUri());
+            URL newUrl = new URL(originalUrl.getProtocol(), originalUrl.getHost(), wiremockPort, originalUrl.getFile());
+            user.getListElement().setUri(newUrl.toString());
 
-        // WireMock.reset();
-        stubFor(get(urlEqualTo("/api/users.list/"))
+            // put each user into wiremock
+            stubFor(get(urlEqualTo(newUrl.getPath()))
+                    .willReturn(aResponse()
+                            .withStatus(200)
+                            .withHeader("Content-Type", "application/json; charset=utf-8")
+                            .withBody(localMapper.writeValueAsString(user.getUser()))));
+
+            list.add(user.getListElement());
+        }
+
+        // Put the whole user List into Wiremock
+        stubFor(get(urlEqualTo("/gma/api/security/users"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json; charset=utf-8")
-                        .withBody(response)));
+                        .withBody(localMapper.writeValueAsString(list))));
 
         return responseFromFile;
     }
-
 
     @Test
     public void userListTest() throws Exception {
         WireMock.reset();
 
         Set<String> memberIds = new HashSet<>();
-        for (SlackMember m : initWiremock("/slack_01.json").getMembers()) {
-            memberIds.add(m.getId());
+        for (ArtifactoryListElementWithUser user : initWiremock("/artifactory_01.json", wireMockServer.port())) {
+            memberIds.add(user.getUser().getName());
         }
 
-        ToolCallConfig slack = new ToolCallConfig(new String[]{"gma", ToolEnum.SLACK.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/api/users.list/"}, 1L, 1);
-        RequestStreamHandler call = new SlackCall(localDynamoDbServer.getPort());
+        ToolCallConfig slack = new ToolCallConfig(new String[]{"gma", ToolEnum.ARTIFACTORY.getName(), "sometoken", "http://localhost:" + wireMockServer.port() + "/gma/api/security/users"}, 1L, 1);
+        RequestStreamHandler call = new ArtifactoryCall(localDynamoDbServer.getPort());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream targetStream = new ByteArrayInputStream(new JSONObject(slack).toString().getBytes());
         call.handleRequest(targetStream, outputStream, null);
 
-        List<ToolCallResult> resultList = localDynamoDbServer.getAllToolCallResult("gma", ToolEnum.SLACK, 1L);
+        List<ToolCallResult> resultList = localDynamoDbServer.getAllToolCallResult("gma", ToolEnum.ARTIFACTORY, 1L);
         assertThat(resultList.size()).isEqualTo(2);
-        assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(163);
-        assertThat(resultList.get(1).getAmountOfUsers()).isEqualTo(163);
+        assertThat(resultList.get(0).getAmountOfUsers()).isEqualTo(103);
+        assertThat(resultList.get(1).getAmountOfUsers()).isEqualTo(103);
 
-        List<ToolCallResult> resultListLatest = localDynamoDbServer.getLatestToolCallResult("gma", ToolEnum.SLACK);
+        List<ToolCallResult> resultListLatest = localDynamoDbServer.getLatestToolCallResult("gma", ToolEnum.ARTIFACTORY);
         assertThat(resultListLatest.size()).isEqualTo(1);
-        assertThat(resultListLatest.get(0).getAmountOfUsers()).isEqualTo(163);
+        assertThat(resultListLatest.get(0).getAmountOfUsers()).isEqualTo(103);
         assertThat(resultListLatest.get(0).getTimestampFormatted()).isEqualTo("1970-01-01T00:00:00.000Z");
 
-        List<SlackMember> itemList = localDynamoDbServer.getSlackMemberListByCompanyToolTimestamp("gma#" + ToolEnum.SLACK.getName() + "#1970-01-01T00:00:00.001Z");
+        List<ArtifactoryUser> artifactoryUserList = localDynamoDbServer.getArtifactoryUserListByCompanyToolTimestamp("gma#" + ToolEnum.ARTIFACTORY.getName() + "#1970-01-01T00:00:00.001Z");
 
-        for (SlackMember m : itemList) {
-            assertThat(memberIds.contains(m.getId()));
-            memberIds.remove(m.getId());
+        for (ArtifactoryUser artifactoryUser : artifactoryUserList) {
+            assertThat(memberIds.contains(artifactoryUser.getName()));
+            memberIds.remove(artifactoryUser.getName());
         }
 
         assertThat(memberIds.size()).isEqualTo(0);
-        assertThat(itemList.size()).isEqualTo(163);
+        assertThat(artifactoryUserList.size()).isEqualTo(103);
+
     }
+
 }

@@ -1,63 +1,57 @@
 package at.madlmayr.artifactory;
 
 import at.madlmayr.Account;
-import com.amazonaws.services.dynamodbv2.datamodeling.*;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 import java.io.Serializable;
 
 @DynamoDBTable(tableName = Account.TABLE_NAME)
-public class ArtifactoryUser implements Serializable {
+public class ArtifactoryUser implements Serializable, Account {
 
     private String companyToolTimestamp;
 
-    @DynamoDBHashKey(attributeName = Account.COLUMN_COMPANY_TOOL)
+    @DynamoDBHashKey(attributeName = COLUMN_COMPANY_TOOL)
+    @Override
     public String getCompanyToolTimestamp() {
         return companyToolTimestamp;
     }
 
+    @Override
     public void setCompanyToolTimestamp(String companyToolTimestamp) {
         this.companyToolTimestamp = companyToolTimestamp;
     }
 
-    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("email")
     private String email;
 
-    @JsonProperty("admin")
     private boolean admin;
 
-    @JsonProperty("profileUpdatable")
     private boolean profileUpdatable;
 
-    @JsonProperty("internalPasswordDisabled")
     private boolean internalPasswordDisabled;
 
-    @JsonProperty("groups")
     private String[] groups;
 
-    @JsonProperty("lastLoggedIn")
     private String lastLoggedIn;
 
-    @JsonProperty("lastLoggedInMillis")
     private long lastLoggedInMillis;
 
-    @JsonProperty("offlineMode")
     private boolean offlineMode;
 
-    @JsonProperty("disableUIAccess")
     private boolean disableUIAccess;
 
-    @JsonProperty("realm")
     private String realm;
 
     public ArtifactoryUser() {
     }
 
 
-    @DynamoDBRangeKey(attributeName = Account.COLUMN_ID)
+    @DynamoDBRangeKey(attributeName = COLUMN_ID)
+    @Override
     public String getName() {
         return name;
     }
@@ -66,7 +60,7 @@ public class ArtifactoryUser implements Serializable {
         this.name = name;
     }
 
-    @DynamoDBAttribute(attributeName = "email")
+    @Override
     public String getEmail() {
         return email;
     }

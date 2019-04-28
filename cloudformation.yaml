@@ -20,7 +20,7 @@ Resources:
       CodeUri: target/client-lambda.jar
       Handler: 'at.madlmayr.slack.SlackCall::handleRequest'
       Runtime: java8
-      Description: "Slack Call"
+      Description: "Slack WriteAccountsToDb"
       MemorySize: 256
       Timeout: 60
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -32,7 +32,7 @@ Resources:
       CodeUri: target/client-lambda.jar
       Handler: 'at.madlmayr.artifactory.ArtifactoryCall::handleRequest'
       Runtime: java8
-      Description: "Artifactory Call"
+      Description: "Artifactory WriteAccountsToDb"
       MemorySize: 256
       Timeout: 60
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -44,7 +44,7 @@ Resources:
       CodeUri: target/client-lambda.jar
       Handler: 'at.madlmayr.jira.JiraV2Call::handleRequest'
       Runtime: java8
-      Description: "JiraV2Call Call"
+      Description: "JiraV2Call WriteAccountsToDb"
       MemorySize: 256
       Timeout: 180
       Role: !GetAtt LambdaExecutionRole.Arn

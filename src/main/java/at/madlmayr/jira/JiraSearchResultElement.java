@@ -10,33 +10,39 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 @DynamoDBTable(tableName = Account.TABLE_NAME)
-public class JiraSearchResultElement implements Serializable {
+public class JiraSearchResultElement implements Serializable, Account {
+
+    @JsonProperty("emailAddress")
+    private String email;
 
     private String companyToolTimestamp;
-    @JsonProperty("self")
+
     private String self;
-    @JsonProperty("key")
+
     private String key;
-    @JsonProperty("name")
+
     private String name;
-    @JsonProperty("emailAddress")
-    private String emailAddress;
-    @JsonProperty("avatarUrls")
+
+    public JiraSearchResultElement() {
+    }
+
     private AvatarUrls avatarUrls;
-    @JsonProperty("displayName")
+
     private String displayName;
-    @JsonProperty("active")
+
     private boolean active;
-    @JsonProperty("timeZone")
+
     private String timeZone;
-    @JsonProperty("locale")
+
     private String locale;
 
-    @DynamoDBHashKey(attributeName = Account.COLUMN_COMPANY_TOOL)
+    @DynamoDBHashKey(attributeName = COLUMN_COMPANY_TOOL)
+    @Override
     public String getCompanyToolTimestamp() {
         return companyToolTimestamp;
     }
 
+    @Override
     public void setCompanyToolTimestamp(String companyToolTimestamp) {
         this.companyToolTimestamp = companyToolTimestamp;
     }
@@ -49,7 +55,7 @@ public class JiraSearchResultElement implements Serializable {
         this.self = self;
     }
 
-    @DynamoDBRangeKey(attributeName = Account.COLUMN_ID)
+    @DynamoDBRangeKey(attributeName = COLUMN_ID)
     public String getKey() {
         return key;
     }
@@ -58,7 +64,7 @@ public class JiraSearchResultElement implements Serializable {
         this.key = key;
     }
 
-
+    @Override
     public String getName() {
         return name;
     }
@@ -68,14 +74,14 @@ public class JiraSearchResultElement implements Serializable {
         this.name = name;
     }
 
-
-    public String getEmailAddress() {
-        return emailAddress;
+    @Override
+    public String getEmail() {
+        return email;
     }
 
 
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 
@@ -138,7 +144,7 @@ public class JiraSearchResultElement implements Serializable {
         }
 
         // if search string is in one of the email components
-        String[] emailComponents = getEmailAddress().split("\\.|@");
+        String[] emailComponents = getEmail().split("\\.|@");
 
         for (String component : emailComponents) {
             if (component.toLowerCase().startsWith(lowerCaseSearchString)) {

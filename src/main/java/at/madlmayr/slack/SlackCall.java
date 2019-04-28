@@ -24,19 +24,18 @@ import java.util.List;
 public class SlackCall implements RequestStreamHandler, ToolCall {
 
     private static final Logger LOGGER = LogManager.getLogger(SlackCall.class);
-    private final DynamoFactory.DynamoAbstraction db;
     private final CloseableHttpClient httpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final Call<SlackMember> call;
 
     public SlackCall() {
-        db = new DynamoFactory().create();
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
+        call = new WriteAccountsToDb<>();
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(WriteAccountsToDb.getRequestConfig()).build();
     }
 
     public SlackCall(int port) {
-        db = new DynamoFactory().create(port);
-        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(Call.getRequestConfig()).build();
+        call = new WriteAccountsToDb<>(port);
+        httpClient = HttpClientBuilder.create().setRecorder(AWSXRay.getGlobalRecorder()).setDefaultRequestConfig(WriteAccountsToDb.getRequestConfig()).build();
     }
 
 
@@ -45,36 +44,10 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
         ToolCallConfig toolCallRequest;
         try {
             toolCallRequest = objectMapper.readValue(inputStream, ToolCallConfig.class);
-
             JSONArray users = processCall(toolCallRequest.getUrl(), toolCallRequest.getBearer());
             List<SlackMember> userList = objectMapper.readValue(users.toString(), new TypeReference<List<SlackMember>>() {
             });
-            LOGGER.info("Amount of Users: {} ", userList.size());
-            for (SlackMember member : userList) {
-                member.setCompanyToolTimestamp(toolCallRequest.getCompany() + "#" + toolCallRequest.getTool() + "#" + toolCallRequest.getTimestampFormatted());
-                member.setId(member.getId());
-            }
-            LOGGER.info("Start writing to db");
-            db.writeSlackMembersBatch(userList);
-            LOGGER.info("End writing to db");
-
-            ToolCallResult result = new ToolCallResult(toolCallRequest.getCompany(), toolCallRequest.getTool(), users.length(), toolCallRequest.getTimestamp(), toolCallRequest.getNumberOfToolsPerCompany());
-            db.writeCallResult(result);
-            LOGGER.info("current result {}, Users: {}", result.getKey(), result.getAmountOfUsers());
-
-            // also write the same element with Timestamp 0 into the DB, to indicate, this is the latest one.
-            result.setTimestamp(0L);
-            db.writeCallResult(result);
-
-            List<ToolCallResult> unfinishedCalls = db.getAllToolCallResultUnfinished(toolCallRequest.getCompany(), toolCallRequest.getTimestamp());
-            if (unfinishedCalls.isEmpty()) {
-                LOGGER.info("All calls done");
-            } else {
-                LOGGER.info("Still waiting for other calls: {}", unfinishedCalls.size());
-                for (ToolCallResult unfinishedJob : unfinishedCalls) {
-                    LOGGER.info("calls '{}' still running", unfinishedJob.getTool());
-                }
-            }
+            call.writeStuffToDatabase(userList, toolCallRequest);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
             AWSXRay.getGlobalRecorder().getCurrentSegment().addException(e);
@@ -90,10 +63,10 @@ public class SlackCall implements RequestStreamHandler, ToolCall {
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             String jsonString = EntityUtils.toString(response.getEntity());
             if ((response.getStatusLine().getStatusCode() / 100) == 2) {
-                LOGGER.info("HTTP Call to '{}' was successful", url);
+                LOGGER.info("HTTP WriteAccountsToDb to '{}' was successful", url);
                 return new JSONObject(jsonString).getJSONArray("members");
             } else {
-                throw new ToolCallException(String.format("Call to '%s' was not successful. Ended with response: '%s'", url, jsonString));
+                throw new ToolCallException(String.format("WriteAccountsToDb to '%s' was not successful. Ended with response: '%s'", url, jsonString));
             }
         } catch (IOException ioe) {
             throw new ToolCallException(ioe);

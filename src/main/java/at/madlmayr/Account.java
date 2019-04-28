@@ -1,8 +1,17 @@
 package at.madlmayr;
 
-public class Account {
+public interface Account {
 
-    public static final String TABLE_NAME = "Accounts";
-    public static final String COLUMN_COMPANY_TOOL = "companyToolTimestamp";
-    public static final String COLUMN_ID = "id";
+    String TABLE_NAME = "Accounts";
+    String COLUMN_COMPANY_TOOL = "companyToolTimestamp";
+    String COLUMN_ID = "id";
+
+    String getCompanyToolTimestamp();
+
+    void setCompanyToolTimestamp(final String ts);
+
+    String getName();
+
+    String getEmail();
+
 }
